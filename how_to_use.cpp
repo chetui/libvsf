@@ -38,7 +38,7 @@ void myscheduler(std::vector<VM> &vms)
                 //static
                 framework.node_num();
                 framework.node_ids();
-                framework.node_id(core_id); //core_id is a vector<int>(2). It is combined with node_id & core_id.
+                framework.node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
                 framework.node_id(hpthread_id);
                 framework.core_num();
                 framework.core_num(node_id);
@@ -59,6 +59,10 @@ void myscheduler(std::vector<VM> &vms)
                 //dynamic
                 framework.cpu_reuse_ratio();
                 framework.cpu_reuse_ratio(node_id);
+                framework.cpu_usage();
+                framework.cpu_usage(node_id);
+                framework.cpu_usage(core_id);
+                framework.cpu_usage(hpthread_id);
                 framework.used_mem_size();
                 framework.used_mem_size(node_id);
 
@@ -66,19 +70,19 @@ void myscheduler(std::vector<VM> &vms)
 
                 //static
                 vm.vm_id();
-                //vm.vnode_num(); //vNUMA
-                //vm.vnode_ids(); //vNUMA
+                vm.vnode_num(); //vNUMA
+                vm.vnode_ids(); //vNUMA
                 vm.vcpu_num();
                 vm.vcpu_ids();
-                //vm.vcpu_ids(vnode_id); //vNUMA
+                vm.vcpu_ids(vnode_id); //vNUMA
                 vm.vmthread_num();
                 vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
                 vm.total_mem_size();
-                vm.mem_mode(); //memory mode is static currently, since it is hard to implement dynamicly
-                vm.bound_mem_node_ids();
+                vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
+                vm.bindinfo_mem_node_ids();
 
                 //dynamic
-                //vm.bindinfo_node(vnode_id); //vNUMA
+                vm.bindinfo_mem_node_id(vnode_id); //vNUMA
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id) 
                 vm.bindinfo_hpthread_ids(vmthread_id) 
@@ -98,7 +102,7 @@ void myscheduler(std::vector<VM> &vms)
                 framework.set_vcpu_mig(vmthread_id, hpthread_ids);
                 framework.set_mem_mig(vm_id, node_ids);
                 framework.set_mem_mig(vm_id, node_ids, addr_start, page_size);
-                //framework.set_mem_mig(vnode_id, node_id); //vNUMA
+                framework.set_mem_mig(vnode_id, node_id); //vNUMA
     }
 
     return;
