@@ -33,9 +33,7 @@ void myscheduler(std::vector<VM> &vms)
     {
         //INPUT: available info
 
-            //hardware
-
-                //static
+            //<<hardware static info>>
                 framework.node_num();
                 framework.node_ids();
                 framework.node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
@@ -56,7 +54,7 @@ void myscheduler(std::vector<VM> &vms)
                 framework.node_dist();
                 framework.node_dist(node_id_0, node_id_1);
 
-                //dynamic
+            //<<hardware dynamic info>>
                 framework.cpu_reuse_ratio();
                 framework.cpu_reuse_ratio(node_id);
                 framework.cpu_usage();
@@ -66,9 +64,7 @@ void myscheduler(std::vector<VM> &vms)
                 framework.used_mem_size();
                 framework.used_mem_size(node_id);
 
-            //VM
-
-                //static
+            //<<VM static info>>
                 vm.vm_id();
                 vm.vnode_num(); //vNUMA
                 vm.vnode_ids(); //vNUMA
@@ -81,7 +77,7 @@ void myscheduler(std::vector<VM> &vms)
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
                 vm.bindinfo_mem_node_ids();
 
-                //dynamic
+            //<<VM dynamic info>>
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id) 
