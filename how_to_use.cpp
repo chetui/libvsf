@@ -1,19 +1,19 @@
 #include <vector>
-#include "framework.h"
+#include "vsf.h"
 
-Framework framework;
+VSF framework;
 
 int main()
 {
     //set some flags to enable optional function
-    //and refresh Hardware Static Info
+    //and refresh <<Hardware Static Info>>
     framework.init(ACCU_NODE_DIST | MISS_RATE | MEM_ADDR | MEM_DISTR);
     
     while(1) {
 
-        //refresh VM Static Info
+        //refresh <<VM Static Info>>
         std::vector<VM> vms = framework.vms();
-        //update_info would refresh Hardware & VM Dynamic Info
+        //update_info would refresh <<Hardware & VM Dynamic Info>>
         framework.update_info(vms);
 
         //your scheduler algorithm
@@ -23,6 +23,8 @@ int main()
 
         sleep(1); 
     }
+
+    return 0;
 }
 
 void myscheduler(std::vector<VM> &vms)
@@ -36,48 +38,65 @@ void myscheduler(std::vector<VM> &vms)
                 //static
                 framework.node_num();
                 framework.node_ids();
-                framework.cpu_num();
-                framework.cpu_num(nodeid);
-                framework.cpu_ids();
-                framework.cpu_ids(nodeid);
+                framework.core_num();
+                framework.core_num(node_id);
+                framework.core_ids();
+                framework.core_ids(node_id);
+                framework.hpthread_num();
+                framework.hpthread_num(node_id);
+                framework.hpthread_num(core_id);
+                framework.hpthread_ids();
+                framework.hpthread_ids(node_id);
+                framework.hpthread_ids(core_id);
                 framework.total_mem_size();
-                framework.total_mem_size(nodeid);
+                framework.total_mem_size(node_id);
                 framework.node_dist();
-                framework.node_dist(nodeid0, nodeid1);
+                framework.node_dist(node_id_0, node_id_1);
 
                 //dynamic
                 framework.cpu_reuse_ratio();
-                framework.cpu_reuse_ratio(nodeid);
+                framework.cpu_reuse_ratio(node_id);
                 framework.used_mem_size();
-                framework.used_mem_size(nodeid);
+                framework.used_mem_size(node_id);
 
             //VM
 
                 //static
+                vm.vm_id();
                 //vm.vnode_num(); //vNUMA
                 //vm.vnode_ids(); //vNUMA
                 vm.vcpu_num();
-                //vm.vcpu_ids(); //vNUMA
-                //vm.vcpu_ids(vnodeid); //vNUMA
+                vm.vcpu_ids();
+                //vm.vcpu_ids(vnode_id); //vNUMA
+                vm.vmthread_num();
+                vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
                 vm.total_mem_size();
                 vm.mem_mode(); //memory mode is static currently, since it is hard to implement dynamicly
                 vm.bound_mem_node_ids();
 
                 //dynamic
-                //vm.bound_node(vnodeid); //vNUMA
-                //vm.bound_cpu_ids(vcpuid) //vNUMA
-                vm.bound_cpu_ids();
+                //vm.bound_node(vnode_id); //vNUMA
+                vm.bound_hpthread_ids();
+                vm.bound_hpthread_ids(vcpu_id) 
+                vm.bound_hpthread_ids(vmthread_id) 
                 vm.cpu_usage();
+                vm.cpu_usage(vcpu_id);
+                vm.cpu_usage(vmthread_id);
                 vm.miss_rate(MISS_RATE_TYPE);
+                vm.miss_rate(MISS_RATE_TYPE, vcpu_id);
+                vm.miss_rate(MISS_RATE_TYPE, vmthread_id);
                 vm.mem_sample(); //sample the latest visited page addr
                 vm.used_mem_size();
-                vm.used_mem_size(nodeid);
+                vm.used_mem_size(node_id);
 
         //OUTPUT: decide scheduling strategy
 
-                //framework.set_vcpu_mig(vcpu_id, cpu_ids); //vNUMA
-                framework.set_vcpu_mig(vm, vcpu_node_ids);
-                framework.set_mem_mig(vm, mem_node_ids);
-                framework.set_mem_mig(vm, mem_node_ids[vm], mem_addr_start, mem_page_size);
+                framework.set_vcpu_mig(vcpu_id, hpthread_ids);
+                framework.set_vcpu_mig(vmthread_id, hpthread_ids);
+                framework.set_mem_mig(vm_id, node_ids);
+                framework.set_mem_mig(vm_id, node_ids, addr_start, page_size);
+                //framework.set_mem_mig(vnode_id, node_id); //vNUMA
     }
+
+    return;
 }
