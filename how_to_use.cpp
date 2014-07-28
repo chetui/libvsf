@@ -38,10 +38,13 @@ void myscheduler(std::vector<VM> &vms)
                 //static
                 framework.node_num();
                 framework.node_ids();
+                framework.node_id(core_id); //core_id is a vector<int>(2). It is combined with node_id & core_id.
+                framework.node_id(hpthread_id);
                 framework.core_num();
                 framework.core_num(node_id);
                 framework.core_ids();
                 framework.core_ids(node_id);
+                framework.core_id(hpthread_id);
                 framework.hpthread_num();
                 framework.hpthread_num(node_id);
                 framework.hpthread_num(core_id);
@@ -75,10 +78,10 @@ void myscheduler(std::vector<VM> &vms)
                 vm.bound_mem_node_ids();
 
                 //dynamic
-                //vm.bound_node(vnode_id); //vNUMA
-                vm.bound_hpthread_ids();
-                vm.bound_hpthread_ids(vcpu_id) 
-                vm.bound_hpthread_ids(vmthread_id) 
+                //vm.bindinfo_node(vnode_id); //vNUMA
+                vm.bindinfo_hpthread_ids();
+                vm.bindinfo_hpthread_ids(vcpu_id) 
+                vm.bindinfo_hpthread_ids(vmthread_id) 
                 vm.cpu_usage();
                 vm.cpu_usage(vcpu_id);
                 vm.cpu_usage(vmthread_id);
