@@ -13,6 +13,9 @@ set (SRC_LIST
     sysinfo/hardware.cpp
     utils/runnable.cpp
     )
+set (MICRO_LIST
+    utils/microbench.c
+    )
 
 # test files
 set (TEST_DIR ../test)
@@ -22,6 +25,9 @@ set (TEST_LIST
     )
 
 # build test
+add_executable (microbench ${MICRO_LIST})
+target_link_libraries (microbench pthread)
+
 add_executable (test_all ${TEST_LIST} ${SRC_LIST})
 target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
 

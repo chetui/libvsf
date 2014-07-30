@@ -5,7 +5,7 @@ project (scheduler)
 include_directories (include)
 # subdir must also have CMakeLists.txt
 add_subdirectory (src)
-add_subdirectory (test/gtest)
+add_subdirectory (test/tools/gtest)
 
 # to enable [make test] cmd, which would execute target [test_all]
 # notice [make test] is the Unit Test framework of Make, rather than GTest. 
