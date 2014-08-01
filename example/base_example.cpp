@@ -51,8 +51,8 @@ void myscheduler(std::vector<VM> &vms)
                 framework.hpthread_ids(core_id);
                 framework.total_mem_size();
                 framework.total_mem_size(node_id);
-                framework.node_dist();
-                framework.node_dist(node_id_0, node_id_1);
+                framework.node_dist(); //DONE
+                framework.node_dist(node_id_0, node_id_1); //DONE
 
             //<<hardware dynamic info>>
                 framework.cpu_reuse_ratio();
