@@ -29,25 +29,25 @@ int main()
 
 void myscheduler(std::vector<VM> &vms)
 {
-    for (vm : vms)
+    for (auto& vm : vms)
     {
         //INPUT: available info
 
             //<<hardware static info>>
-                framework.node_num();
+                framework.node_num(); //DONE
                 framework.node_ids();
                 framework.node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
-                framework.node_id(hpthread_id);
+                framework.node_id(hpthread_id); //DONE
                 framework.core_num();
                 framework.core_num(node_id);
                 framework.core_ids();
                 framework.core_ids(node_id);
                 framework.core_id(hpthread_id);
-                framework.hpthread_num();
-                framework.hpthread_num(node_id);
+                framework.hpthread_num(); //DONE
+                framework.hpthread_num(node_id); //DONE
                 framework.hpthread_num(core_id);
                 framework.hpthread_ids();
-                framework.hpthread_ids(node_id);
+                framework.hpthread_ids(node_id); //DONE
                 framework.hpthread_ids(core_id);
                 framework.total_mem_size();
                 framework.total_mem_size(node_id);
@@ -61,16 +61,16 @@ void myscheduler(std::vector<VM> &vms)
                 framework.cpu_usage(node_id);
                 framework.cpu_usage(core_id);
                 framework.cpu_usage(hpthread_id);
-                framework.used_mem_size();
-                framework.used_mem_size(node_id);
+                framework.used_mem_size(); //DONE Zuo
+                framework.used_mem_size(node_id); //DONE Zuo
 
             //<<VM static info>>
                 vm.vm_id();
-                vm.vnode_num(); //vNUMA
-                vm.vnode_ids(); //vNUMA
+                vm.vnode_num(); //vNUMA //DONE Zuo
+                vm.vnode_ids(); //vNUMA //DONE Zuo
                 vm.vcpu_num();
                 vm.vcpu_ids();
-                vm.vcpu_ids(vnode_id); //vNUMA
+                vm.vcpu_ids(vnode_id); //vNUMA //DONE Zuo
                 vm.vmthread_num();
                 vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
                 vm.total_mem_size();

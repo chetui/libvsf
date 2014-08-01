@@ -9,4 +9,4 @@ make
 echo "--------<<<UnitTest: GTest>>>---------"
 cd ./bin
 ./test_all
-echo "--------<<<CodeStyleCheck: cpplint>>>---------"
+#echo "--------<<<CodeStyleCheck: cpplint>>>---------"
