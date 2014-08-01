@@ -11,6 +11,7 @@ string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 # src files
 set (SRC_LIST 
     sysinfo/hardware.cpp
+    utils/func_option.cpp
     utils/runnable.cpp
     )
 set (MICRO_LIST
@@ -22,6 +23,7 @@ set (TEST_DIR ../test)
 
 set (TEST_LIST
     ${TEST_DIR}/test_hardware.cpp
+    ${TEST_DIR}/test_func_option.cpp
     )
 
 # build test
