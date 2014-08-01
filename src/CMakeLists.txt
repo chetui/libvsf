@@ -13,6 +13,7 @@ set (SRC_LIST
     sysinfo/hardware.cpp
     utils/func_option.cpp
     utils/runnable.cpp
+    vsf.cpp
     )
 set (MICRO_LIST
     utils/microbench.c
@@ -24,7 +25,11 @@ set (TEST_DIR ../test)
 set (TEST_LIST
     ${TEST_DIR}/test_hardware.cpp
     ${TEST_DIR}/test_func_option.cpp
+    ${TEST_DIR}/test_vsf.cpp
     )
+
+# example files
+set (EXAMPLE_DIR ../example)
 
 # build test
 add_executable (microbench ${MICRO_LIST})
@@ -32,6 +37,8 @@ target_link_libraries (microbench pthread)
 
 add_executable (test_all ${TEST_LIST} ${SRC_LIST})
 target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
+
+add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})
 
 # set output path as build/bin
 set (EXECUTABLE_OUTPUT_PATH ../bin)

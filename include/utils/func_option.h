@@ -8,8 +8,13 @@
 #include <stdexcept>
 
 enum class Option : unsigned int { 
+    OP_NODE_CORE_HPTHREAD,
     OP_MISS_RATE, 
     OP_MEM_SAMPLE
+};
+
+enum class Func : unsigned int { 
+    FC_NODE_NUM
 };
 
 class FuncOption 
@@ -18,21 +23,32 @@ public:
     static FuncOption* get_instance();
     void enable_option(std::initializer_list<Option> ops);
     void disable_option(std::initializer_list<Option> ops);
-    void check_option(std::string func_name, std::initializer_list<Option> ops);
+    void check_option(Func fc);
 
 private:
     FuncOption();
     std::set<Option> options_;
     std::map<const Option, const std::string> option_str_ = {
+        { Option::OP_NODE_CORE_HPTHREAD, "OP_NODE_CORE_HPTHREAD" },
         { Option::OP_MISS_RATE, "OP_MISS_RATE" },
         { Option::OP_MEM_SAMPLE, "OP_MEM_SAMPLE" }
+    };
+    std::map<const Func, const std::string> func_str_ = {
+        { Func::FC_NODE_NUM, "Vsf::node_num()" }
+    };
+    std::map<Func, std::set<Option> > func_to_option_ = {
+        { Func::FC_NODE_NUM, { Option::OP_NODE_CORE_HPTHREAD } }
     };
 };
 
 class OpNotEnable : public std::logic_error {
 public:
     explicit OpNotEnable(const std::string &op_str, const std::string &s):
-        std::logic_error(op_str + " is not enabled. It is needed by function: " + s + ". Please use VSF::init() to enable " + op_str + ".") 
+        std::logic_error(
+op_str + " is not enabled. \
+It is needed by function: " + s + ". \
+Please use VSF::init() to enable " + op_str + "."
+        ) 
     {}
 };
 

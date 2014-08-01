@@ -30,8 +30,9 @@ void FuncOption::disable_option(initializer_list<Option> ops)
     return;
 }
 
-void FuncOption::check_option(string func_name, initializer_list<Option> ops)
+void FuncOption::check_option(Func fc)
 {
+    set<Option> ops = func_to_option_[fc];
     for (auto& op : ops)
     {
         if (options_.count(op) == 0)
@@ -41,7 +42,7 @@ void FuncOption::check_option(string func_name, initializer_list<Option> ops)
             size = backtrace(func_trace, 128);
             backtrace_symbols_fd(func_trace, size, STDERR_FILENO);
 
-            throw OpNotEnable(option_str_[op], func_name);
+            throw OpNotEnable(option_str_[op], func_str_[fc]);
         }
     }
 
