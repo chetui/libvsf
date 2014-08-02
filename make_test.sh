@@ -8,5 +8,8 @@ echo "==================<<<Build2: Make>>>====================="
 make
 echo "==================<<<UnitTest: GTest>>>=================="
 cd ./bin
-./test_all
+./test_hardware
+./test_func_option
+./test_vsf
+#./test_all
 #echo "========<<<CodeStyleCheck: cpplint>>>========="

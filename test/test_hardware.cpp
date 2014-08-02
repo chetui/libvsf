@@ -7,6 +7,7 @@ class HardwareTest: public ::testing::Test {
 protected:
     HardwareTest() {
         hd = Hardware::get_instance();
+        hd->refresh();
     }
 
     Hardware* hd;

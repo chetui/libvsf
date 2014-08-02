@@ -13,9 +13,13 @@ public:
     static Vsf* get_instance();
 
     //framework
-    void init(std::initializer_list<Option> ops);
+    void set_func_options(std::initializer_list<Option> ops);
+    void exec_init();
     std::vector<Vm> vms();
     void update_info(std::vector<Vm> &vms);
+
+    //set parameters
+    void set_hw_test_node_dist_param();
 
     //exec
     void exec_mig();

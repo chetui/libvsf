@@ -13,6 +13,7 @@ protected:
 
 TEST_F(VsfTest, node_num)
 {
-    vsf->init({Option::OP_NODE_CORE_HPTHREAD});
+    vsf->set_func_options({Option::OP_HW_NODE_CORE_HPTHREAD});
+    vsf->exec_init();
     ASSERT_EQ(vsf->node_num(), 2);
 }

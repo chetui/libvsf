@@ -1,4 +1,4 @@
-#include <utils/func_option.h>
+#include "utils/func_option.h"
 #include <execinfo.h>
 #include <unistd.h>
 
@@ -32,7 +32,7 @@ void FuncOption::disable_option(initializer_list<Option> ops)
 
 void FuncOption::check_option(Func fc)
 {
-    set<Option> ops = func_to_option_[fc];
+    set<Option> ops = func_to_option[fc];
     for (auto& op : ops)
     {
         if (options_.count(op) == 0)
@@ -42,7 +42,7 @@ void FuncOption::check_option(Func fc)
             size = backtrace(func_trace, 128);
             backtrace_symbols_fd(func_trace, size, STDERR_FILENO);
 
-            throw OpNotEnable(option_str_[op], func_str_[fc]);
+            throw OpNotEnable(option_str[op], func_str[fc]);
         }
     }
 
