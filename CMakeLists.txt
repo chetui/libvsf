@@ -3,9 +3,10 @@ cmake_minimum_required (VERSION 2.8)
 project (scheduler)
 
 include_directories (include)
+include_directories (tools/gtest/include)
 # subdir must also have CMakeLists.txt
 add_subdirectory (src)
-add_subdirectory (test/tools/gtest)
+add_subdirectory (tools/gtest)
 
 # to enable [make test] cmd, which would execute target [test_all]
 # notice [make test] is the Unit Test framework of Make, rather than GTest. 

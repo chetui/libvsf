@@ -1,5 +1,5 @@
 #include <set>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "sysinfo/hardware.h"
 
