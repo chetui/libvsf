@@ -1,15 +1,15 @@
 #include <set>
 #include "gtest/gtest.h"
 
-#include "sysinfo/hardware.h"
+#include "sysinfo/host/static/node_core_hpthread.h"
 
 class HardwareTest: public ::testing::Test {
 protected:
     HardwareTest() {
-        hd = Hardware::get_instance();
+        hd = NodeCoreHpthread::get_instance();
     }
 
-    Hardware* hd;
+    NodeCoreHpthread* hd;
 };
 
 TEST_F(HardwareTest, node_num) 

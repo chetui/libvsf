@@ -1,4 +1,4 @@
-#include "sysinfo/hardware.h"
+#include "sysinfo/host/static/node_core_hpthread.h"
 
 #include <unistd.h>
 #include <dirent.h>
@@ -10,36 +10,36 @@
 
 using namespace std;
 
-Hardware::Hardware()
+NodeCoreHpthread::NodeCoreHpthread()
 {
     refresh();
 }
 
-Hardware::~Hardware()
+NodeCoreHpthread::~NodeCoreHpthread()
 {
 }
 
-bool Hardware::compat_checking()
+bool NodeCoreHpthread::compat_checking()
 {
     //TODO
     return true;
 }
 
-Hardware* Hardware::get_instance()
+NodeCoreHpthread* NodeCoreHpthread::get_instance()
 {
     if (!compat_checking())
         return nullptr;
 
-    static Hardware hardware;
-    return &hardware;
+    static NodeCoreHpthread node_core_hpthread;
+    return &node_core_hpthread;
 }
 
-int Hardware::get_node_num() const
+int NodeCoreHpthread::get_node_num() const
 {
     return nodes_.size();
 }
 
-int Hardware::puid_to_nodeid(int puid) const
+int NodeCoreHpthread::puid_to_nodeid(int puid) const
 {
     for (size_t i = 0; i < nodes_.size(); ++i) {
         if (nodes_[i].find(puid) != nodes_[i].end()) {
@@ -49,7 +49,7 @@ int Hardware::puid_to_nodeid(int puid) const
     return -1;
 }
 
-int Hardware::get_pu_num() const
+int NodeCoreHpthread::get_pu_num() const
 {
     int num_conf   = sysconf(_SC_NPROCESSORS_CONF);
     int num_online = sysconf(_SC_NPROCESSORS_ONLN);
@@ -59,17 +59,17 @@ int Hardware::get_pu_num() const
     return num_conf;
 }
 
-int Hardware::get_pu_num_on_node(int nodeid) const
+int NodeCoreHpthread::get_pu_num_on_node(int nodeid) const
 {
     return nodes_[nodeid].size();
 }
 
-pus_t& Hardware::get_pu_on_node(int nodeid) const
+pus_t& NodeCoreHpthread::get_pu_on_node(int nodeid) const
 {
     return nodes_[nodeid];
 }
 
-std::vector< std::vector<int> > Hardware::get_node_dist(MicroParam& param) {
+std::vector< std::vector<int> > NodeCoreHpthread::get_node_dist(MicroParam& param) {
     int node_size = nodes_.size();
     std::vector< std::vector<int> > ret;
     for(int cpu=0; cpu<node_size; cpu++)
@@ -110,7 +110,7 @@ std::vector< std::vector<int> > Hardware::get_node_dist(MicroParam& param) {
     return ret;
 }
 
-std::vector< std::vector<int> > Hardware::get_node_dist()
+std::vector< std::vector<int> > NodeCoreHpthread::get_node_dist()
 {
     std::vector< std::vector<int> > ret;
     std::string command = "numactl --hardware";
@@ -156,7 +156,7 @@ std::vector< std::vector<int> > Hardware::get_node_dist()
     return ret;
 }
 
-void Hardware::refresh()
+void NodeCoreHpthread::refresh()
 {
     vector<string> node_dirs;
     get_node_dirs(&node_dirs);
@@ -169,7 +169,7 @@ void Hardware::refresh()
         ifstream fin(string(NODE_DIR).append(node_dirs[i]).append("/cpulist"));
         if (!fin.good()) {
 //            LOG(LogLevel::err) 
-//                << "Hardware::refresh: " << strerror(errno) << endl;
+//                << "NodeCoreHpthread::refresh: " << strerror(errno) << endl;
             return;
         }
         fin >> cpulist;
@@ -215,7 +215,7 @@ void Hardware::refresh()
     }
 }
 
-int Hardware::node_and_digits(const struct dirent *dptr)
+int NodeCoreHpthread::node_and_digits(const struct dirent *dptr)
 {
     auto *p = (char *)(dptr->d_name);
     if (*p++ != 'n') return 0;
@@ -229,13 +229,13 @@ int Hardware::node_and_digits(const struct dirent *dptr)
     return 1;
 }
 
-void Hardware::get_node_dirs(vector<string>* node_dirs)
+void NodeCoreHpthread::get_node_dirs(vector<string>* node_dirs)
 {
     struct dirent **namelist;
-    int num_nodes = scandir(NODE_DIR, &namelist, Hardware::node_and_digits, nullptr);
+    int num_nodes = scandir(NODE_DIR, &namelist, NodeCoreHpthread::node_and_digits, nullptr);
     if (num_nodes < 0) {
 //        LOG(LogLevel::err) 
-//            << "Hardware::get_node_dirs: " << strerror(errno) << endl;
+//            << "NodeCoreHpthread::get_node_dirs: " << strerror(errno) << endl;
     } else {
         for (int i=0; i<num_nodes; ++i) {
             node_dirs->push_back(string(namelist[i]->d_name));
@@ -245,7 +245,7 @@ void Hardware::get_node_dirs(vector<string>* node_dirs)
     }
 }
 
-void Hardware::split(std::string& s, char delim, std::vector<std::string>& ret)
+void NodeCoreHpthread::split(std::string& s, char delim, std::vector<std::string>& ret)
 {
     int len = s.size();
     std::string sub_str = "";

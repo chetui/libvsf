@@ -1,11 +1,11 @@
-#ifndef _VSF_
-#define _VSF_
+#ifndef _VSF_H_
+#define _VSF_H_
 
 #include <vector>
 #include <map>
 #include <initializer_list>
 #include "utils/func_option.h"
-#include "sysinfo/hardware.h"
+#include "framework/host.h"
 
 class Vm;
 
@@ -16,22 +16,19 @@ public:
     //framework
     void init(std::map<Option, std::map<OptionParam, OptionParamVal> > ops);
     std::vector<Vm> vms();
+    Host *init_host();
+    std::vector<Vm>& init_vms(Host *host);
     void update_info(std::vector<Vm> &vms);
-
-    //set parameters
-    void set_hw_test_node_dist_param();
 
     //exec
     void exec_mig();
 
-    //hardware info
-    int node_num();
-
 private:
     Vsf();
 
+    Host *host_;
+
     std::map<Option, std::map<OptionParam, OptionParamVal> > option_param_;
-    Hardware* hardware_;
     FuncOption* func_option_;
 
 };

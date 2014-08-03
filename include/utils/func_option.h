@@ -1,5 +1,5 @@
-#ifndef _UTILS_FUNC_OPTION_
-#define _UTILS_FUNC_OPTION_
+#ifndef _FUNC_OPTION_H_
+#define _FUNC_OPTION_H_
 
 #include <set>
 #include <map>

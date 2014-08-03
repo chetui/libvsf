@@ -1,5 +1,5 @@
-#ifndef _UTILS_RUNNABLE_H_
-#define _UTILS_RUNNABLE_H_
+#ifndef _RUNNABLE_H_
+#define _RUNNABLE_H_
 
 #include <atomic>
 #include <thread>

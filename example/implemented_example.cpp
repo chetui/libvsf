@@ -1,18 +1,17 @@
 #include <iostream>
 #include "vsf.h"
 
-void myscheduler();
+void myscheduler(Host *host);
 Vsf* framework = Vsf::get_instance();
 
 int main()
 {
     //set some flags to enable optional functions
-    //and refresh <<Hardware Static Info>>
     framework->init({
-        { Option::OP_HW_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
         { Option::OP_VM_MISS_RATE, { } },
         { Option::OP_VM_MEM_SAMPLE, { } },
-        { Option::OP_HW_TEST_NODE_DIST, 
+        { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
@@ -21,16 +20,19 @@ int main()
             }
         }
     });
+
+    //refresh <<Host Static Info>>
+    Host *host = framework->init_host();
     
     //your scheduler algorithm
-    myscheduler();
+    myscheduler(host);
 
     return 0;
 }
 
-void myscheduler()
+void myscheduler(Host *host)
 {
-    std::cout << "node_num:" << framework->node_num() << std::endl;
+    std::cout << "node_num:" << host->node_num() << std::endl;
 
     return;
 }

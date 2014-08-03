@@ -1,5 +1,5 @@
-#ifndef _SYSINFO_DEFINE_FUNC_OPTION_
-#define _SYSINFO_DEFINE_FUNC_OPTION_
+#ifndef _DEFINE_FUNC_OPTION_H_
+#define _DEFINE_FUNC_OPTION_H_
 
 #include <map>
 #include <set>
@@ -7,15 +7,15 @@
 
 //Options
 enum class Option : unsigned int { 
-    //<<hardware static info>>
-    OP_HW_NODE_CORE_HPTHREAD,
-    OP_HW_TOTAL_MEM_SIZE,
-    OP_HW_SYS_NODE_DIST,
-    OP_HW_TEST_NODE_DIST,
-    //<<hardware dynamic info>>
-    OP_HW_CPU_REUSE_RATIO,
-    OP_HW_CPU_USAGE,
-    OP_HW_USED_MEM_SIZE,
+    //<<host static info>>
+    OP_HS_NODE_CORE_HPTHREAD,
+    OP_HS_TOTAL_MEM_SIZE,
+    OP_HS_SYS_NODE_DIST,
+    OP_HS_TEST_NODE_DIST,
+    //<<host dynamic info>>
+    OP_HS_CPU_REUSE_RATIO,
+    OP_HS_CPU_USAGE,
+    OP_HS_USED_MEM_SIZE,
     //<<vm static info>>
     OP_VM_VCPU_VMTHREAD,
     OP_VM_VNODE,
@@ -33,37 +33,37 @@ extern std::map<const Option, const std::string> option_str;
 
 //Functions
 enum class Func : unsigned int { 
-    //<<hardware static info>>
-    FC_HW_NODE_NUM_P_,
-    FC_HW_NODE_IDS_P_,
-    FC_HW_NODE_ID_P_CORE_ID,
-    FC_HW_NODE_ID_P_HPTHREAD_ID,
-    FC_HW_CORE_NUM_P_,
-    FC_HW_CORE_NUM_P_NODE_ID,
-    FC_HW_CORE_IDS_P_,
-    FC_HW_CORE_IDS_P_NODE_ID,
-    FC_HW_CORE_ID_P_HPTHREAD_ID,
-    FC_HW_HPTHREAD_NUM_P_,
-    FC_HW_HPTHREAD_NUM_P_NODE_ID,
-    FC_HW_HPTHREAD_NUM_P_CORE_ID,
-    FC_HW_HPTHREAD_IDS_P_,
-    FC_HW_HPTHREAD_IDS_P_NODE_ID,
-    FC_HW_HPTHREAD_IDS_P_CORE_ID,
-    FC_HW_TOTAL_MEM_SIZE_P_,
-    FC_HW_TOTAL_MEM_SIZE_P_NODE_ID,
-    FC_HW_SYS_NODE_DIST_P_,
-    FC_HW_SYS_NODE_DIST_P_NODE_ID_0_NODE_ID_1,
-    FC_HW_TEST_NODE_DIST_P_,
-    FC_HW_TEST_NODE_DIST_P_NODE_ID_0_NODE_ID_1,
-    //<<hardware dynamic info>>
-    FC_HW_CPU_REUSE_RATIO_P_,
-    FC_HW_CPU_REUSE_RATIO_P_NODE_ID,
-    FC_HW_CPU_USAGE_P_,
-    FC_HW_CPU_USAGE_P_NODE_ID,
-    FC_HW_CPU_USAGE_P_CORE_ID,
-    FC_HW_CPU_USAGE_P_HPTHREAD_ID,
-    FC_HW_USED_MEM_SIZE_P_,
-    FC_HW_USED_MEM_SIZE_P_NODE_ID,
+    //<<host static info>>
+    FC_HS_NODE_NUM_P_,
+    FC_HS_NODE_IDS_P_,
+    FC_HS_NODE_ID_P_CORE_ID,
+    FC_HS_NODE_ID_P_HPTHREAD_ID,
+    FC_HS_CORE_NUM_P_,
+    FC_HS_CORE_NUM_P_NODE_ID,
+    FC_HS_CORE_IDS_P_,
+    FC_HS_CORE_IDS_P_NODE_ID,
+    FC_HS_CORE_ID_P_HPTHREAD_ID,
+    FC_HS_HPTHREAD_NUM_P_,
+    FC_HS_HPTHREAD_NUM_P_NODE_ID,
+    FC_HS_HPTHREAD_NUM_P_CORE_ID,
+    FC_HS_HPTHREAD_IDS_P_,
+    FC_HS_HPTHREAD_IDS_P_NODE_ID,
+    FC_HS_HPTHREAD_IDS_P_CORE_ID,
+    FC_HS_TOTAL_MEM_SIZE_P_,
+    FC_HS_TOTAL_MEM_SIZE_P_NODE_ID,
+    FC_HS_SYS_NODE_DIST_P_,
+    FC_HS_SYS_NODE_DIST_P_NODE_ID_0_NODE_ID_1,
+    FC_HS_TEST_NODE_DIST_P_,
+    FC_HS_TEST_NODE_DIST_P_NODE_ID_0_NODE_ID_1,
+    //<<host dynamic info>>
+    FC_HS_CPU_REUSE_RATIO_P_,
+    FC_HS_CPU_REUSE_RATIO_P_NODE_ID,
+    FC_HS_CPU_USAGE_P_,
+    FC_HS_CPU_USAGE_P_NODE_ID,
+    FC_HS_CPU_USAGE_P_CORE_ID,
+    FC_HS_CPU_USAGE_P_HPTHREAD_ID,
+    FC_HS_USED_MEM_SIZE_P_,
+    FC_HS_USED_MEM_SIZE_P_NODE_ID,
     //<<VM static info>>
     FC_VM_VM_ID_P_,
     FC_VM_VMTHREAD_NUM_P_,

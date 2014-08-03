@@ -1,5 +1,5 @@
-#ifndef _SYSINFO_HARDWARE_H_
-#define _SYSINFO_HARDWARE_H_
+#ifndef _HOST_NODE_CORE_HPTHREAD_H_
+#define _HOST_NODE_CORE_HPTHREAD_H_
 
 #include <vector>
 #include <string>
@@ -10,16 +10,15 @@ using pus_t = const std::set<int>;
 struct MicroParam;
 
 /**
- * Collect hardware information.
  * Singlton
  */
-class Hardware {
+class NodeCoreHpthread {
 public:
-    ~Hardware();
+    ~NodeCoreHpthread();
     /**
      * not thread-safe
      */
-    static Hardware* get_instance();
+    static NodeCoreHpthread* get_instance();
     /**
      * Get NUMA node number on this system.
      */
@@ -45,12 +44,12 @@ public:
     std::vector< std::vector<int> > get_node_dist();
     std::vector< std::vector<int> > get_node_dist(MicroParam& param);
     /**
-     * Reread the hardware info.
+     * Reread the node_core_hpthread info.
      */
     void refresh();
 
 private:
-    Hardware();
+    NodeCoreHpthread();
     static bool compat_checking();
     static int node_and_digits(const struct dirent *dptr);
     void get_node_dirs(std::vector<std::string>* node_dirs);

@@ -14,7 +14,9 @@ protected:
 TEST_F(VsfTest, node_num)
 {
     vsf->init({ 
-        { Option::OP_HW_NODE_CORE_HPTHREAD, {} }
+        { Option::OP_HS_NODE_CORE_HPTHREAD, {} }
     });
-    ASSERT_EQ(vsf->node_num(), 2);
+    Host *host = vsf->init_host();
+    
+    ASSERT_EQ(host->node_num(), 2);
 }

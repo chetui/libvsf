@@ -7,13 +7,12 @@ Vsf* framework = Vsf::get_instance();
 int main()
 {
     //set some flags to enable optional functions
-    //and refresh <<Hardware Static Info>>
     framework->init({
-        //<<hardware static info>>
-        { Option::OP_HW_NODE_CORE_HPTHREAD, { } },
-        { Option::OP_HW_TOTAL_MEM_SIZE, { } },
-        { Option::OP_HW_SYS_NODE_DIST, { } },
-        { Option::OP_HW_TEST_NODE_DIST, 
+        //<<host static info>>
+        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HS_TOTAL_MEM_SIZE, { } },
+        { Option::OP_HS_SYS_NODE_DIST, { } },
+        { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
@@ -21,11 +20,10 @@ int main()
                 { OptionParam::LOOP, 200 }
             }
         },
-
-        //<<hardware dynamic info>>
-        { Option::OP_HW_CPU_REUSE_RATIO, { } },
-        { Option::OP_HW_CPU_USAGE, { } },
-        { Option::OP_HW_USED_MEM_SIZE, { } },
+        //<<host dynamic info>>
+        { Option::OP_HS_CPU_REUSE_RATIO, { } },
+        { Option::OP_HS_CPU_USAGE, { } },
+        { Option::OP_HS_USED_MEM_SIZE, { } },
         //<<vm static info>>
         { Option::OP_VM_VCPU_VMTHREAD, { } },
         { Option::OP_VM_VNODE, { } },
@@ -39,23 +37,21 @@ int main()
         { Option::OP_VM_MEM_SAMPLE, { } },
         { Option::OP_VM_USED_MEM_SIZE { } }
     });
-//    //set parameters for some optional functions. if do not set parameters, default parameters would be used.
-//    framework->set_hw_test_node_dist_param(".", 20, MicroType::SERIAL, 20);
-//
-//    //refresh <<Hardware Static Info>>
-//    framework->exec_init();
+
+    //refresh <<Host Static Info>>
+    Host *host = framework->init_host();
     
     while(1) {
 
         //refresh <<VM Static Info>>
-        std::vector<VM> vms = framework->vms();
+        std::vector<VM> vms = framework->init_vms(host); //get all the VMs on the host
         //update_info would refresh <<Hardware & VM Dynamic Info>>
-        framework->update_info(vms);
+        framework->update_info(host, vms);
 
         //your scheduler algorithm
-        myscheduler(vms);
+        myscheduler(host, vms);
 
-        framework->exec_mig();
+        framework->exec_mig(host, vms); //only host parameter may be OK?
 
         sleep(1); 
     }
@@ -63,55 +59,55 @@ int main()
     return 0;
 }
 
-void myscheduler(std::vector<VM> &vms)
+void myscheduler(HOST *host, std::vector<VM> &vms)
 {
     for (auto& vm : vms)
     {
         //INPUT: available info
 
-            //<<hardware static info>>
-                //OP_HW_NODE_CORE_HPTHREAD
-                framework->node_num(); //DONE
-                framework->node_ids();
-                framework->node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
-                framework->node_id(hpthread_id); //DONE
-                framework->core_num();
-                framework->core_num(node_id);
-                framework->core_ids();
-                framework->core_ids(node_id);
-                framework->core_id(hpthread_id);
-                framework->hpthread_num(); //DONE
-                framework->hpthread_num(node_id); //DONE
-                framework->hpthread_num(core_id);
-                framework->hpthread_ids();
-                framework->hpthread_ids(node_id); //DONE
-                framework->hpthread_ids(core_id);
-                //OP_HW_TOTAL_MEM_SIZE
-                framework->total_mem_size();
-                //OP_HW_TOTAL_MEM_SIZE, OP_HW_NODE_CORE_HPTHREAD
-                framework->total_mem_size(node_id);
-                //OP_HW_SYS_NODE_DIST, OP_HW_NODE_CORE_HPTHREAD
-                framework->sys_node_dist(); //DONE
-                framework->sys_node_dist(node_id_0, node_id_1); //DONE
-                //OP_HW_TEST_NODE_DIST, OP_HW_NODE_CORE_HPTHREAD
-                framework->test_node_dist(); //DONE
-                framework->test_node_dist(node_id_0, node_id_1); //DONE
+            //<<host static info>>
+                //OP_HS_NODE_CORE_HPTHREAD
+                host->node_num(); //DONE
+                host->node_ids();
+                host->node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
+                host->node_id(hpthread_id); //DONE
+                host->core_num();
+                host->core_num(node_id);
+                host->core_ids();
+                host->core_ids(node_id);
+                host->core_id(hpthread_id);
+                host->hpthread_num(); //DONE
+                host->hpthread_num(node_id); //DONE
+                host->hpthread_num(core_id);
+                host->hpthread_ids();
+                host->hpthread_ids(node_id); //DONE
+                host->hpthread_ids(core_id);
+                //OP_HS_TOTAL_MEM_SIZE
+                host->total_mem_size();
+                //OP_HS_TOTAL_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
+                host->total_mem_size(node_id);
+                //OP_HS_SYS_NODE_DIST, OP_HS_NODE_CORE_HPTHREAD
+                host->sys_node_dist(); //DONE
+                host->sys_node_dist(node_id_0, node_id_1); //DONE
+                //OP_HS_TEST_NODE_DIST, OP_HS_NODE_CORE_HPTHREAD
+                host->test_node_dist(); //DONE
+                host->test_node_dist(node_id_0, node_id_1); //DONE
 
-            //<<hardware dynamic info>>
-                //OP_HW_CPU_REUSE_RATIO
-                framework->cpu_reuse_ratio();
-                //OP_HW_CPU_REUSE_RATIO, OP_HW_NODE_CORE_HPTHREAD
-                framework->cpu_reuse_ratio(node_id);
-                //OP_HW_CPU_USAGE
-                framework->cpu_usage();
-                //OP_HW_CPU_USAGE, OP_HW_NODE_CORE_HPTHREAD
-                framework->cpu_usage(node_id);
-                framework->cpu_usage(core_id);
-                framework->cpu_usage(hpthread_id);
-                //OP_HW_USED_MEM_SIZE
-                framework->used_mem_size(); //DONE Zuo
-                //OP_HW_USED_MEM_SIZE, OP_HW_NODE_CORE_HPTHREAD
-                framework->used_mem_size(node_id); //DONE Zuo
+            //<<host dynamic info>>
+                //OP_HS_CPU_REUSE_RATIO
+                host->cpu_reuse_ratio();
+                //OP_HS_CPU_REUSE_RATIO, OP_HS_NODE_CORE_HPTHREAD
+                host->cpu_reuse_ratio(node_id);
+                //OP_HS_CPU_USAGE
+                host->cpu_usage();
+                //OP_HS_CPU_USAGE, OP_HS_NODE_CORE_HPTHREAD
+                host->cpu_usage(node_id);
+                host->cpu_usage(core_id);
+                host->cpu_usage(hpthread_id);
+                //OP_HS_USED_MEM_SIZE
+                host->used_mem_size(); //DONE Zuo
+                //OP_HS_USED_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
+                host->used_mem_size(node_id); //DONE Zuo
 
             //<<VM static info>>
                 //OP_VM_VCPU_VMTHREAD
@@ -129,15 +125,15 @@ void myscheduler(std::vector<VM> &vms)
                 vm.total_mem_size();
                 //OP_VM_MEM_POLICY
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
-                //OP_VM_MEM_POLICY, OP_HW_NODE_CORE_HPTHREAD
+                //OP_VM_MEM_POLICY, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_mem_node_ids();
 
             //<<VM dynamic info>>
-                //OP_VM_CPU_BINDINFO, OP_VM_VCPU_VMTHREAD, OP_HW_NODE_CORE_HPTHREAD
+                //OP_VM_CPU_BINDINFO, OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id);
                 vm.bindinfo_hpthread_ids(vmthread_id);
-                //OP_VM_MEM_BINDINFO, OP_VM_VNODE, OP_HW_NODE_CORE_HPTHREAD
+                //OP_VM_MEM_BINDINFO, OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
                 //OP_VM_CPU_USAGE
                 vm.cpu_usage();
@@ -153,7 +149,7 @@ void myscheduler(std::vector<VM> &vms)
                 vm.mem_sample(); //sample the latest visited page addr
                 //OP_VM_USED_MEM_SIZE
                 vm.used_mem_size();
-                //OP_VM_USED_MEM_SIZE, OP_HW_NODE_CORE_HPTHREAD
+                //OP_VM_USED_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
                 vm.used_mem_size(node_id);
 
         //OUTPUT: decide scheduling strategy
