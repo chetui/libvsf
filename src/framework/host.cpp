@@ -4,6 +4,7 @@ Host::Host()
 {
     func_option_ = FuncOption::get_instance();
     node_core_hpthread_ = NodeCoreHpthread::get_instance();
+    node_dist_ = NodeDist::get_instance();
 }
 
 Host* Host::get_instance()

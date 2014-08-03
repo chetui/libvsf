@@ -15,6 +15,7 @@ echo "==================<<<UnitTest: GTest>>>=================="
 echo ""
 cd ./bin
 ./test_host_node_core_hpthread
+./test_host_node_dist
 ./test_func_option
 ./test_vsf
 #./test_all

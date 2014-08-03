@@ -3,6 +3,7 @@
 
 #include "utils/func_option.h"
 #include "sysinfo/host/static/node_core_hpthread.h"
+#include "sysinfo/host/static/node_dist.h"
 
 class Host {
 public:
@@ -15,6 +16,7 @@ private:
 
     FuncOption* func_option_;
     NodeCoreHpthread* node_core_hpthread_;
+    NodeDist* node_dist_;
 };
 
 #endif
