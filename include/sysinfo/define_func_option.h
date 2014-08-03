@@ -96,4 +96,11 @@ extern std::map<const Func, const std::string> func_str;
 //Functions to Options
 extern std::map<Func, std::set<Option> > func_to_option;
 
+enum class OptionParam : unsigned int {
+    PATH,
+    SIZE_IN_MB,
+    WORKLOAD_TYPE,
+    LOOP
+};
+
 #endif

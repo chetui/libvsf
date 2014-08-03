@@ -7,14 +7,20 @@ Vsf* framework = Vsf::get_instance();
 int main()
 {
     //set some flags to enable optional functions
-    framework->set_func_options({
-        Option::OP_HW_NODE_CORE_HPTHREAD,
-        Option::OP_VM_MISS_RATE,
-        Option::OP_VM_MEM_SAMPLE,
+    //and refresh <<Hardware Static Info>>
+    framework->init({
+        { Option::OP_HW_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_VM_MISS_RATE, { } },
+        { Option::OP_VM_MEM_SAMPLE, { } },
+        { Option::OP_HW_TEST_NODE_DIST, 
+            { 
+                { OptionParam::PATH, "." },
+                { OptionParam::SIZE_IN_MB, 20 },
+                { OptionParam::WORKLOAD_TYPE, MWT_RANDOM },
+                { OptionParam::LOOP, 200 }
+            }
+        }
     });
-
-    //refresh <<Hardware Static Info>>
-    framework->exec_init();
     
     //your scheduler algorithm
     myscheduler();

@@ -2,6 +2,7 @@
 #define _VSF_
 
 #include <vector>
+#include <map>
 #include <initializer_list>
 #include "utils/func_option.h"
 #include "sysinfo/hardware.h"
@@ -13,8 +14,7 @@ public:
     static Vsf* get_instance();
 
     //framework
-    void set_func_options(std::initializer_list<Option> ops);
-    void exec_init();
+    void init(std::map<Option, std::map<OptionParam, OptionParamVal> > ops);
     std::vector<Vm> vms();
     void update_info(std::vector<Vm> &vms);
 
@@ -30,6 +30,7 @@ public:
 private:
     Vsf();
 
+    std::map<Option, std::map<OptionParam, OptionParamVal> > option_param_;
     Hardware* hardware_;
     FuncOption* func_option_;
 

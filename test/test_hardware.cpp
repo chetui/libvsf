@@ -7,7 +7,6 @@ class HardwareTest: public ::testing::Test {
 protected:
     HardwareTest() {
         hd = Hardware::get_instance();
-        hd->refresh();
     }
 
     Hardware* hd;
@@ -61,7 +60,7 @@ TEST_F(HardwareTest, node_dist_default_param)
 
 TEST_F(HardwareTest, node_dist_custom_param)
 {
-    MicroParam p(".", 20, MicroType::SERIAL, 20);
+    MicroParam p(".", 20, MWT_SERIAL, 20);
     std::vector<std::vector<int> > res = hd->get_node_dist(p);
     print_dist(res);
 }

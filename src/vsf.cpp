@@ -1,10 +1,10 @@
+#include <iostream>
 #include "vsf.h"
 
 using namespace std;
 
 Vsf::Vsf()
 {
-    hardware_ = Hardware::get_instance();
     func_option_ = FuncOption::get_instance();
 }
 
@@ -15,15 +15,14 @@ Vsf* Vsf::get_instance()
 }
 
 //framework
-void Vsf::set_func_options(initializer_list<Option> ops) 
+void Vsf::init(std::map<Option, std::map<OptionParam, OptionParamVal> > ops)
 {
-    func_option_->enable_option(ops);
+    option_param_ = ops;
+    for (auto& op : ops) 
+        func_option_->enable_option({op.first});
+//    cout << option_param_[Option::OP_HW_TEST_NODE_DIST][OptionParam::LOOP].get_int() << endl;
+    hardware_ = Hardware::get_instance();
     return;
-}
-
-void Vsf::exec_init()
-{
-    hardware_->refresh();
 }
 
 //hardware info

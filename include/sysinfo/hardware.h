@@ -63,15 +63,15 @@ private:
 
 };
 
-enum class MicroType : char { RANDOM = 'r', SERIAL = 's' };
+enum MicroWorkloadType : char { MWT_RANDOM = 'r', MWT_SERIAL = 's' };
 
 struct MicroParam {
-    MicroParam() {}
-    MicroParam(std::string path, int size_in_mb, MicroType type, int loop):path(path), size_in_mb(size_in_mb), type(type), loop(loop) {}
+    MicroParam() {};
+    MicroParam(std::string path, int size_in_mb, MicroWorkloadType type, int loop):path(path), size_in_mb(size_in_mb), type(type), loop(loop) {};
 
     std::string path = ".";
     int size_in_mb = 20;
-    MicroType type = MicroType::RANDOM;
+    MicroWorkloadType type = MWT_RANDOM;
     int loop = 200;
 };
 

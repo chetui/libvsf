@@ -12,6 +12,7 @@ using namespace std;
 
 Hardware::Hardware()
 {
+    refresh();
 }
 
 Hardware::~Hardware()

@@ -7,34 +7,43 @@ Vsf* framework = Vsf::get_instance();
 int main()
 {
     //set some flags to enable optional functions
-    framework->set_func_options({
+    //and refresh <<Hardware Static Info>>
+    framework->init({
         //<<hardware static info>>
-        Option::OP_HW_NODE_CORE_HPTHREAD,
-        Option::OP_HW_TOTAL_MEM_SIZE,
-        Option::OP_HW_SYS_NODE_DIST,
-        Option::OP_HW_TEST_NODE_DIST,
-        //<<hardware dynamic info>>
-        Option::OP_HW_CPU_REUSE_RATIO,
-        Option::OP_HW_CPU_USAGE,
-        Option::OP_HW_USED_MEM_SIZE,
-        //<<vm static info>>
-        Option::OP_VM_VCPU_VMTHREAD,
-        Option::OP_VM_VNODE,
-        Option::OP_VM_TOTAL_MEM_SIZE,
-        Option::OP_VM_MEM_POLICY,
-        //<<vm dynamic info>>
-        Option::OP_VM_CPU_BINDINFO,
-        Option::OP_VM_MEM_BINDINFO,
-        Option::OP_VM_CPU_USAGE,
-        Option::OP_VM_MISS_RATE,
-        Option::OP_VM_MEM_SAMPLE,
-        Option::OP_VM_USED_MEM_SIZE
-    });
-    //set parameters for some optional functions. if do not set parameters, default parameters would be used.
-    framework->set_hw_test_node_dist_param(".", 20, MicroType::SERIAL, 20);
+        { Option::OP_HW_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HW_TOTAL_MEM_SIZE, { } },
+        { Option::OP_HW_SYS_NODE_DIST, { } },
+        { Option::OP_HW_TEST_NODE_DIST, 
+            { 
+                { OptionParam::PATH, "." },
+                { OptionParam::SIZE_IN_MB, 20 },
+                { OptionParam::WORKLOAD_TYPE, MWT_RANDOM },
+                { OptionParam::LOOP, 200 }
+            }
+        },
 
-    //refresh <<Hardware Static Info>>
-    framework->exec_init();
+        //<<hardware dynamic info>>
+        { Option::OP_HW_CPU_REUSE_RATIO, { } },
+        { Option::OP_HW_CPU_USAGE, { } },
+        { Option::OP_HW_USED_MEM_SIZE, { } },
+        //<<vm static info>>
+        { Option::OP_VM_VCPU_VMTHREAD, { } },
+        { Option::OP_VM_VNODE, { } },
+        { Option::OP_VM_TOTAL_MEM_SIZE, { } },
+        { Option::OP_VM_MEM_POLICY, { } },
+        //<<vm dynamic info>>
+        { Option::OP_VM_CPU_BINDINFO, { } },
+        { Option::OP_VM_MEM_BINDINFO, { } },
+        { Option::OP_VM_CPU_USAGE, { } },
+        { Option::OP_VM_MISS_RATE, { } },
+        { Option::OP_VM_MEM_SAMPLE, { } },
+        { Option::OP_VM_USED_MEM_SIZE { } }
+    });
+//    //set parameters for some optional functions. if do not set parameters, default parameters would be used.
+//    framework->set_hw_test_node_dist_param(".", 20, MicroType::SERIAL, 20);
+//
+//    //refresh <<Hardware Static Info>>
+//    framework->exec_init();
     
     while(1) {
 
