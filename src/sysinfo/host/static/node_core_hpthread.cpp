@@ -19,17 +19,8 @@ NodeCoreHpthread::~NodeCoreHpthread()
 {
 }
 
-bool NodeCoreHpthread::compat_checking()
-{
-    //TODO
-    return true;
-}
-
 NodeCoreHpthread* NodeCoreHpthread::get_instance()
 {
-    if (!compat_checking())
-        return nullptr;
-
     static NodeCoreHpthread node_core_hpthread;
     return &node_core_hpthread;
 }

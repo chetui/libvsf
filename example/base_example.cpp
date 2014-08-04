@@ -6,9 +6,10 @@ Vsf* framework = Vsf::get_instance();
 
 int main()
 {
-    //set some flags to enable optional functions
+    //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
+    //if others functions are called without set corresponding flags, info would be collected immediately.
     framework->init({
-        //<<host static info>>
+        //<<Optional Host Static Info>>
         { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
         { Option::OP_HS_TOTAL_MEM_SIZE, { } },
         { Option::OP_HS_SYS_NODE_DIST, { } },
@@ -20,16 +21,16 @@ int main()
                 { OptionParam::LOOP, 200 }
             }
         },
-        //<<host dynamic info>>
+        //<<Optional Host Dynamic Info>>
         { Option::OP_HS_CPU_REUSE_RATIO, { } },
         { Option::OP_HS_CPU_USAGE, { } },
         { Option::OP_HS_USED_MEM_SIZE, { } },
-        //<<vm static info>>
+        //<<Optional VM Static Info>>
         { Option::OP_VM_VCPU_VMTHREAD, { } },
         { Option::OP_VM_VNODE, { } },
         { Option::OP_VM_TOTAL_MEM_SIZE, { } },
         { Option::OP_VM_MEM_POLICY, { } },
-        //<<vm dynamic info>>
+        //<<Optional VM Dynamic Info>>
         { Option::OP_VM_CPU_BINDINFO, { } },
         { Option::OP_VM_MEM_BINDINFO, { } },
         { Option::OP_VM_CPU_USAGE, { } },
@@ -38,14 +39,14 @@ int main()
         { Option::OP_VM_USED_MEM_SIZE { } }
     });
 
-    //refresh <<Host Static Info>>
+    //refresh <<Optional Host Static Info>>
     Host *host = framework->init_host();
     
     while(1) {
 
-        //refresh <<VM Static Info>>
+        //refresh <<Optional VM Static Info>>
         std::vector<VM> vms = framework->init_vms(host); //get all the VMs on the host
-        //update_info would refresh <<Hardware & VM Dynamic Info>>
+        //update_info would refresh <<Optional Host & VM Dynamic Info>>
         framework->update_info(host, vms);
 
         //your scheduler algorithm

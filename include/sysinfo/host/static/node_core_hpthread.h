@@ -46,7 +46,6 @@ public:
 
 private:
     NodeCoreHpthread();
-    static bool compat_checking();
     static int node_and_digits(const struct dirent *dptr);
     void get_node_dirs(std::vector<std::string>* node_dirs);
 

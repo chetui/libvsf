@@ -6,7 +6,8 @@ Vsf* framework = Vsf::get_instance();
 
 int main()
 {
-    //set some flags to enable optional functions
+    //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
+    //if others functions are called without set corresponding flags, info would be collected immediately.
     framework->init({
         { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
         { Option::OP_VM_MISS_RATE, { } },
@@ -21,7 +22,7 @@ int main()
         }
     });
 
-    //refresh <<Host Static Info>>
+    //refresh <<Optional Host Static Info>>
     Host *host = framework->init_host();
     
     //your scheduler algorithm

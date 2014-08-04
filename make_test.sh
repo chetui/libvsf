@@ -18,5 +18,6 @@ cd ./bin
 ./test_host_node_dist
 ./test_func_option
 ./test_vsf
+./test_compat
 #./test_all
 #echo "========<<<CodeStyleCheck: cpplint>>>========="
