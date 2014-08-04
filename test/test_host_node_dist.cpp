@@ -23,22 +23,22 @@ void print_dist( std::vector<std::vector<int> >& dist)
     }
 }
 
-TEST_F(NodeDistTest, no_param)
+TEST_F(NodeDistTest, sys)
 {
-    std::vector<std::vector<int> > res = nd->get_node_dist();
+    std::vector<std::vector<int> > res = nd->get_sys_node_dist();
     print_dist(res);
 }
 
-TEST_F(NodeDistTest, default_param)
+TEST_F(NodeDistTest, test_default_param)
 {
     MicroParam p;
-    std::vector<std::vector<int> > res = nd->get_node_dist(p);
+    std::vector<std::vector<int> > res = nd->get_test_node_dist(p);
     print_dist(res);
 }
 
-TEST_F(NodeDistTest, custom_param)
+TEST_F(NodeDistTest, test_custom_param)
 {
     MicroParam p(".", 20, MWT_SERIAL, 20);
-    std::vector<std::vector<int> > res = nd->get_node_dist(p);
+    std::vector<std::vector<int> > res = nd->get_test_node_dist(p);
     print_dist(res);
 }

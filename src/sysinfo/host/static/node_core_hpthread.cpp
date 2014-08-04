@@ -12,7 +12,6 @@ using namespace std;
 
 NodeCoreHpthread::NodeCoreHpthread()
 {
-    refresh();
 }
 
 NodeCoreHpthread::~NodeCoreHpthread()
@@ -25,8 +24,10 @@ NodeCoreHpthread* NodeCoreHpthread::get_instance()
     return &node_core_hpthread;
 }
 
-int NodeCoreHpthread::get_node_num() const
+int NodeCoreHpthread::get_node_num()
 {
+    if(!inited_)
+        refresh();
     return nodes_.size();
 }
 
@@ -116,6 +117,7 @@ void NodeCoreHpthread::refresh()
 //        for(auto& x : nodes_[i])
 //              LOG() << "node[" << i << "]:" << x;
     }
+    inited_ = true;
 }
 
 int NodeCoreHpthread::node_and_digits(const struct dirent *dptr)

@@ -10,6 +10,7 @@ public:
     static Host *get_instance();
 
     int node_num();
+    std::vector<std::vector<int> > sys_node_dist();
 
 private:
     Host();

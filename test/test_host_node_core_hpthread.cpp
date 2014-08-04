@@ -7,6 +7,7 @@ class NodeCoreHpthreadTest: public ::testing::Test {
 protected:
     NodeCoreHpthreadTest() {
         hd = NodeCoreHpthread::get_instance();
+        hd->refresh();
     }
 
     NodeCoreHpthread* hd;

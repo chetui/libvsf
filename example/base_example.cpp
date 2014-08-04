@@ -83,31 +83,27 @@ void myscheduler(HOST *host, std::vector<VM> &vms)
                 host->hpthread_ids();
                 host->hpthread_ids(node_id); //DONE
                 host->hpthread_ids(core_id);
-                //OP_HS_TOTAL_MEM_SIZE
+                //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD
                 host->total_mem_size();
-                //OP_HS_TOTAL_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
                 host->total_mem_size(node_id);
-                //OP_HS_SYS_NODE_DIST, OP_HS_NODE_CORE_HPTHREAD
+                //OP_HS_SYS_NODE_DIST ((( OP_HS_NODE_CORE_HPTHREAD
                 host->sys_node_dist(); //DONE
                 host->sys_node_dist(node_id_0, node_id_1); //DONE
-                //OP_HS_TEST_NODE_DIST, OP_HS_NODE_CORE_HPTHREAD
+                //OP_HS_TEST_NODE_DIST ((( OP_HS_NODE_CORE_HPTHREAD
                 host->test_node_dist(); //DONE
                 host->test_node_dist(node_id_0, node_id_1); //DONE
 
             //<<host dynamic info>>
-                //OP_HS_CPU_REUSE_RATIO
+                //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CORE_HPTHREAD
                 host->cpu_reuse_ratio();
-                //OP_HS_CPU_REUSE_RATIO, OP_HS_NODE_CORE_HPTHREAD
                 host->cpu_reuse_ratio(node_id);
-                //OP_HS_CPU_USAGE
+                //OP_HS_CPU_USAGE ((( OP_HS_NODE_CORE_HPTHREAD
                 host->cpu_usage();
-                //OP_HS_CPU_USAGE, OP_HS_NODE_CORE_HPTHREAD
                 host->cpu_usage(node_id);
                 host->cpu_usage(core_id);
                 host->cpu_usage(hpthread_id);
-                //OP_HS_USED_MEM_SIZE
+                //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD
                 host->used_mem_size(); //DONE Zuo
-                //OP_HS_USED_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
                 host->used_mem_size(node_id); //DONE Zuo
 
             //<<VM static info>>
@@ -117,40 +113,35 @@ void myscheduler(HOST *host, std::vector<VM> &vms)
                 vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
                 vm.vcpu_num();
                 vm.vcpu_ids();
-                //OP_VM_VCPU_VMTHREAD, OP_VM_VNODE
+                //OP_VM_VNODE ((( OP_VM_VCPU_VMTHREAD 
                 vm.vcpu_ids(vnode_id); //vNUMA //DONE Zuo
-                //OP_VM_VNODE
                 vm.vnode_num(); //vNUMA //DONE Zuo
                 vm.vnode_ids(); //vNUMA //DONE Zuo
                 //OP_VM_TOTAL_MEM_SIZE
                 vm.total_mem_size();
-                //OP_VM_MEM_POLICY
+                //OP_VM_MEM_POLICY ((( OP_HS_NODE_CORE_HPTHREAD
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
-                //OP_VM_MEM_POLICY, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_mem_node_ids();
 
             //<<VM dynamic info>>
-                //OP_VM_CPU_BINDINFO, OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD
+                //OP_VM_CPU_BINDINFO ((( OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id);
                 vm.bindinfo_hpthread_ids(vmthread_id);
-                //OP_VM_MEM_BINDINFO, OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD
+                //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
-                //OP_VM_CPU_USAGE
+                //OP_VM_CPU_USAGE ((( OP_VM_VCPU_VMTHREAD
                 vm.cpu_usage();
-                //OP_VM_CPU_USAGE, OP_VM_VCPU_VMTHREAD
                 vm.cpu_usage(vcpu_id);
                 vm.cpu_usage(vmthread_id);
-                //OP_VM_MISS_RATE
+                //OP_VM_MISS_RATE ((( OP_VM_VCPU_VMTHREAD
                 vm.miss_rate(MISS_RATE_TYPE);
-                //OP_VM_MISS_RATE, OP_VM_VCPU_VMTHREAD
                 vm.miss_rate(MISS_RATE_TYPE, vcpu_id);
                 vm.miss_rate(MISS_RATE_TYPE, vmthread_id);
                 //OP_VM_MEM_SAMPLE
                 vm.mem_sample(); //sample the latest visited page addr
-                //OP_VM_USED_MEM_SIZE
+                //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD
                 vm.used_mem_size();
-                //OP_VM_USED_MEM_SIZE, OP_HS_NODE_CORE_HPTHREAD
                 vm.used_mem_size(node_id);
 
         //OUTPUT: decide scheduling strategy

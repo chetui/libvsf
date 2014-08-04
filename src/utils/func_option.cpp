@@ -14,9 +14,22 @@ FuncOption* FuncOption::get_instance()
     return &func_option;
 }
 
-void FuncOption::enable_option(initializer_list<Option> ops)
+void FuncOption::enable_option(std::map<Option, std::map<OptionParam, OptionParamVal> > &ops)
 {
+    //enable ops
     options_.insert(ops.begin(), ops.end());
+    
+    //enable all the dependent options of ops
+    for (auto& op : ops)
+    {
+        auto cnt = option_dep.count(op.first);
+        auto iter = option_dep.find(op.first);
+        while(cnt) {
+            options_.insert({iter->second, map<OptionParam, OptionParamVal>()});//when adding dependent options, always take default parameters
+            ++iter;
+            --cnt;
+        }
+    }
 
     return;
 }
@@ -30,23 +43,32 @@ void FuncOption::disable_option(initializer_list<Option> ops)
     return;
 }
 
-void FuncOption::check_option(Func fc)
+bool FuncOption::check_option(Option op)
 {
-    set<Option> ops = func_to_option[fc];
-    for (auto& op : ops)
-    {
-        if (options_.count(op) == 0)
-        {
-            void *func_trace[128];
-            size_t size;
-            size = backtrace(func_trace, 128);
-            backtrace_symbols_fd(func_trace, size, STDERR_FILENO);
+    return options_.count(op) > 0;
+//    bool res = true;
+//    set<Option> ops = func_to_option[fc];
+//    for (auto& op : ops)
+//    {
+//        if (options_.count(op) == 0)
+//        {
+//            res = false;
+//            break;
+//            void *func_trace[128];
+//            size_t size;
+//            size = backtrace(func_trace, 128);
+//            backtrace_symbols_fd(func_trace, size, STDERR_FILENO);
+//
+//            throw OpNotEnable(option_str[op], func_str[fc]);
+//        }
+//    }
+//
+//    return res;
+}
 
-            throw OpNotEnable(option_str[op], func_str[fc]);
-        }
-    }
-
-    return;
+std::map<OptionParam, OptionParamVal> &FuncOption::get_param(Option op)
+{
+    return options_[op];
 }
 
 OptionParamVal::OptionParamVal(): type(INT), ival{0} 

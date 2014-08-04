@@ -20,7 +20,7 @@ public:
     /**
      * Get NUMA node number on this system.
      */
-    int get_node_num() const;
+    int get_node_num();
     /**
      * Given id of process unit, return the NUMA node id where the
      * process unit located.
@@ -50,6 +50,7 @@ private:
     void get_node_dirs(std::vector<std::string>* node_dirs);
 
     std::vector<std::set<int> > nodes_;
+    bool inited_ = false;
 
     static constexpr char const * NODE_DIR = "/sys/devices/system/node/";
 };

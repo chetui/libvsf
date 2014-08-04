@@ -17,9 +17,7 @@ Vsf* Vsf::get_instance()
 //framework
 void Vsf::init(std::map<Option, std::map<OptionParam, OptionParamVal> > ops)
 {
-    option_param_ = ops;
-    for (auto& op : ops) 
-        func_option_->enable_option({op.first});
+    func_option_->enable_option(ops);
 //    cout << option_param_[Option::OP_HW_TEST_NODE_DIST][OptionParam::LOOP].get_int() << endl;
     return;
 }

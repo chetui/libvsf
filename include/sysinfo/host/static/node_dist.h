@@ -10,11 +10,18 @@ class NodeDist {
 public:
     static NodeDist* get_instance();
 
-    std::vector< std::vector<int> > get_node_dist();
-    std::vector< std::vector<int> > get_node_dist(MicroParam& param);
+    std::vector< std::vector<int> > &get_sys_node_dist();
+    std::vector< std::vector<int> > &get_test_node_dist(MicroParam& param);
+
+    void refresh_sys();
+    void refresh_test(MicroParam &param);
 
 private:
     NodeDist();
+    std::vector<std::vector<int> > sys_node_dist_;
+    std::vector<std::vector<int> > test_node_dist_;
+    bool sys_inited_ = false;
+    bool test_inited_ = false;
     void split(std::string& s, char delim, std::vector<std::string>& ret);
 
     static constexpr int BUF_SIZE = 1024;

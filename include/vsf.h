@@ -28,9 +28,7 @@ private:
 
     Host *host_;
 
-    std::map<Option, std::map<OptionParam, OptionParamVal> > option_param_;
     FuncOption* func_option_;
-
 };
 
 #endif

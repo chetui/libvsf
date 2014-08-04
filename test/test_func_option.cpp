@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include "gtest/gtest.h"
 
 #include "utils/func_option.h"
@@ -16,32 +17,40 @@ protected:
 
 TEST_F(FuncOptionTest, have_option) 
 {
-    bool catched = false;
-    fo->enable_option({Option::OP_HS_NODE_CORE_HPTHREAD, Option::OP_VM_MEM_SAMPLE});
-    try {
-        fo->check_option(Func::FC_HS_NODE_NUM_P_);
-    } catch (OpNotEnable e) {
-        cout << "catch exception OpNotEnable" << endl
-            << "what(): " << e.what() << endl;
-        catched = true;
-    }
+    map<Option, map<OptionParam, OptionParamVal> > ops = {
+        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_VM_MEM_SAMPLE, { } }
+    };
 
-    ASSERT_EQ(catched, false);
+    fo->enable_option(ops);
+    bool has = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+
+    ASSERT_EQ(has, true);
+}
+
+TEST_F(FuncOptionTest, have_option_dep) 
+{
+    map<Option, map<OptionParam, OptionParamVal> > ops = {
+        { Option::OP_VM_MEM_BINDINFO, { } }
+    };
+    fo->enable_option(ops);
+    bool has0 = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+    bool has1 = fo->check_option(Option::OP_VM_VNODE);
+
+    ASSERT_EQ(has0, true);
+    ASSERT_EQ(has1, true);
 }
 
 TEST_F(FuncOptionTest, have_no_option) 
 {
-    bool catched = false;
-    fo->enable_option({Option::OP_VM_MISS_RATE, Option::OP_HS_NODE_CORE_HPTHREAD});
+    map<Option, map<OptionParam, OptionParamVal> > ops = {
+        { Option::OP_VM_MISS_RATE, { } },
+        { Option::OP_HS_NODE_CORE_HPTHREAD, { } }
+    };
+    fo->enable_option(ops);
     fo->disable_option({Option::OP_HS_NODE_CORE_HPTHREAD});
-    try {
-        fo->check_option(Func::FC_HS_NODE_NUM_P_);
-    } catch (OpNotEnable e) {
-        cout << "catch exception OpNotEnable" << endl
-            << "what(): " << e.what() << endl;
-        catched = true;
-    }
+    bool has = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
 
-    ASSERT_EQ(catched, true);
+    ASSERT_EQ(has, false);
 }
 

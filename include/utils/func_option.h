@@ -14,27 +14,28 @@ class FuncOption
 {
 public:
     static FuncOption* get_instance();
-    void enable_option(std::initializer_list<Option> ops);
+    void enable_option(std::map<Option, std::map<OptionParam, OptionParamVal> > &ops);
     void disable_option(std::initializer_list<Option> ops);
-    void check_option(Func fc);
+    bool check_option(Option op);
+    std::map<OptionParam, OptionParamVal> &get_param(Option op);
 
 private:
     FuncOption();
-    std::set<Option> options_;
+    std::map<Option, std::map<OptionParam, OptionParamVal> > options_;
 };
 
-class OpNotEnable : public std::logic_error 
-{
-public:
-    explicit OpNotEnable(const std::string &op_str, const std::string &s):
-        std::logic_error(
-op_str + " is not enabled. \
-It is needed by function: " + s + ". \
-Please use VSF::init() to enable " + op_str + "."
-        ) 
-    {}
-};
-
+//class OpNotEnable : public std::logic_error 
+//{
+//public:
+//    explicit OpNotEnable(const std::string &op_str, const std::string &s):
+//        std::logic_error(
+//op_str + " is not enabled. 
+//It is needed by function: " + s + ". 
+//Please use VSF::init() to enable " + op_str + "."
+//        ) 
+//    {}
+//};
+//
 class OptionParamVal 
 {
 public:

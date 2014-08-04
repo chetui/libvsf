@@ -16,9 +16,11 @@ NodeDist *NodeDist::get_instance()
     return &node_dist;
 }
 
-std::vector< std::vector<int> > NodeDist::get_node_dist(MicroParam& param) {
+std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param) {
+    if(test_inited_)
+        return test_node_dist_;
+
     int node_size = NodeCoreHpthread::get_instance()->get_node_num();
-    std::vector< std::vector<int> > ret;
     for(int cpu=0; cpu<node_size; cpu++)
     {
         std::vector<int> row;
@@ -34,7 +36,7 @@ std::vector< std::vector<int> > NodeDist::get_node_dist(MicroParam& param) {
             // execuate command
             FILE *fp = popen(command, "r");
             if(fp == NULL)
-                return ret;
+                return test_node_dist_;
 
             // read result
             char buf[BUF_SIZE];
@@ -52,21 +54,24 @@ std::vector< std::vector<int> > NodeDist::get_node_dist(MicroParam& param) {
             row.push_back((int)(time/base_time*10));
             fclose(fp);
         }
-        ret.push_back(row);
+        test_node_dist_.push_back(row);
     }
-    return ret;
+
+    return test_node_dist_;
 }
 
-std::vector< std::vector<int> > NodeDist::get_node_dist()
+std::vector< std::vector<int> > &NodeDist::get_sys_node_dist()
 {
-    std::vector< std::vector<int> > ret;
+    if(sys_inited_)
+        return sys_node_dist_;
+
     std::string command = "numactl --hardware";
     // execuate command
     FILE *fp = popen(command.c_str(), "r");
     
     // read result
     if(fp == NULL)
-        return ret;
+        return sys_node_dist_;
     std::string res;
     char buf[BUF_SIZE];
     bool dist_flag = false;
@@ -97,12 +102,23 @@ std::vector< std::vector<int> > NodeDist::get_node_dist()
         {
             line.push_back(atoi(split_res[j].c_str()));
         }
-        ret.push_back(line);
+        sys_node_dist_.push_back(line);
     }
     fclose(fp);
-    return ret;
+    return sys_node_dist_;
 }
 
+void NodeDist::refresh_sys()
+{
+    get_sys_node_dist();
+    sys_inited_ = true;
+}
+
+void NodeDist::refresh_test(MicroParam &param)
+{
+    get_test_node_dist(param);
+    test_inited_ = true;
+}
 
 void NodeDist::split(std::string& s, char delim, std::vector<std::string>& ret)
 {
