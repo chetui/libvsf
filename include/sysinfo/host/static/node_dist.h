@@ -11,9 +11,14 @@ public:
     static NodeDist* get_instance();
 
     std::vector< std::vector<int> > &get_sys_node_dist();
+    int get_sys_node_dist(int node_id_0, int node_id_1);
+
+    std::vector< std::vector<int> > &get_test_node_dist();
     std::vector< std::vector<int> > &get_test_node_dist(MicroParam& param);
+    int get_test_node_dist(int node_id_0, int node_id_1);
 
     void refresh_sys();
+    void refresh_test();
     void refresh_test(MicroParam &param);
 
 private:

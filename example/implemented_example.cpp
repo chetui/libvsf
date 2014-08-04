@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "vsf.h"
 
 void myscheduler(Host *host);
@@ -16,11 +17,13 @@ int main()
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
-                { OptionParam::WORKLOAD_TYPE, MWT_RANDOM },
+                { OptionParam::WORKLOAD_TYPE, (char)MWT_RANDOM },
                 { OptionParam::LOOP, 200 }
             }
         }
     });
+
+    std::cout << MWT_RANDOM << std::endl;
 
     //refresh <<Optional Host Static Info>>
     Host *host = framework->init_host();
@@ -31,9 +34,26 @@ int main()
     return 0;
 }
 
+void print_dist(std::vector<std::vector<int> >& dist)
+{
+    for(std::vector<std::vector<int> >::iterator i = dist.begin(); i != dist.end(); i++)
+    {
+        for(std::vector<int>::iterator ii = i->begin(); ii != i->end(); ii++)
+            std::cout<<*ii<<" ";
+        std::cout<<std::endl;
+    }
+}
+
+
 void myscheduler(Host *host)
 {
     std::cout << "node_num:" << host->node_num() << std::endl;
+    std::vector<std::vector<int> > res = host->test_node_dist();
+    print_dist(res);
+    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
+    res = host->sys_node_dist();
+    print_dist(res);
+    std::cout << "sys_node_dist 0-1: " << host->sys_node_dist(0, 1) << std::endl;
 
     return;
 }

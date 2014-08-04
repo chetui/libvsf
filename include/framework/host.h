@@ -9,8 +9,13 @@ class Host {
 public:
     static Host *get_instance();
 
+    //OP_HS_NODE_CORE_HPTHREAD
     int node_num();
+    //OP_HS_SYS_NODE_DIST
     std::vector<std::vector<int> > sys_node_dist();
+    int sys_node_dist(int node_id_0, int node_id_1);
+    std::vector<std::vector<int> > test_node_dist();
+    int test_node_dist(int node_id_0, int node_id_1);
 
 private:
     Host();

@@ -17,9 +17,16 @@ NodeDist *NodeDist::get_instance()
 }
 
 std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param) {
+    std::cout << "AA" << std::endl;
     if(test_inited_)
         return test_node_dist_;
+    test_inited_ = true;
 
+    std::cout << "BB" << std::endl;
+    std::cout << param.path << std::endl;
+    std::cout << param.size_in_mb << std::endl;
+    std::cout << param.type << std::endl;
+    std::cout << param.loop << std::endl;
     int node_size = NodeCoreHpthread::get_instance()->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
@@ -57,13 +64,27 @@ std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param)
         test_node_dist_.push_back(row);
     }
 
+    std::cout << "CC" << std::endl;
     return test_node_dist_;
+}
+
+std::vector< std::vector<int> > &NodeDist::get_test_node_dist() 
+{
+    MicroParam p;
+    return get_test_node_dist(p);
+}
+
+int NodeDist::get_test_node_dist(int node_id_0, int node_id_1)
+{
+    MicroParam p;
+    return get_test_node_dist(p)[node_id_0][node_id_1];
 }
 
 std::vector< std::vector<int> > &NodeDist::get_sys_node_dist()
 {
     if(sys_inited_)
         return sys_node_dist_;
+    sys_inited_ = true;
 
     std::string command = "numactl --hardware";
     // execuate command
@@ -108,16 +129,24 @@ std::vector< std::vector<int> > &NodeDist::get_sys_node_dist()
     return sys_node_dist_;
 }
 
+int NodeDist::get_sys_node_dist(int node_id_0, int node_id_1)
+{
+    return get_sys_node_dist()[node_id_0][node_id_1];
+}
+
 void NodeDist::refresh_sys()
 {
     get_sys_node_dist();
-    sys_inited_ = true;
 }
 
+void NodeDist::refresh_test()
+{
+    MicroParam p;
+    refresh_test(p);
+}
 void NodeDist::refresh_test(MicroParam &param)
 {
     get_test_node_dist(param);
-    test_inited_ = true;
 }
 
 void NodeDist::split(std::string& s, char delim, std::vector<std::string>& ret)
