@@ -27,22 +27,25 @@ TEST_F(NodeDistTest, sys_matrix)
 {
     std::vector<std::vector<int> > res = nd->get_sys_node_dist();
     print_dist(res);
+    ASSERT_EQ(res[0][1], 20);
 }
 
 TEST_F(NodeDistTest, sys_one)
 {
-    std::cout << nd->get_sys_node_dist(0, 1) << std::endl;
+    std::cout << nd->get_sys_node_dist(1, 0) << std::endl;
+    ASSERT_EQ(nd->get_sys_node_dist(1, 0), 20);
 }
 
 TEST_F(NodeDistTest, test_default_param_matrix)
 {
     std::vector<std::vector<int> > res = nd->get_test_node_dist();
     print_dist(res);
+    ASSERT_EQ(true, res[0][1] > 10);
 }
 
 TEST_F(NodeDistTest, test_custom_param_matrix)
 {
-    MicroParam p(".", 20, MWT_SERIAL, 20);
+    MicroParam p(".", 20, WORKLOADTYPE_SERIAL, 20);
     std::vector<std::vector<int> > res = nd->get_test_node_dist(p);
     print_dist(res);
 }

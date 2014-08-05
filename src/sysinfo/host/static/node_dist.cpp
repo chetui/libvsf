@@ -23,6 +23,7 @@ std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param)
     test_inited_ = true;
 
     std::cout << "BB" << std::endl;
+    std::cout << "loop in get_test_node_dist" << param.loop << std::endl;
     std::cout << param.path << std::endl;
     std::cout << param.size_in_mb << std::endl;
     std::cout << param.type << std::endl;

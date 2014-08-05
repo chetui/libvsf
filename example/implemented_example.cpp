@@ -17,13 +17,11 @@ int main()
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
-                { OptionParam::WORKLOAD_TYPE, (char)MWT_RANDOM },
+                { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
                 { OptionParam::LOOP, 200 }
             }
         }
     });
-
-    std::cout << MWT_RANDOM << std::endl;
 
     //refresh <<Optional Host Static Info>>
     Host *host = framework->init_host();

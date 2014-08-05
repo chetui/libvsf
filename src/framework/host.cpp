@@ -17,6 +17,7 @@ Host::Host()
     if(func_option_->check_option(Option::OP_HS_TEST_NODE_DIST))
     {
         map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_HS_TEST_NODE_DIST);
+        cout << "size:" << param.size() << endl;
         if(param.size() == 0)
         {
             node_dist_->refresh_test();
@@ -25,11 +26,10 @@ Host::Host()
         {
             cout << "ss-1:" << param[OptionParam::PATH].get_string() << endl;
             cout << "ss0:" << param[OptionParam::WORKLOAD_TYPE].get_char() << endl;
-            cout << "ss1:" << (MicroWorkloadType)(param[OptionParam::WORKLOAD_TYPE].get_char()) << endl;
             MicroParam p(
                 param[OptionParam::PATH].get_string(),
                 param[OptionParam::SIZE_IN_MB].get_int(),
-                (MicroWorkloadType)(param[OptionParam::WORKLOAD_TYPE].get_char()),
+                param[OptionParam::WORKLOAD_TYPE].get_char(),
                 param[OptionParam::LOOP].get_int()
             );
             node_dist_->refresh_test(p);

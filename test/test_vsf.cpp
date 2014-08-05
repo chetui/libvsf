@@ -28,15 +28,16 @@ TEST_F(VsfTest, test_node_dist)
         { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },
-                { OptionParam::SIZE_IN_MB, 20 },
-                { OptionParam::WORKLOAD_TYPE, (char)MWT_RANDOM },
-                { OptionParam::LOOP, 200 }
+                { OptionParam::SIZE_IN_MB, 21 },
+                { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
+                { OptionParam::LOOP, 210 }
             }
          }
     });
     Host *host = vsf->init_host();
     
     std::cout << host->test_node_dist(0, 1) << std::endl;
+    ASSERT_EQ(true, host->test_node_dist(0, 1) > 10);
 }
 
 TEST_F(VsfTest, sys_node_dist)

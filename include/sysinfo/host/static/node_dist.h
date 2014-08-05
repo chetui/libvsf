@@ -32,15 +32,18 @@ private:
     static constexpr int BUF_SIZE = 1024;
 };
 
-enum MicroWorkloadType : char { MWT_RANDOM = 'r', MWT_SERIAL = 's' };
+//enum MicroWorkloadType : char { MWT_RANDOM = 'r', MWT_SERIAL = 's' };
+#define WORKLOADTYPE_RANDOM 'r'
+#define WORKLOADTYPE_SERIAL 's'
+
 
 struct MicroParam {
     MicroParam() {};
-    MicroParam(std::string path, int size_in_mb, MicroWorkloadType type, int loop):path(path), size_in_mb(size_in_mb), type(type), loop(loop) {};
+    MicroParam(std::string path, int size_in_mb, char type, int loop):path(path), size_in_mb(size_in_mb), type(type), loop(loop) {};
 
     std::string path = ".";
     int size_in_mb = 20;
-    MicroWorkloadType type = MWT_RANDOM;
+    char type = WORKLOADTYPE_RANDOM;
     int loop = 200;
 };
 

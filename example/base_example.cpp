@@ -17,7 +17,7 @@ int main()
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
-                { OptionParam::WORKLOAD_TYPE, MWT_RANDOM },
+                { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
                 { OptionParam::LOOP, 200 }
             }
         },
