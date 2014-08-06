@@ -14,8 +14,12 @@ public:
     //OP_HS_SYS_NODE_DIST
     std::vector<std::vector<int> > sys_node_dist();
     int sys_node_dist(int node_id_0, int node_id_1);
+        //may with Option Parameters. if without Option Parameters, then use default parameters.
     std::vector<std::vector<int> > test_node_dist();
     int test_node_dist(int node_id_0, int node_id_1);
+        //must without Option Parameters.
+    std::vector<std::vector<int> > test_node_dist(const MicroParam &p);
+    int test_node_dist(int node_id_0, int node_id_1, const MicroParam &p);
 
 private:
     Host();
@@ -23,6 +27,10 @@ private:
     FuncOption* func_option_;
     NodeCoreHpthread* node_core_hpthread_;
     NodeDist* node_dist_;
+
+    //OP_HS_SYS_NODE_DIST
+    MicroParam get_param_test_node_dist();
+
 };
 
 #endif

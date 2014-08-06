@@ -16,18 +16,19 @@ NodeDist *NodeDist::get_instance()
     return &node_dist;
 }
 
-std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param) {
-    std::cout << "AA" << std::endl;
-    if(test_inited_)
+std::vector< std::vector<int> > &NodeDist::get_test_node_dist(const MicroParam& param) {
+//    std::cout << "AA" << std::endl;
+    if(test_inited_ && param == test_param)
         return test_node_dist_;
     test_inited_ = true;
+    test_param = param;
 
-    std::cout << "BB" << std::endl;
-    std::cout << "loop in get_test_node_dist" << param.loop << std::endl;
-    std::cout << param.path << std::endl;
-    std::cout << param.size_in_mb << std::endl;
-    std::cout << param.type << std::endl;
-    std::cout << param.loop << std::endl;
+//    std::cout << "BB" << std::endl;
+//    std::cout << "loop in get_test_node_dist" << param.loop << std::endl;
+//    std::cout << param.path << std::endl;
+//    std::cout << param.size_in_mb << std::endl;
+//    std::cout << param.type << std::endl;
+//    std::cout << param.loop << std::endl;
     int node_size = NodeCoreHpthread::get_instance()->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
@@ -65,20 +66,13 @@ std::vector< std::vector<int> > &NodeDist::get_test_node_dist(MicroParam& param)
         test_node_dist_.push_back(row);
     }
 
-    std::cout << "CC" << std::endl;
+//    std::cout << "CC" << std::endl;
     return test_node_dist_;
 }
 
-std::vector< std::vector<int> > &NodeDist::get_test_node_dist() 
+int NodeDist::get_test_node_dist(int node_id_0, int node_id_1, const MicroParam& param)
 {
-    MicroParam p;
-    return get_test_node_dist(p);
-}
-
-int NodeDist::get_test_node_dist(int node_id_0, int node_id_1)
-{
-    MicroParam p;
-    return get_test_node_dist(p)[node_id_0][node_id_1];
+    return get_test_node_dist(param)[node_id_0][node_id_1];
 }
 
 std::vector< std::vector<int> > &NodeDist::get_sys_node_dist()
@@ -140,12 +134,7 @@ void NodeDist::refresh_sys()
     get_sys_node_dist();
 }
 
-void NodeDist::refresh_test()
-{
-    MicroParam p;
-    refresh_test(p);
-}
-void NodeDist::refresh_test(MicroParam &param)
+void NodeDist::refresh_test(const MicroParam &param)
 {
     get_test_node_dist(param);
 }
@@ -169,3 +158,10 @@ void NodeDist::split(std::string& s, char delim, std::vector<std::string>& ret)
     }
 }
 
+bool operator==(const MicroParam &lp, const MicroParam &rp)
+{
+    return lp.path == rp.path &&
+        lp.size_in_mb == rp.size_in_mb &&
+        lp.type == rp.type &&
+        lp.loop == rp.loop;
+}

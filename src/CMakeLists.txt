@@ -1,4 +1,10 @@
 set (CMAKE_CPP_COMPILER g++)
+# set output path as build/bin
+set (EXECUTABLE_OUTPUT_PATH ../bin)
+# test dir
+set (TEST_DIR ../test)
+# example dir
+set (EXAMPLE_DIR ../example)
 
 # the debug flag is used by gdb
 #set (CMAKE_BUILD_TYPE "Debug")
@@ -19,46 +25,34 @@ set (SRC_LIST
     framework/compat.cpp
     vsf.cpp
     )
-set (MICRO_LIST
-    utils/microbench.c
-    )
 
-# test files
-set (TEST_DIR ../test)
 
-set (TEST_LIST
-    ${TEST_DIR}/test_host_node_core_hpthread.cpp
-    ${TEST_DIR}/test_host_node_dist.cpp
-    ${TEST_DIR}/test_func_option.cpp
-    ${TEST_DIR}/test_vsf.cpp
-    ${TEST_DIR}/test_compat.cpp
-    )
+# build test_all ---------------------------------
+#set (TEST_LIST
+#    ${TEST_DIR}/test_host_node_core_hpthread.cpp
+#    ${TEST_DIR}/test_host_node_dist.cpp
+#    ${TEST_DIR}/test_func_option.cpp
+#    ${TEST_DIR}/test_vsf.cpp
+#    ${TEST_DIR}/test_compat.cpp
+#    )
+#add_executable (test_all ${TEST_LIST} ${SRC_LIST})
+#target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
 
-# example files
-set (EXAMPLE_DIR ../example)
+# build individual tests ------------------------
+    macro (add_indi_test test_name)
+        add_executable (${test_name} ${TEST_DIR}/${test_name}.cpp ${SRC_LIST})
+        target_link_libraries (${test_name} gtest gtest_main)
+    endmacro ()
+add_indi_test (test_host_node_core_hpthread)
+add_indi_test (test_host_node_dist)
+add_indi_test (test_func_option)
+add_indi_test (test_vsf)
+add_indi_test (test_compat)
 
-# build tests
-add_executable (microbench ${MICRO_LIST})
-target_link_libraries (microbench pthread)
-
-    #build test_all
-    #add_executable (test_all ${TEST_LIST} ${SRC_LIST})
-    #target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
-
-    #build individual tests
-    add_executable (test_host_node_core_hpthread ${TEST_DIR}/test_host_node_core_hpthread.cpp ${SRC_LIST})
-    target_link_libraries (test_host_node_core_hpthread gtest gtest_main)
-    add_executable (test_host_node_dist ${TEST_DIR}/test_host_node_dist.cpp ${SRC_LIST})
-    target_link_libraries (test_host_node_dist gtest gtest_main)
-    add_executable (test_func_option ${TEST_DIR}/test_func_option.cpp ${SRC_LIST})
-    target_link_libraries (test_func_option gtest gtest_main)
-    add_executable (test_vsf ${TEST_DIR}/test_vsf.cpp ${SRC_LIST})
-    target_link_libraries (test_vsf gtest gtest_main)
-    add_executable (test_compat ${TEST_DIR}/test_compat.cpp ${SRC_LIST})
-    target_link_libraries (test_compat gtest gtest_main)
-
-# build examples
+# build examples -------------------------------
 add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})
 
-# set output path as build/bin
-set (EXECUTABLE_OUTPUT_PATH ../bin)
+# build other dep exec ------------------------
+add_executable (microbench utils/microbench.c)
+target_link_libraries (microbench pthread)
+

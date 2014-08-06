@@ -9,7 +9,7 @@ cmake ..
 echo ""
 echo "==================<<<Build2: Make>>>====================="
 echo ""
-make
+make -j 8
 echo ""
 echo "==================<<<UnitTest: GTest>>>=================="
 echo ""

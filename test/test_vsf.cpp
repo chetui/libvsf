@@ -12,19 +12,11 @@ protected:
     Vsf* vsf;
 };
 
-TEST_F(VsfTest, node_num)
+TEST_F(VsfTest, node_num_and_node_dist)
 {
     vsf->init({ 
-        { Option::OP_HS_NODE_CORE_HPTHREAD, {} }
-    });
-    Host *host = vsf->init_host();
-    
-    ASSERT_EQ(host->node_num(), 2);
-}
-
-TEST_F(VsfTest, test_node_dist)
-{
-    vsf->init({ 
+        { Option::OP_HS_NODE_CORE_HPTHREAD, {} },
+        { Option::OP_HS_SYS_NODE_DIST, { } },
         { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },
@@ -35,18 +27,13 @@ TEST_F(VsfTest, test_node_dist)
          }
     });
     Host *host = vsf->init_host();
-    
+
+    ASSERT_EQ(host->node_num(), 2);
     std::cout << host->test_node_dist(0, 1) << std::endl;
     ASSERT_EQ(true, host->test_node_dist(0, 1) > 10);
-}
+    std::cout << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 230)) << std::endl;
+    ASSERT_EQ(true, host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 230)) > 10);
 
-TEST_F(VsfTest, sys_node_dist)
-{
-    vsf->init({ 
-        { Option::OP_HS_SYS_NODE_DIST, { } }
-    });
-    Host *host = vsf->init_host();
-    
     ASSERT_EQ(host->sys_node_dist(0, 1), 20);
     ASSERT_EQ(host->sys_node_dist(1, 1), 10);
 }

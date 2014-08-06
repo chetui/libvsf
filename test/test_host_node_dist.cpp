@@ -36,23 +36,23 @@ TEST_F(NodeDistTest, sys_one)
     ASSERT_EQ(nd->get_sys_node_dist(1, 0), 20);
 }
 
-TEST_F(NodeDistTest, test_default_param_matrix)
+TEST_F(NodeDistTest, test_matrix)
 {
-    std::vector<std::vector<int> > res = nd->get_test_node_dist();
+    //default
+    MicroParam dp;
+    std::vector<std::vector<int> > res = nd->get_test_node_dist(dp);
+    print_dist(res);
+
+    //custom
+    MicroParam cp(".", 23, WORKLOADTYPE_RANDOM, 212);
+    res = nd->get_test_node_dist(cp);
     print_dist(res);
     ASSERT_EQ(true, res[0][1] > 10);
 }
 
-TEST_F(NodeDistTest, test_custom_param_matrix)
+TEST_F(NodeDistTest, test_one)
 {
-    MicroParam p(".", 20, WORKLOADTYPE_SERIAL, 20);
-    std::vector<std::vector<int> > res = nd->get_test_node_dist(p);
-    print_dist(res);
+    MicroParam p(".", 23, WORKLOADTYPE_RANDOM, 212);
+    std::cout << nd->get_test_node_dist(0, 1, p) << std::endl;
+    ASSERT_EQ(true, nd->get_test_node_dist(0, 1, p) > 10);
 }
-
-TEST_F(NodeDistTest, test_default_param_one)
-{
-    std::cout << nd->get_test_node_dist(0, 1) << std::endl;
-}
-
-
