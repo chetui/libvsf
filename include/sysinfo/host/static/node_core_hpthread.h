@@ -49,11 +49,11 @@ private:
     NodeCoreHpthread();
     static int node_and_digits(const struct dirent *dptr);
     void get_node_dirs(std::vector<std::string>* node_dirs);
+    void do_refresh();
 
     std::vector<std::set<int> > nodes_;
     bool inited_ = false;
     std::mutex nodes_mutex_;
-    std::mutex inited_mutex_;
 
 
     static constexpr char const * NODE_DIR = "/sys/devices/system/node/";

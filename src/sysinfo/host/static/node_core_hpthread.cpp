@@ -26,15 +26,8 @@ NodeCoreHpthread* NodeCoreHpthread::get_instance()
 
 int NodeCoreHpthread::get_node_num()
 {
-    inited_mutex_.lock();
-    if(!inited_)
-    {
-        inited_mutex_.unlock();
-        refresh();
-    }
-    else
-        inited_mutex_.unlock();
     lock_guard<mutex> lock(nodes_mutex_);
+    do_refresh();
     return nodes_.size();
 }
 
@@ -69,10 +62,14 @@ pus_t& NodeCoreHpthread::get_pu_on_node(int nodeid) const
 }
 void NodeCoreHpthread::refresh()
 {
-    inited_mutex_.lock();
-    inited_ = true;
-    inited_mutex_.unlock();
     lock_guard<mutex> lock(nodes_mutex_);
+    do_refresh();
+}
+void NodeCoreHpthread::do_refresh()
+{
+    if(inited_)
+        return;
+    inited_ = true;
 
     vector<string> node_dirs;
     get_node_dirs(&node_dirs);
