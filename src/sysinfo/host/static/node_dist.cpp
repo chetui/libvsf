@@ -16,12 +16,15 @@ NodeDist *NodeDist::get_instance()
     return &node_dist;
 }
 
-std::vector< std::vector<int> > &NodeDist::get_test_node_dist(const MicroParam& param) {
+std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& param) 
+{
+    std::lock_guard<std::mutex> lock(test_mutex);
 //    std::cout << "AA" << std::endl;
-    if(test_inited_ && param == test_param)
+    if(test_inited_ && param == test_param_)
         return test_node_dist_;
     test_inited_ = true;
-    test_param = param;
+    test_param_ = param;
+    test_node_dist_.clear();
 
 //    std::cout << "BB" << std::endl;
 //    std::cout << "loop in get_test_node_dist" << param.loop << std::endl;
@@ -75,11 +78,13 @@ int NodeDist::get_test_node_dist(int node_id_0, int node_id_1, const MicroParam&
     return get_test_node_dist(param)[node_id_0][node_id_1];
 }
 
-std::vector< std::vector<int> > &NodeDist::get_sys_node_dist()
+std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
 {
+    std::lock_guard<std::mutex> lock(sys_mutex);
     if(sys_inited_)
         return sys_node_dist_;
     sys_inited_ = true;
+    sys_node_dist_.clear();
 
     std::string command = "numactl --hardware";
     // execuate command

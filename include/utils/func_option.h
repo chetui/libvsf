@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <initializer_list>
+#include <mutex>
 #include <stdexcept>
 #include "sysinfo/define_func_option.h"
 
@@ -22,6 +23,7 @@ public:
 private:
     FuncOption();
     std::map<Option, std::map<OptionParam, OptionParamVal> > options_;
+    std::mutex options_mutex_;
 };
 
 //class OpNotEnable : public std::logic_error 

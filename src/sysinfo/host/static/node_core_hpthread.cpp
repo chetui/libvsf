@@ -26,8 +26,15 @@ NodeCoreHpthread* NodeCoreHpthread::get_instance()
 
 int NodeCoreHpthread::get_node_num()
 {
+    inited_mutex_.lock();
     if(!inited_)
+    {
+        inited_mutex_.unlock();
         refresh();
+    }
+    else
+        inited_mutex_.unlock();
+    lock_guard<mutex> lock(nodes_mutex_);
     return nodes_.size();
 }
 
@@ -62,6 +69,11 @@ pus_t& NodeCoreHpthread::get_pu_on_node(int nodeid) const
 }
 void NodeCoreHpthread::refresh()
 {
+    inited_mutex_.lock();
+    inited_ = true;
+    inited_mutex_.unlock();
+    lock_guard<mutex> lock(nodes_mutex_);
+
     vector<string> node_dirs;
     get_node_dirs(&node_dirs);
     nodes_ = vector<set<int>>(node_dirs.size()); 
@@ -117,7 +129,6 @@ void NodeCoreHpthread::refresh()
 //        for(auto& x : nodes_[i])
 //              LOG() << "node[" << i << "]:" << x;
     }
-    inited_ = true;
 }
 
 int NodeCoreHpthread::node_and_digits(const struct dirent *dptr)

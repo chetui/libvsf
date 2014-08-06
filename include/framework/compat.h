@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <mutex>
 #include <stdexcept>
 
 enum class CompatItem : unsigned int { 
@@ -29,6 +30,7 @@ public:
 private:
     Compat();
     std::map<CompatItem, bool> check_res_;
+    std::mutex check_res_mutex_;
 
     void do_compat_checking(CompatItem ci, bool (*check_func)(), std::string excep_str);
 

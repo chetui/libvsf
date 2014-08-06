@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <mutex>
 
 using pus_t = const std::set<int>;
 
@@ -51,6 +52,9 @@ private:
 
     std::vector<std::set<int> > nodes_;
     bool inited_ = false;
+    std::mutex nodes_mutex_;
+    std::mutex inited_mutex_;
+
 
     static constexpr char const * NODE_DIR = "/sys/devices/system/node/";
 };

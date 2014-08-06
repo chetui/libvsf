@@ -30,6 +30,7 @@ void Compat::compat_checking(CompatItem ci)
 void Compat::do_compat_checking(CompatItem ci, bool (*check_func)(), string excep_str)
 {
     bool res;
+    lock_guard<mutex> lock(check_res_mutex_);
 
     if(check_res_.count(ci) == 0) 
     {

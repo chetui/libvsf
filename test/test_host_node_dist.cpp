@@ -13,14 +13,15 @@ protected:
     NodeDist* nd;
 };
 
-void print_dist( std::vector<std::vector<int> >& dist)
+void print_dist(const std::vector<std::vector<int> >& dist)
 {
-    for(std::vector<std::vector<int> >::iterator i = dist.begin(); i != dist.end(); i++)
+    for (const auto& col : dist)
     {
-        for(std::vector<int>::iterator ii = i->begin(); ii != i->end(); ii++)
-            std::cout<<*ii<<" ";
-        std::cout<<std::endl;
+        for (const auto& row : col)
+            std::cout << row << " ";
+        std::cout << std::endl;
     }
+
 }
 
 TEST_F(NodeDistTest, sys_matrix)

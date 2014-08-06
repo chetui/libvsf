@@ -32,26 +32,29 @@ int main()
     return 0;
 }
 
-void print_dist(std::vector<std::vector<int> >& dist)
+void print_dist(const std::vector<std::vector<int> >& dist)
 {
-    for(std::vector<std::vector<int> >::iterator i = dist.begin(); i != dist.end(); i++)
+    for (const auto& col : dist)
     {
-        for(std::vector<int>::iterator ii = i->begin(); ii != i->end(); ii++)
-            std::cout<<*ii<<" ";
-        std::cout<<std::endl;
+        for (const auto& row : col)
+            std::cout << row << " ";
+        std::cout << std::endl;
     }
+
 }
 
 
 void myscheduler(Host *host)
 {
     std::cout << "node_num:" << host->node_num() << std::endl;
-    std::vector<std::vector<int> > res = host->test_node_dist();
-    print_dist(res);
-    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
-    res = host->sys_node_dist();
-    print_dist(res);
+
+    print_dist(host->sys_node_dist());
     std::cout << "sys_node_dist 0-1: " << host->sys_node_dist(0, 1) << std::endl;
+
+    print_dist(host->test_node_dist());
+    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
+    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
+    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
 
     return;
 }

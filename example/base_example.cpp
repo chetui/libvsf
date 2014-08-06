@@ -91,7 +91,9 @@ void myscheduler(HOST *host, std::vector<VM> &vms)
                 host->sys_node_dist(node_id_0, node_id_1); //DONE
                 //OP_HS_TEST_NODE_DIST ((( OP_HS_NODE_CORE_HPTHREAD //Yu
                 host->test_node_dist(); //DONE
+                host->test_node_dist(MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
                 host->test_node_dist(node_id_0, node_id_1); //DONE
+                host->test_node_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
 
             //<<host dynamic info>>
                 //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CORE_HPTHREAD /Yu

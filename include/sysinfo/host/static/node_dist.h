@@ -3,11 +3,10 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
-//enum MicroWorkloadType : char { MWT_RANDOM = 'r', MWT_SERIAL = 's' };
 #define WORKLOADTYPE_RANDOM 'r'
 #define WORKLOADTYPE_SERIAL 's'
-
 
 struct MicroParam {
     MicroParam() {};
@@ -20,14 +19,17 @@ struct MicroParam {
 };
 bool operator==(const MicroParam &lp, const MicroParam &rp);
 
+/**
+ * multi-thread safe
+ */
 class NodeDist {
 public:
     static NodeDist* get_instance();
 
-    std::vector< std::vector<int> > &get_sys_node_dist();
+    std::vector< std::vector<int> > get_sys_node_dist();
     int get_sys_node_dist(int node_id_0, int node_id_1);
 
-    std::vector< std::vector<int> > &get_test_node_dist(const MicroParam& param);
+    std::vector< std::vector<int> > get_test_node_dist(const MicroParam& param);
     int get_test_node_dist(int node_id_0, int node_id_1, const MicroParam& param);
 
     void refresh_sys();
@@ -39,7 +41,9 @@ private:
     std::vector<std::vector<int> > test_node_dist_;
     bool sys_inited_ = false;
     bool test_inited_ = false;
-    MicroParam test_param;
+    std::mutex sys_mutex;
+    std::mutex test_mutex;
+    MicroParam test_param_;
 
     void split(std::string& s, char delim, std::vector<std::string>& ret);
 
