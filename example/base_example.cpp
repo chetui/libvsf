@@ -6,8 +6,11 @@ Vsf* framework = Vsf::get_instance();
 
 int main()
 {
-    //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
-    //if others functions are called without set corresponding flags, info would be collected immediately.
+    //set some flags to refresh optional info ahead of time.
+    //for optional static info, they would be collected when init_host() or init_vms() is called; 
+    //for optional dynamic info, their collecting threads would be started when init_host() or init_vms() is called. 
+    //the corresponding functions of optional info can be called with almost no cost;
+    //but if other functions are called without set corresponding flags, info would be collected immediately. It would have some performance cost depended on the collecting action/
     framework->init({
         //<<Optional Host Static Info>>
         { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
@@ -39,15 +42,15 @@ int main()
         { Option::OP_VM_USED_MEM_SIZE { } }
     });
 
-    //refresh <<Optional Host Static Info>>
+    //refresh <<Optional Host Static Info>>,
+    //and start threads of <<Optional Host Dynamic Info>>
     Host *host = framework->init_host();
     
     while(1) {
 
         //refresh <<Optional VM Static Info>>
-        std::vector<VM> vms = framework->init_vms(host); //get all the VMs on the host
-        //update_info would refresh <<Optional Host & VM Dynamic Info>>
-        framework->update_info(host, vms);
+        //and start threads of <<Optional VM Dynamic Info>>
+        std::vector<VM> vms = framework->init_vms(host);
 
         //your scheduler algorithm
         myscheduler(host, vms);
@@ -110,7 +113,6 @@ void myscheduler(HOST *host, std::vector<VM> &vms)
 
             //<<VM static info>>
                 //OP_VM_VCPU_VMTHREAD //Yu
-                vm.vm_id();
                 vm.vmthread_num();
                 vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
                 vm.vcpu_num();
@@ -126,6 +128,8 @@ void myscheduler(HOST *host, std::vector<VM> &vms)
                 vm.bindinfo_mem_node_ids();
 
             //<<VM dynamic info>>
+                //OP_VM_ID //Yu
+                vm.vm_id();
                 //OP_VM_CPU_BINDINFO ((( OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id);
