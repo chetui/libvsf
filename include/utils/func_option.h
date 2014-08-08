@@ -26,18 +26,6 @@ private:
     std::mutex options_mutex_;
 };
 
-//class OpNotEnable : public std::logic_error 
-//{
-//public:
-//    explicit OpNotEnable(const std::string &op_str, const std::string &s):
-//        std::logic_error(
-//op_str + " is not enabled. 
-//It is needed by function: " + s + ". 
-//Please use VSF::init() to enable " + op_str + "."
-//        ) 
-//    {}
-//};
-//
 class OptionParamVal 
 {
 public:

@@ -28,18 +28,18 @@ TEST_F(FuncOptionTest, have_option)
     ASSERT_EQ(has, true);
 }
 
-TEST_F(FuncOptionTest, have_option_dep) 
-{
-    map<Option, map<OptionParam, OptionParamVal> > ops = {
-        { Option::OP_VM_MEM_BINDINFO, { } }
-    };
-    fo->enable_option(ops);
-    bool has0 = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
-    bool has1 = fo->check_option(Option::OP_VM_VNODE);
-
-    ASSERT_EQ(has0, true);
-    ASSERT_EQ(has1, true);
-}
+//TEST_F(FuncOptionTest, have_option_dep) 
+//{
+//    map<Option, map<OptionParam, OptionParamVal> > ops = {
+//        { Option::OP_VM_MEM_BINDINFO, { } }
+//    };
+//    fo->enable_option(ops);
+//    bool has0 = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+//    bool has1 = fo->check_option(Option::OP_VM_VNODE);
+//
+//    ASSERT_EQ(has0, true);
+//    ASSERT_EQ(has1, true);
+//}
 
 TEST_F(FuncOptionTest, have_no_option) 
 {

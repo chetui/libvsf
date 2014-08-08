@@ -21,17 +21,17 @@ void FuncOption::enable_option(std::map<Option, std::map<OptionParam, OptionPara
     //enable ops
     options_.insert(ops.begin(), ops.end());
     
-    //enable all the dependent options of ops
-    for (auto& op : ops)
-    {
-        auto cnt = option_dep.count(op.first);
-        auto iter = option_dep.find(op.first);
-        while(cnt) {
-            options_.insert({iter->second, map<OptionParam, OptionParamVal>()});//when adding dependent options, always take default parameters
-            ++iter;
-            --cnt;
-        }
-    }
+//    //enable all the dependent options of ops
+//    for (auto& op : ops)
+//    {
+//        auto cnt = option_dep.count(op.first);
+//        auto iter = option_dep.find(op.first);
+//        while(cnt) {
+//            options_.insert({iter->second, map<OptionParam, OptionParamVal>()});//when adding dependent options, always take default parameters
+//            ++iter;
+//            --cnt;
+//        }
+//    }
 
     return;
 }
@@ -51,24 +51,6 @@ bool FuncOption::check_option(Option op)
 {
     lock_guard<mutex> lock(options_mutex_);
     return options_.count(op) > 0;
-//    bool res = true;
-//    set<Option> ops = func_to_option[fc];
-//    for (auto& op : ops)
-//    {
-//        if (options_.count(op) == 0)
-//        {
-//            res = false;
-//            break;
-//            void *func_trace[128];
-//            size_t size;
-//            size = backtrace(func_trace, 128);
-//            backtrace_symbols_fd(func_trace, size, STDERR_FILENO);
-//
-//            throw OpNotEnable(option_str[op], func_str[fc]);
-//        }
-//    }
-//
-//    return res;
 }
 
 std::map<OptionParam, OptionParamVal> &FuncOption::get_param(Option op)

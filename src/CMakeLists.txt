@@ -18,6 +18,7 @@ string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 set (SRC_LIST 
     sysinfo/host/static/node_core_hpthread.cpp
     sysinfo/host/static/node_dist.cpp
+    sysinfo/vm/static/vm_base.cpp
     sysinfo/define_func_option.cpp
     utils/func_option.cpp
     utils/runnable.cpp
@@ -45,6 +46,7 @@ set (SRC_LIST
     endmacro ()
 add_indi_test (test_host_node_core_hpthread)
 add_indi_test (test_host_node_dist)
+add_indi_test (test_vm_vm_base)
 add_indi_test (test_func_option)
 add_indi_test (test_vsf)
 add_indi_test (test_compat)

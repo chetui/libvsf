@@ -1,22 +1,32 @@
 #include "sysinfo/define_func_option.h"
 
-std::multimap<const Option, const Option> option_dep = {
-    { Option::OP_HS_TOTAL_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_HS_SYS_NODE_DIST, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_HS_TEST_NODE_DIST, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_HS_CPU_REUSE_RATIO, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_HS_CPU_USAGE, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_HS_USED_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_VM_VNODE, Option::OP_VM_VCPU_VMTHREAD },
-    { Option::OP_VM_MEM_POLICY, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_VM_CPU_BINDINFO, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_VM_CPU_BINDINFO, Option::OP_VM_VCPU_VMTHREAD },
-    { Option::OP_VM_MEM_BINDINFO, Option::OP_HS_NODE_CORE_HPTHREAD },
-    { Option::OP_VM_MEM_BINDINFO, Option::OP_VM_VNODE },
-    { Option::OP_VM_CPU_USAGE, Option::OP_VM_VCPU_VMTHREAD },
-    { Option::OP_VM_MISS_RATE, Option::OP_VM_VCPU_VMTHREAD },
-    { Option::OP_VM_USED_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD }
-};
+//suggested dependency of each options
+//std::multimap<const Option, const Option> option_dep = {
+//    { Option::OP_HS_TOTAL_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_HS_SYS_NODE_DIST, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_HS_TEST_NODE_DIST, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_HS_CPU_REUSE_RATIO, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_HS_CPU_USAGE, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_HS_USED_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_VM_VCPU_VMTHREAD, Option::OP_VM_BASE },
+//    { Option::OP_VM_VNODE, Option::OP_VM_VCPU_VMTHREAD },
+//    { Option::OP_VM_VNODE, Option::OP_VM_BASE },
+//    { Option::OP_VM_MEM_POLICY, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_VM_MEM_POLICY, Option::OP_VM_BASE },
+//    { Option::OP_VM_CPU_BINDINFO, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_VM_CPU_BINDINFO, Option::OP_VM_VCPU_VMTHREAD },
+//    { Option::OP_VM_CPU_BINDINFO, Option::OP_VM_BASE },
+//    { Option::OP_VM_MEM_BINDINFO, Option::OP_HS_NODE_CORE_HPTHREAD },
+//    { Option::OP_VM_MEM_BINDINFO, Option::OP_VM_VNODE },
+//    { Option::OP_VM_MEM_BINDINFO, Option::OP_VM_BASE },
+//    { Option::OP_VM_CPU_USAGE, Option::OP_VM_VCPU_VMTHREAD },
+//    { Option::OP_VM_CPU_USAGE, Option::OP_VM_BASE },
+//    { Option::OP_VM_MISS_RATE, Option::OP_VM_VCPU_VMTHREAD },
+//    { Option::OP_VM_MISS_RATE, Option::OP_VM_BASE },
+//    { Option::OP_VM_MEM_SAMPLE, Option::OP_VM_BASE },
+//    { Option::OP_VM_USED_MEM_SIZE, Option::OP_HS_NODE_CORE_HPTHREAD }
+//    { Option::OP_VM_USED_MEM_SIZE, Option::OP_VM_BASE }
+//};
 
 
 ////Functions to Options

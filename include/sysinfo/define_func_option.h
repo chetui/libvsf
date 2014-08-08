@@ -17,9 +17,9 @@ enum class Option : unsigned int {
     OP_HS_CPU_USAGE,
     OP_HS_USED_MEM_SIZE,
     //<<vm static info>>
+    OP_VM_BASE,
     OP_VM_VCPU_VMTHREAD,
     OP_VM_VNODE,
-    OP_VM_TOTAL_MEM_SIZE,
     OP_VM_MEM_POLICY,
     //<<vm dynamic info>>
     OP_VM_CPU_BINDINFO,
