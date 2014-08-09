@@ -63,6 +63,9 @@ MicroParam Host::get_param_test_node_dist()
         case OptionParam::LOOP:
             ret_p.loop = p.second.get_int();
             break;
+        default:
+            //cerr message "invalid parameter for OP_HS_TEST_NODE_DIST"
+            break;
         }
     }
     return ret_p;

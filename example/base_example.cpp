@@ -1,7 +1,8 @@
-#include <vector>
+#include <unistd.h>
+#include <set>
 #include "vsf.h"
 
-void myscheduler(std::vector<VM> &vms);
+void myscheduler(Host *host, std::set<VM> &vms);
 Vsf* framework = Vsf::get_instance();
 
 int main()
@@ -54,7 +55,7 @@ int main()
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
-        std::vector<VM> vms = framework->init_vms(host);
+        std::set<VM> vms = framework->init_vms(host);
 
         //your scheduler algorithm
         myscheduler(host, vms);
@@ -67,7 +68,7 @@ int main()
     return 0;
 }
 
-void myscheduler(HOST *host, std::vector<VM> &vms)
+void myscheduler(HOST *host, std::set<VM> &vms)
 {
     for (auto& vm : vms)
     {

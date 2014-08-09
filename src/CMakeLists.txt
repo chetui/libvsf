@@ -23,6 +23,7 @@ set (SRC_LIST
     utils/func_option.cpp
     utils/runnable.cpp
     framework/host.cpp
+    framework/vm.cpp
     framework/compat.cpp
     vsf.cpp
     )

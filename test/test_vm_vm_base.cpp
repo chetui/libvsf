@@ -34,7 +34,6 @@ TEST_F(VmBaseTest, vm_ids_with_thread)
 {
     vm_base->set_vm_cmd("qemu-system-x86_64");
     vm_base->start();
-    sleep(2);
     set<VmId> ids = vm_base->get_vm_ids();
     for(auto& id : ids)
         cout << id.start_timestamp << ":" << id.pid << " ";
@@ -55,7 +54,6 @@ TEST_F(VmBaseTest, vm_total_mem_size_with_thread)
 {
     vm_base->set_vm_cmd("qemu-system-x86_64");
     vm_base->start();
-    sleep(2);
     set<VmId> ids = vm_base->get_vm_ids();
     for (auto & id : ids)
         cout << "vm total mem size:" << vm_base->get_vm_total_mem_size(id) << endl;

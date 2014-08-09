@@ -20,11 +20,11 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     echo ""
     cd ./bin
     ./test_vm_vm_base
-#    ./test_func_option
-#    ./test_vsf
-#    ./test_compat
-#    ./test_host_node_core_hpthread
-#    ./test_host_node_dist
-#    #./test_all
+    ./test_func_option
+    ./test_vsf
+    ./test_compat
+    ./test_host_node_core_hpthread
+    ./test_host_node_dist
+    #./test_all
 fi
 #echo "========<<<CodeStyleCheck: cpplint>>>========="

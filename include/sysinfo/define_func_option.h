@@ -36,7 +36,8 @@ enum class OptionParam : unsigned int {
     PATH,
     SIZE_IN_MB,
     WORKLOAD_TYPE,
-    LOOP
+    LOOP,
+    VM_CMD
 };
 //extern std::map<const Option, const std::string> option_str;
 //

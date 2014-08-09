@@ -1,6 +1,7 @@
 #include "sysinfo/vm/static/vm_base.h"
 
 #include <cstdio>
+#include <cmath>
 #include <iostream>
 #include <regex>
 
@@ -8,21 +9,23 @@ using namespace std;
 
 VmBase::VmBase()
 {
-    FILE* fp = fopen(PID_MAX_FILE, "r");
-    if (fp == nullptr) {
-        //TODO throw except
-//        LOG(LogLevel::err) 
-//            << "VmProcs::get_pid_max: " << strerror(errno) << endl;
-    } else {
-        fscanf(fp, "%llu", &pid_max_);
-    }
+//    FILE* fp = fopen(PID_MAX_FILE, "r");
+//    if (fp == nullptr) {
+//        //TODO throw except
+////        LOG(LogLevel::err) 
+////            << "VmProcs::get_pid_max: " << strerror(errno) << endl;
+//    } else {
+//        fscanf(fp, "%llu", &pid_max_);
+//    }
 
+    has_data = false;
     buf_ = new char[BUF_SIZE];
 }
 
 VmBase::~VmBase()
 {
     delete[] buf_;
+    stop();
 }
 
 VmBase *VmBase::get_instance()
@@ -33,6 +36,10 @@ VmBase *VmBase::get_instance()
 
 void VmBase::set_vm_cmd(std::string vm_cmd)
 {
+    lock_guard<mutex> ids_lock(vm_ids_mutex_);
+    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
+    has_data = false;
+
     vm_ids_.clear();
     vm_total_mem_size_.clear();
     vm_cmd_ = vm_cmd;
@@ -40,22 +47,32 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
 
 std::set<VmId> VmBase::get_vm_ids()
 {
-    //TODO make sure already inited
     if(!joinable())
         refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> ids_lock(vm_ids_mutex_);
     return vm_ids_;
 }
 
 int VmBase::get_vm_total_mem_size(VmId vm_id)
 {
-    //TODO make sure already inited
     if(!joinable())
         refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
     return vm_total_mem_size_[vm_id];
 }
 
 void VmBase::refresh()
 {
+    lock_guard<mutex> ids_lock(vm_ids_mutex_);
+    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
+    has_data = true;
+
+    vm_ids_.clear();
+    vm_total_mem_size_.clear();
     string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
     time_t cur_time;
     time(&cur_time);
@@ -115,7 +132,7 @@ void VmBase::run()
 
 bool operator==(const VmId &lv, const VmId &rv)
 {
-    return lv.start_timestamp == rv.start_timestamp
+    return abs(difftime(lv.start_timestamp, rv.start_timestamp)) <= 2
         && lv.pid == rv.pid;
 }
 
@@ -127,3 +144,8 @@ bool operator<(const VmId &lv, const VmId &rv)
         return lv.start_timestamp < rv.start_timestamp;
 }
 
+ostream &operator<<(ostream &os, const VmId &v)
+{
+    os << v.start_timestamp << ":" << v.pid;
+    return os;
+}

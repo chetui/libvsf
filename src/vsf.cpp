@@ -6,6 +6,7 @@ using namespace std;
 Vsf::Vsf()
 {
     func_option_ = FuncOption::get_instance();
+    vm_set_ = VmSet::get_instance();
 }
 
 Vsf* Vsf::get_instance()
@@ -27,3 +28,8 @@ Host *Vsf::init_host()
     return host_;
 }
 
+
+set<VM> Vsf::init_vms(Host *host)
+{
+    return vm_set_->init_vms(host);
+}
