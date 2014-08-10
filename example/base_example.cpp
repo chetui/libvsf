@@ -30,7 +30,6 @@ int main()
         { Option::OP_HS_CPU_USAGE, { } },
         { Option::OP_HS_USED_MEM_SIZE, { } },
         //<<Optional VM Static Info>>
-        { Option::OP_VM_VCPU_VMTHREAD, { } },
         { Option::OP_VM_VNODE, { } },
         { Option::OP_VM_MEM_POLICY, { } },
         //<<Optional VM Dynamic Info>>
@@ -118,12 +117,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->used_mem_size(node_id); //DONE
 
             //<<VM static info>>
-                //OP_VM_VCPU_VMTHREAD ((( OP_VM_BASE //Yu
-                vm.vmthread_num();
-                vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
-                vm.vcpu_num();
-                vm.vcpu_ids();
-                //OP_VM_VNODE ((( OP_VM_VCPU_VMTHREAD, OP_VM_BASE //Zuo
+                //OP_VM_VNODE ((( OP_VM_BASE //Zuo
                 vm.vcpu_ids(vnode_id); //vNUMA //DONE
                 vm.vnode_num(); //vNUMA //DONE
                 vm.vnode_ids(); //vNUMA //DONE
@@ -135,17 +129,23 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_VM_BASE //Yu
                 vm.vm_id();
                 vm.total_mem_size();
-                //OP_VM_CPU_BINDINFO ((( OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
+                vm.stable_vmthread_num();
+                vm.stable_vmthread_ids();
+                vm.volatile_vmthread_num();//volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
+                vm.volatile_vmthread_ids();
+                vm.vcpu_num();
+                vm.vcpu_ids();
+                //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id);
                 vm.bindinfo_hpthread_ids(vmthread_id);
                 //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
-                //OP_VM_CPU_USAGE ((( OP_VM_VCPU_VMTHREAD, OP_VM_BASE //Yu
+                //OP_VM_CPU_USAGE ((( OP_VM_BASE //Yu
                 vm.cpu_usage();
                 vm.cpu_usage(vcpu_id);
                 vm.cpu_usage(vmthread_id);
-                //OP_VM_MISS_RATE ((( OP_VM_VCPU_VMTHREAD, OP_VM_BASE //Yu
+                //OP_VM_MISS_RATE ((( OP_VM_BASE //Yu
                 vm.miss_rate(MISS_RATE_TYPE);
                 vm.miss_rate(MISS_RATE_TYPE, vcpu_id);
                 vm.miss_rate(MISS_RATE_TYPE, vmthread_id);
