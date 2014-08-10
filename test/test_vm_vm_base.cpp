@@ -3,7 +3,7 @@
 #include <set>
 #include "gtest/gtest.h"
 
-#include "sysinfo/vm/static/vm_base.h"
+#include "sysinfo/vm/dynamic/vm_base.h"
 
 using namespace std;
 
@@ -41,10 +41,18 @@ TEST_F(VmBaseTest, vm_ids_with_thread)
     vm_base->stop();
 }
 
-TEST_F(VmBaseTest, vm_ids_without_thread)
+TEST_F(VmBaseTest, vm_ids_without_thread_no_p)
 {
     vm_base->set_vm_cmd("qemu-system-x86_64");
     set<VmId> ids = vm_base->get_vm_ids();
+    for(auto& id : ids)
+        cout << id.start_timestamp << ":" << id.pid << " ";
+    cout << endl;
+}
+
+TEST_F(VmBaseTest, vm_ids_without_thread_p)
+{
+    set<VmId> ids = vm_base->get_vm_ids("qemu-system-x86_64");
     for(auto& id : ids)
         cout << id.start_timestamp << ":" << id.pid << " ";
     cout << endl;

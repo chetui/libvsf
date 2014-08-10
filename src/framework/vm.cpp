@@ -17,6 +17,11 @@ VmSet* VmSet::get_instance()
 
 std::set<VM> VmSet::init_vms(Host *host)
 {
+    return init_vms(host, "");
+}
+
+std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
+{
     //TODO check whether host is inited
     host = host;
 
@@ -40,7 +45,12 @@ std::set<VM> VmSet::init_vms(Host *host)
         if (!vm_base_->joinable())
             vm_base_->start();
     }
-    set<VmId> vm_ids = vm_base_->get_vm_ids();
+
+    set<VmId> vm_ids;
+    if (vm_cmd == "")
+        vm_ids = vm_base_->get_vm_ids();
+    else
+        vm_ids = vm_base_->get_vm_ids(vm_cmd);
     for (auto& vm_id : vm_ids)
         vms_.insert(VM(vm_id));
 

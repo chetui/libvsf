@@ -2,8 +2,9 @@
 #define _VM_
 
 #include <set>
+#include <string>
 #include "utils/func_option.h"
-#include "sysinfo/vm/static/vm_base.h"
+#include "sysinfo/vm/dynamic/vm_base.h"
 
 class Host;
 class VM;
@@ -12,6 +13,7 @@ class VmSet {
 public:
     static VmSet* get_instance();
     std::set<VM> init_vms(Host *host);
+    std::set<VM> init_vms(Host *host, std::string vm_cmd);
 private:
     VmSet();
     std::set<VM> vms_;

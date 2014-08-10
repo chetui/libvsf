@@ -1,4 +1,4 @@
-#include "sysinfo/vm/static/vm_base.h"
+#include "sysinfo/vm/dynamic/vm_base.h"
 
 #include <cstdio>
 #include <cmath>
@@ -45,6 +45,12 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
     vm_cmd_ = vm_cmd;
 }
 
+std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
+{
+    set_vm_cmd(vm_cmd);
+    return get_vm_ids();
+}
+
 std::set<VmId> VmBase::get_vm_ids()
 {
     if(!joinable())
@@ -62,7 +68,10 @@ int VmBase::get_vm_total_mem_size(VmId vm_id)
     while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
     lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
-    return vm_total_mem_size_[vm_id];
+    if (vm_total_mem_size_.find(vm_id) != vm_total_mem_size_.end())
+        return vm_total_mem_size_[vm_id];
+    else
+        return -1;
 }
 
 void VmBase::refresh()

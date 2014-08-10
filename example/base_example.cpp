@@ -56,6 +56,7 @@ int main()
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
         std::set<VM> vms = framework->init_vms(host);
+        std::set<VM> vms = framework->init_vms(host, "qemu-system-x86_64");
 
         //your scheduler algorithm
         myscheduler(host, vms);
@@ -117,9 +118,6 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->used_mem_size(node_id); //DONE
 
             //<<VM static info>>
-                //OP_VM_BASE //Yu
-                vm.vm_id();
-                vm.total_mem_size();
                 //OP_VM_VCPU_VMTHREAD ((( OP_VM_BASE //Yu
                 vm.vmthread_num();
                 vm.vmthread_ids(); //need to check whether some threads would be created, which make vmthread_num & vmthread_ids to be dynamic info.
@@ -134,6 +132,9 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.bindinfo_mem_node_ids();
 
             //<<VM dynamic info>>
+                //OP_VM_BASE //Yu
+                vm.vm_id();
+                vm.total_mem_size();
                 //OP_VM_CPU_BINDINFO ((( OP_VM_VCPU_VMTHREAD, OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id);

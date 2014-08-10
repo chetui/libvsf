@@ -15,26 +15,6 @@ protected:
     Vsf* vsf;
 };
 
-TEST_F(VsfTest, vm_base)
-{
-    vsf->init({ 
-        { Option::OP_VM_BASE,
-            {
-                { OptionParam::VM_CMD, "qemu-system-x86_64" }
-            }
-        }
-    });
-    Host *host = vsf->init_host();
-
-    set<VM> vms = vsf->init_vms(host);
-
-    for (auto& vm : vms)
-    {
-        cout << vm.vm_id() << ":" << vm.total_mem_size() << endl;
-    }
-
-}
-
 TEST_F(VsfTest, node_num_and_node_dist)
 {
     vsf->init({ 

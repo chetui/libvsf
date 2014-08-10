@@ -36,7 +36,8 @@ int main()
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
-        std::set<VM> vms = framework->init_vms(host);
+        //std::set<VM> vms = framework->init_vms(host);
+        std::set<VM> vms = framework->init_vms(host, "qemu-system-x86_64");
 
         //your scheduler algorithm
         myscheduler(host, vms);
