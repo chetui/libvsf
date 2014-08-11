@@ -131,7 +131,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_VM_VNODE ((( OP_VM_BASE //Zuo
                 vm.vcpu_ids(vnode_id); //vNUMA //DONE
                 vm.vnode_num(); //vNUMA //DONE
-                vm.vnode_ids(); //vNUMA //DONE
+                vm.vnode_ids(); //vNUMA //DONE //VnodeId need to have a VM start timestamp, because it would be used by set_mem
                 //OP_VM_MEM_POLICY ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
                 vm.bindinfo_mem_node_ids();
@@ -143,13 +143,13 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.uuid();//no use
                 vm.total_mem_size();
                     //Host Perspective
-                vm.stable_vmthread_num();
+                vm.stable_vmthread_num();//typedef VmthreadId = VmId
                 vm.stable_vmthread_ids();//vcpu_ids + tgid
                 vm.volatile_vmthread_num();//volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
                 vm.volatile_vmthread_ids();
                     //VM Perspective
                 vm.vcpu_num();//Currently not support maxcpus. Throw Exception
-                vm.vcpu_ids();
+                vm.vcpu_ids();//typedef VcpuId = VmthreadId;
                 vm.vsocket_num();//no use //vsocket,vcore,vhpthread 's id may need vnuma's help
                 vm.vcore_num();//no use
                 vm.vhpthread_num();//no use
@@ -175,7 +175,9 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 framework->set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu
                 framework->set_mem_mig(vm_id, node_ids); //Zuo
                 framework->set_mem_mig(vm_id, node_ids, addr_start, page_size); //Zuo
-                framework->set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
+                //which one??
+                framework->set_mem_mig(vm_id, vnode_id, node_id); //vNUMA //Zuo
+                //framework->set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
     }
 
     return;
