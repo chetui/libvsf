@@ -78,18 +78,27 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_HS_NODE_CORE_HPTHREAD //Yu
                 host->node_num(); //DONE
                 host->node_ids();
+                host->node_id(socket_id); //DONE
                 host->node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
                 host->node_id(hpthread_id); //DONE
+                host->socket_num();
+                host->socket_num(node_id);
+                host->socket_ids();
+                host->socket_ids(node_id);
+                host->socket_id(core_id);
+                host->socket_id(hpthread_id);
                 host->core_num();
                 host->core_num(node_id);
                 host->core_ids();
                 host->core_ids(node_id);
+                host->core_ids(socket_id);
                 host->core_id(hpthread_id);
                 host->hpthread_num(); //DONE
                 host->hpthread_num(node_id); //DONE
                 host->hpthread_num(core_id);
                 host->hpthread_ids();
                 host->hpthread_ids(node_id); //DONE
+                host->hpthread_ids(socket_id);
                 host->hpthread_ids(core_id);
                 //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
                 host->total_mem_size();
@@ -107,9 +116,11 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CORE_HPTHREAD /Yu
                 host->cpu_reuse_ratio();
                 host->cpu_reuse_ratio(node_id);
+                host->cpu_reuse_ratio(socket_id);
                 //OP_HS_CPU_USAGE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
                 host->cpu_usage();
                 host->cpu_usage(node_id);
+                host->cpu_usage(socket_id);
                 host->cpu_usage(core_id);
                 host->cpu_usage(hpthread_id);
                 //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
@@ -128,27 +139,31 @@ void myscheduler(HOST *host, std::set<VM> &vms)
             //<<VM dynamic info>>
                 //OP_VM_BASE //Yu
                 vm.vm_id();
+                vm.name();//no use
+                vm.uuid();//no use
                 vm.total_mem_size();
+                    //Host Perspective
                 vm.stable_vmthread_num();
-                vm.stable_vmthread_ids();
+                vm.stable_vmthread_ids();//vcpu_ids + tgid
                 vm.volatile_vmthread_num();//volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
                 vm.volatile_vmthread_ids();
-                vm.vcpu_num();
+                    //VM Perspective
+                vm.vcpu_num();//Currently not support maxcpus. Throw Exception
                 vm.vcpu_ids();
+                vm.vsocket_num();//no use //vsocket,vcore,vhpthread 's id may need vnuma's help
+                vm.vcore_num();//no use
+                vm.vhpthread_num();//no use
                 //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
-                vm.bindinfo_hpthread_ids(vcpu_id);
-                vm.bindinfo_hpthread_ids(vmthread_id);
+                vm.bindinfo_hpthread_ids(vcpu_id/vmthread_id);
                 //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
                 //OP_VM_CPU_USAGE ((( OP_VM_BASE //Yu
                 vm.cpu_usage();
-                vm.cpu_usage(vcpu_id);
-                vm.cpu_usage(vmthread_id);
+                vm.cpu_usage(vcpu_id/vmthread_id);
                 //OP_VM_MISS_RATE ((( OP_VM_BASE //Yu
                 vm.miss_rate(MISS_RATE_TYPE);
-                vm.miss_rate(MISS_RATE_TYPE, vcpu_id);
-                vm.miss_rate(MISS_RATE_TYPE, vmthread_id);
+                vm.miss_rate(MISS_RATE_TYPE, vcpu_id/vmthread_id);
                 //OP_VM_MEM_SAMPLE ((( OP_VM_BASE //Yu
                 vm.mem_sample(); //sample the latest visited page addr
                 //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
@@ -157,8 +172,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
 
         //OUTPUT: decide scheduling strategy
 
-                framework->set_vcpu_mig(vcpu_id, hpthread_ids); //Yu
-                framework->set_vcpu_mig(vmthread_id, hpthread_ids); //Yu
+                framework->set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu
                 framework->set_mem_mig(vm_id, node_ids); //Zuo
                 framework->set_mem_mig(vm_id, node_ids, addr_start, page_size); //Zuo
                 framework->set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
