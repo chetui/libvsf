@@ -9,4 +9,5 @@ a library for Virtual Machine Scheduling Framework.
 
 #### Dev Guide 
 
+[Sysinfo Development Guide](https://github.com/chetui/libvsf/blob/master/doc/sysinfo_dev_guide.md)
 Project Tools: Gtest, cpplint.

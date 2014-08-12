@@ -11,6 +11,8 @@
 #include "../../../utils/runnable.h"
 
 struct VmId;
+using VmthreadId = VmId;
+using VcpuId = VmId;
 
 class VmBase : public Runnable {
 public:
@@ -28,6 +30,14 @@ private:
 
     std::set<VmId> vm_ids_;
     std::map<VmId, int> vm_total_mem_size_;
+    std::map<VmId, std::string> vm_name_;
+    std::map<VmId, std::string> vm_uuid_;
+    std::map<VmId, std::string> vm_stable_vmthread_ids_;
+    std::map<VmId, std::string> vm_volatile_vmthread_ids_;
+    std::map<VmId, std::string> vm_vcpu_ids_;
+    std::map<VmId, std::string> vm_vsocket_num_;
+    std::map<VmId, std::string> vm_vcore_num_;
+    std::map<VmId, std::string> vm_vhpthread_num_;
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
     std::mutex vm_ids_mutex_;
