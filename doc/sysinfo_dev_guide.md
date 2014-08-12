@@ -7,14 +7,14 @@ The purpose of this guide is to help the developers who want to add new sysinfo 
 
 #### the name of API
 
-The final API is just the name of the sysinfo data, like *int node_num()*.
+The final API is just the name of the sysinfo data, like *int node_num()*.  
 The name of sysinfo class public function is get\_\*(), like *int get_node_num()*.
 
 #### input parameter type of sysinfo class public function
 
-If input parameter is **fundamental types**, such as *int* and *double*:
-**use copy**. For example, *int get_node_id(int core_id)*.
-If input parameter is **class types**, such as *class*, *struct* and *union*:
+If input parameter is **fundamental types**, such as *int* and *double*:  
+**use copy**. For example, *int get_node_id(int core_id)*.  
+If input parameter is **class types**, such as *class*, *struct* and *union*:  
 **use const reference**, which can imporve performance. For example, *int get_cpu_usage(const VcpuId &vcpu_id)*.
 
 #### return type of sysinfo class public function
@@ -23,7 +23,7 @@ Return type must be copy, rather than reference or pointer, in case of modificat
 
 #### config parameter of sysinfo class public function
 
-Config parameter is optional. 
+Config parameter is optional.   
 If the result of your sysinfo is based on user-defined config, then you need to add config parameter into your design.
 
 The logic of config parameter:
@@ -37,8 +37,8 @@ The implementation of config parameter:
 
 #### multi-thread safety
 
-The sysinfo class must be multi-thread safety. 
-It means you need to consider all the data in the sysinfo class, to check whether they are multi-thread safety.
+The sysinfo class must be multi-thread safety.   
+It means you need to consider all the data in the sysinfo class, to check whether they are multi-thread safety.  
 
 In my practice, you need to consider each member variable one by one. 
 * Add corresponding *mutex* to STL container; Add *lock_guard<mutex>* in each functions who read or write STL container;
