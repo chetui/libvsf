@@ -12,10 +12,8 @@ The name of sysinfo class public function is get\_\*(), like *int get_node_num()
 
 #### input parameter type of sysinfo class public function
 
-If input parameter is **fundamental types**, such as *int* and *double*:  
-**use copy**. For example, *int get_node_id(int core_id)*.  
-If input parameter is **class types**, such as *class*, *struct* and *union*:  
-**use const reference**, which can imporve performance. For example, *int get_cpu_usage(const VcpuId &vcpu_id)*.
+If input parameter is **fundamental types**, such as *int* and *double*, **use copy**. For example, *int get_node_id(int core_id)*.  
+If input parameter is **class types**, such as *class*, *struct* and *union*, **use const reference**, which can imporve performance. For example, *int get_cpu_usage(const VcpuId &vcpu_id)*.
 
 #### return type of sysinfo class public function
 
