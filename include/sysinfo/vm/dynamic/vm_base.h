@@ -20,7 +20,12 @@ public:
     void set_vm_cmd(std::string vm_cmd);
     std::set<VmId> get_vm_ids();
     std::set<VmId> get_vm_ids(std::string vm_cmd);
-    int get_vm_total_mem_size(VmId vm_id);
+    std::string get_name(VmId vm_id);
+    std::string get_uuid(VmId vm_id);
+    int get_vsocket_num(VmId vm_id);
+    int get_vcore_num(VmId vm_id);
+    int get_vhpthread_num(VmId vm_id);
+    int get_total_mem_size(VmId vm_id);
 
 private:
     VmBase();
@@ -29,19 +34,24 @@ private:
     void refresh();
 
     std::set<VmId> vm_ids_;
-    std::map<VmId, int> vm_total_mem_size_;
-    std::map<VmId, std::string> vm_name_;
-    std::map<VmId, std::string> vm_uuid_;
-    std::map<VmId, std::string> vm_stable_vmthread_ids_;
-    std::map<VmId, std::string> vm_volatile_vmthread_ids_;
-    std::map<VmId, std::string> vm_vcpu_ids_;
-    std::map<VmId, std::string> vm_vsocket_num_;
-    std::map<VmId, std::string> vm_vcore_num_;
-    std::map<VmId, std::string> vm_vhpthread_num_;
+    std::map<VmId, std::string> name_;
+    std::map<VmId, std::string> uuid_;
+//    std::map<VmId, std::string> vm_stable_vmthread_ids_;
+//    std::map<VmId, std::string> vm_volatile_vmthread_ids_; //proc
+//    std::map<VmId, std::string> vm_vcpu_ids_; //cgroup
+    std::map<VmId, int> vsocket_num_;
+    std::map<VmId, int> vcore_num_;
+    std::map<VmId, int> vhpthread_num_;
+    std::map<VmId, int> total_mem_size_;
+    std::mutex vm_ids_mutex_;
+    std::mutex name_mutex_;
+    std::mutex uuid_mutex_;
+    std::mutex vsocket_num_mutex_;
+    std::mutex vcore_num_mutex_;
+    std::mutex vhpthread_num_mutex_;
+    std::mutex total_mem_size_mutex_;
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
-    std::mutex vm_ids_mutex_;
-    std::mutex vm_total_mem_size_mutex_;
     std::atomic<bool> has_data;
 
     static constexpr const int BUF_SIZE = 102400;

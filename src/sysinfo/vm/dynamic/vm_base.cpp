@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <regex>
+#include "utils/str_tools.h"
 
 using namespace std;
 
@@ -37,11 +38,21 @@ VmBase *VmBase::get_instance()
 void VmBase::set_vm_cmd(std::string vm_cmd)
 {
     lock_guard<mutex> ids_lock(vm_ids_mutex_);
-    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
+    lock_guard<mutex> name_lock(name_mutex_);
+    lock_guard<mutex> uuid_lock(uuid_mutex_);
+    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
+    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
+    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
+    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
     has_data = false;
 
     vm_ids_.clear();
-    vm_total_mem_size_.clear();
+    name_.clear();
+    uuid_.clear();
+    vsocket_num_.clear();
+    vcore_num_.clear();
+    vhpthread_num_.clear();
+    total_mem_size_.clear();
     vm_cmd_ = vm_cmd;
 }
 
@@ -61,27 +72,104 @@ std::set<VmId> VmBase::get_vm_ids()
     return vm_ids_;
 }
 
-int VmBase::get_vm_total_mem_size(VmId vm_id)
+string VmBase::get_name(VmId vm_id)
 {
     if(!joinable())
         refresh();
     while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
-    if (vm_total_mem_size_.find(vm_id) != vm_total_mem_size_.end())
-        return vm_total_mem_size_[vm_id];
+    lock_guard<mutex> name_lock(name_mutex_);
+    for(auto& n : name_)
+        cout << "get_name " << n.first << " " << n.second << endl;
+    if (name_.find(vm_id) != name_.end())
+        return name_[vm_id];
+    else
+        return "";
+}
+
+string VmBase::get_uuid(VmId vm_id)
+{
+    if(!joinable())
+        refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> uuid_lock(uuid_mutex_);
+    if (uuid_.find(vm_id) != uuid_.end())
+        return uuid_[vm_id];
+    else
+        return "";
+}
+
+int VmBase::get_vsocket_num(VmId vm_id)
+{
+    if(!joinable())
+        refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
+    if (vsocket_num_.find(vm_id) != vsocket_num_.end())
+        return vsocket_num_[vm_id];
+    else
+        return -1;
+}
+
+int VmBase::get_vcore_num(VmId vm_id)
+{
+    if(!joinable())
+        refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
+    if (vcore_num_.find(vm_id) != vcore_num_.end())
+        return vcore_num_[vm_id];
+    else
+        return -1;
+}
+
+int VmBase::get_vhpthread_num(VmId vm_id)
+{
+    if(!joinable())
+        refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
+    if (vhpthread_num_.find(vm_id) != vhpthread_num_.end())
+        return vhpthread_num_[vm_id];
+    else
+        return -1;
+}
+
+int VmBase::get_total_mem_size(VmId vm_id)
+{
+    if(!joinable())
+        refresh();
+    while(!has_data) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
+    if (total_mem_size_.find(vm_id) != total_mem_size_.end())
+        return total_mem_size_[vm_id];
     else
         return -1;
 }
 
 void VmBase::refresh()
 {
-    lock_guard<mutex> ids_lock(vm_ids_mutex_);
-    lock_guard<mutex> vm_total_mem_size_lock(vm_total_mem_size_mutex_);
+    lock_guard<mutex> vm_ids_lock(vm_ids_mutex_);
+    lock_guard<mutex> name_lock(name_mutex_);
+    lock_guard<mutex> uuid_lock(uuid_mutex_);
+    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
+    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
+    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
+    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
     has_data = true;
 
     vm_ids_.clear();
-    vm_total_mem_size_.clear();
+    name_.clear();
+    uuid_.clear();
+    vsocket_num_.clear();
+    vcore_num_.clear();
+    vhpthread_num_.clear();
+    total_mem_size_.clear();
     string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
     time_t cur_time;
     time(&cur_time);
@@ -114,15 +202,61 @@ void VmBase::refresh()
         VmId vm_id(cur_time, stoull(pid));
         vm_ids_.insert(vm_id);
 
-        //add vm_total_mem_size
-        auto iter = find(args.begin(), args.end(), "-m");
-        int size = -1;
+        //add name
+        string name = "";
+        auto name_iter = find(args.begin(), args.end(), "-name");
+        if (name_iter != args.end())
+        {
+            ++name_iter;
+            name = *name_iter;
+        }
+        else
+        {
+            //TODO throw //because of cgroup need it
+        }
+        name_[vm_id] = name;
+
+        //add uuid
+        string uuid = "";
+        auto uuid_iter = find(args.begin(), args.end(), "-uuid");
+        if (uuid_iter != args.end())
+        {
+            ++uuid_iter;
+            uuid = *uuid_iter;
+        }
+        uuid_[vm_id] = uuid;
+
+        //add vsocket vcore vhpthread
+        auto iter = find(args.begin(), args.end(), "-smp");
         if (iter != args.end())
         {
             ++iter;
-            size = stoi(*iter);
+            vector<string> ops;
+            str_tools::split(*iter, ',', ops);
+            for(auto& op : ops)
+            {
+                vector<string> data;
+                str_tools::split(op, '=', data);
+                if (data.size() == 2) {
+                    if(data[0] == "sockets")
+                        vsocket_num_[vm_id] = stoi(data[1]);
+                    else if(data[0] == "cores")
+                        vcore_num_[vm_id] = stoi(data[1]);
+                    else if(data[0] == "threads")
+                        vhpthread_num_[vm_id] = stoi(data[1]);
+                }
+            }
         }
-        vm_total_mem_size_[vm_id] = size;
+
+        //add total_mem_size
+        int size = -1;
+        auto size_iter = find(args.begin(), args.end(), "-m");
+        if (size_iter != args.end())
+        {
+            ++size_iter;
+            size = stoi(*size_iter);
+        }
+        total_mem_size_[vm_id] = size;
     }
     pclose(data);
     

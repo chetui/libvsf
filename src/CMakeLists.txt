@@ -22,6 +22,7 @@ set (SRC_LIST
     sysinfo/define_func_option.cpp
     utils/func_option.cpp
     utils/runnable.cpp
+    utils/str_tools.cpp
     framework/host.cpp
     framework/vm.cpp
     framework/compat.cpp

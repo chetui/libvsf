@@ -78,9 +78,9 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_HS_NODE_CORE_HPTHREAD //Yu
                 host->node_num(); //DONE
                 host->node_ids();
-                host->node_id(socket_id); //DONE
+                host->node_id(socket_id);
                 host->node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
-                host->node_id(hpthread_id); //DONE
+                host->node_id(hpthread_id);
                 host->socket_num();
                 host->socket_num(node_id);
                 host->socket_ids();
@@ -93,11 +93,11 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->core_ids(node_id);
                 host->core_ids(socket_id);
                 host->core_id(hpthread_id);
-                host->hpthread_num(); //DONE
-                host->hpthread_num(node_id); //DONE
+                host->hpthread_num();
+                host->hpthread_num(node_id);
                 host->hpthread_num(core_id);
                 host->hpthread_ids();
-                host->hpthread_ids(node_id); //DONE
+                host->hpthread_ids(node_id);
                 host->hpthread_ids(socket_id);
                 host->hpthread_ids(core_id);
                 //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
@@ -124,24 +124,24 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->cpu_usage(core_id);
                 host->cpu_usage(hpthread_id);
                 //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
-                host->used_mem_size(); //DONE
-                host->used_mem_size(node_id); //DONE
+                host->used_mem_size(); 
+                host->used_mem_size(node_id);
 
             //<<VM static info>>
                 //OP_VM_VNODE ((( OP_VM_BASE //Zuo
-                vm.vcpu_ids(vnode_id); //vNUMA //DONE
-                vm.vnode_num(); //vNUMA //DONE
-                vm.vnode_ids(); //vNUMA //DONE //VnodeId need to have a VM start timestamp, because it would be used by set_mem
+                vm.vcpu_ids(vnode_id); //vNUMA 
+                vm.vnode_num(); //vNUMA
+                vm.vnode_ids(); //vNUMA //VnodeId need to have a VM start timestamp, because it would be used by set_mem
                 //OP_VM_MEM_POLICY ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
                 vm.bindinfo_mem_node_ids();
 
             //<<VM dynamic info>>
                 //OP_VM_BASE //Yu
-                vm.vm_id();
-                vm.name();//no use
-                vm.uuid();//no use
-                vm.total_mem_size();
+                vm.vm_id();//DONE
+                vm.name();//no use //DONE
+                vm.uuid();//no use //DONE
+                vm.total_mem_size(); //DONE
                     //Host Perspective
                 vm.stable_vmthread_num();//typedef VmthreadId = VmId
                 vm.stable_vmthread_ids();//vcpu_ids + tgid
@@ -150,9 +150,9 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                     //VM Perspective
                 vm.vcpu_num();//Currently not support maxcpus. Throw Exception
                 vm.vcpu_ids();//typedef VcpuId = VmthreadId;
-                vm.vsocket_num();//no use //vsocket,vcore,vhpthread 's id may need vnuma's help
-                vm.vcore_num();//no use
-                vm.vhpthread_num();//no use
+                vm.vsocket_num();//no use //vsocket,vcore,vhpthread 's id may need vnuma's help //DONE
+                vm.vcore_num();//no use //DONE
+                vm.vhpthread_num();//no use //DONE
                 //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id/vmthread_id);

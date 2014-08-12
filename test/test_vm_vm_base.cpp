@@ -58,21 +58,34 @@ TEST_F(VmBaseTest, vm_ids_without_thread_p)
     cout << endl;
 }
     
-TEST_F(VmBaseTest, vm_total_mem_size_with_thread)
+TEST_F(VmBaseTest, vm_other_info_with_thread)
 {
     vm_base->set_vm_cmd("qemu-system-x86_64");
     vm_base->start();
     set<VmId> ids = vm_base->get_vm_ids();
-    for (auto & id : ids)
-        cout << "vm total mem size:" << vm_base->get_vm_total_mem_size(id) << endl;
+    for (auto & id : ids) {
+        cout << "vm name:" << vm_base->get_name(id) << endl;
+        cout << "vm uuid:" << vm_base->get_uuid(id) << endl;
+        cout << "vm vsocket_num:" << vm_base->get_vsocket_num(id) << endl;
+        cout << "vm vcore_num:" << vm_base->get_vcore_num(id) << endl;
+        cout << "vm vhpthread:" << vm_base->get_vhpthread_num(id) << endl;
+        cout << "vm total mem size:" << vm_base->get_total_mem_size(id) << endl;
+    }
     vm_base->stop();
 }
 
-TEST_F(VmBaseTest, vm_total_mem_size_without_thread)
+TEST_F(VmBaseTest, vm_other_info_without_thread)
 {
     vm_base->set_vm_cmd("qemu-system-x86_64");
     set<VmId> ids = vm_base->get_vm_ids();
     for (auto & id : ids)
-        cout << "vm total mem size:" << vm_base->get_vm_total_mem_size(id) << endl;
+    {
+        cout << "vm name:" << vm_base->get_name(id) << endl;
+        cout << "vm uuid:" << vm_base->get_uuid(id) << endl;
+        cout << "vm vsocket_num:" << vm_base->get_vsocket_num(id) << endl;
+        cout << "vm vcore_num:" << vm_base->get_vcore_num(id) << endl;
+        cout << "vm vhpthread:" << vm_base->get_vhpthread_num(id) << endl;
+        cout << "vm total mem size:" << vm_base->get_total_mem_size(id) << endl;
+    }
 }
     

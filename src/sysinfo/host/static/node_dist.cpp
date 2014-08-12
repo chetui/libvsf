@@ -110,7 +110,7 @@ std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
 
     // text processing to get distance
     std::vector<std::string> res_in_line;
-    split(res, '\n', res_in_line);
+    str_tools::split(res, '\n', res_in_line);
     std::vector< std::vector<int> > node_dist;
     std::vector<std::string>::iterator i = res_in_line.begin();
     i++; // ignore the first line "node 0 1 ..."
@@ -118,7 +118,7 @@ std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
     {
         std::vector<std::string> split_res;
         std::vector<int> line;
-        split(*i, ' ', split_res); // e.g. ["0:", "10", "20"]
+        str_tools::split(*i, ' ', split_res); // e.g. ["0:", "10", "20"]
         for(unsigned int j=1; j<split_res.size(); j++)
         {
             line.push_back(atoi(split_res[j].c_str()));
@@ -142,25 +142,6 @@ void NodeDist::refresh_sys()
 void NodeDist::refresh_test(const MicroParam &param)
 {
     get_test_node_dist(param);
-}
-
-void NodeDist::split(std::string& s, char delim, std::vector<std::string>& ret)
-{
-    int len = s.size();
-    std::string sub_str = "";
-    for(int i=0; i<len; i++)
-    {
-        if(s.at(i) == delim)            
-        {
-            if(sub_str != "")
-            {
-                ret.push_back(sub_str);
-                sub_str = "";
-            }
-        }
-        else
-            sub_str.push_back(s.at(i));
-    }
 }
 
 bool operator==(const MicroParam &lp, const MicroParam &rp)

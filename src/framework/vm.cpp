@@ -68,9 +68,34 @@ VmId VM::vm_id() const
     return vm_id_;
 }
 
+string VM::name() const
+{
+    return vm_base_->get_name(vm_id_);
+}
+
+string VM::uuid() const
+{
+    return vm_base_->get_uuid(vm_id_);
+}
+
+int VM::vsocket_num() const
+{
+    return vm_base_->get_vsocket_num(vm_id_);
+}
+
+int VM::vcore_num() const
+{
+    return vm_base_->get_vcore_num(vm_id_);
+}
+
+int VM::vhpthread_num() const
+{
+    return vm_base_->get_vhpthread_num(vm_id_);
+}
+
 int VM::total_mem_size() const
 {
-    return vm_base_->get_vm_total_mem_size(vm_id_);
+    return vm_base_->get_total_mem_size(vm_id_);
 }
 
 VM& VM::operator=(const VM &v)

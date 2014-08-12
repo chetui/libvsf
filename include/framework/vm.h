@@ -28,6 +28,11 @@ public:
     VM &operator=(const VM &v);
     
     VmId vm_id() const;
+    std::string name() const;
+    std::string uuid() const;
+    int vsocket_num() const;
+    int vcore_num() const;
+    int vhpthread_num() const;
     int total_mem_size() const;
 private:
     VmId vm_id_;

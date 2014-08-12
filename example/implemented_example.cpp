@@ -67,6 +67,11 @@ void myscheduler(Host *host, std::set<VM> &vms)
     for (auto& vm : vms)
     {
         std::cout << "vm_id: " << vm.vm_id() << std::endl;
+        std::cout << "name: " << vm.name() << std::endl;
+        std::cout << "uuid: " << vm.uuid() << std::endl;
+        std::cout << "vsocket_num: " << vm.vsocket_num() << std::endl;
+        std::cout << "vcore_num: " << vm.vcore_num() << std::endl;
+        std::cout << "vhpthread_num: " << vm.vhpthread_num() << std::endl;
         std::cout << "total_mem_size: " << vm.total_mem_size() << std::endl;
     }
 

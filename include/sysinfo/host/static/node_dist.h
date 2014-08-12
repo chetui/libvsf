@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include "utils/str_tools.h"
 
 #define WORKLOADTYPE_RANDOM 'r'
 #define WORKLOADTYPE_SERIAL 's'
@@ -44,8 +45,6 @@ private:
     std::mutex sys_mutex;
     std::mutex test_mutex;
     MicroParam test_param_;
-
-    void split(std::string& s, char delim, std::vector<std::string>& ret);
 
     static constexpr int BUF_SIZE = 1024;
 };
