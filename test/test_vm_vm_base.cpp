@@ -57,6 +57,50 @@ TEST_F(VmBaseTest, vm_ids_without_thread_p)
         cout << id.start_timestamp << ":" << id.pid << " ";
     cout << endl;
 }
+
+TEST_F(VmBaseTest, vcpu_ids_with_thread)
+{
+    vm_base->set_vm_cmd("qemu-system-x86_64");
+    vm_base->start();
+    set<VmId> ids = vm_base->get_vm_ids();
+    for (auto & id : ids) {
+        cout << "vm vcpu_num:" << vm_base->get_vcpu_num(id) << endl;
+        set<pid_t> vcpu_ids = vm_base->get_vcpu_ids(id);
+        cout << "vm vcpu_ids:";
+        for (auto& vid : vcpu_ids)
+            cout << " " << vid;
+        cout << endl;
+        cout << "vm stable_vmthread_num:" << vm_base->get_stable_vmthread_num(id) << endl;
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(id);
+        cout << "vm stable_vmthread_ids:";
+        for (auto& vid : stable_vmthread_ids)
+            cout << " " << vid;
+        cout << endl;
+    }
+    vm_base->stop();
+}
+
+TEST_F(VmBaseTest, vcpu_ids_without_thread)
+{
+    vm_base->set_vm_cmd("qemu-system-x86_64");
+    set<VmId> ids = vm_base->get_vm_ids();
+    for (auto & id : ids)
+    {
+        cout << "vm vcpu_num:" << vm_base->get_vcpu_num(id) << endl;
+        set<pid_t> vcpu_ids = vm_base->get_vcpu_ids(id);
+        cout << "vm vcpu_ids:";
+        for (auto& vid : vcpu_ids)
+            cout << " " << vid;
+        cout << endl;
+        cout << "vm stable_vmthread_num:" << vm_base->get_stable_vmthread_num(id) << endl;
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(id);
+        cout << "vm stable_vmthread_ids:";
+        for (auto& vid : stable_vmthread_ids)
+            cout << " " << vid;
+        cout << endl;
+    }
+}
+    
     
 TEST_F(VmBaseTest, vm_other_info_with_thread)
 {

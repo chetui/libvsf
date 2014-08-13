@@ -73,6 +73,16 @@ void myscheduler(Host *host, std::set<VM> &vms)
         std::cout << "vcore_num: " << vm.vcore_num() << std::endl;
         std::cout << "vhpthread_num: " << vm.vhpthread_num() << std::endl;
         std::cout << "total_mem_size: " << vm.total_mem_size() << std::endl;
+        std::cout << "vcpu: " << vm.vcpu_num() << " ";
+        std::set<pid_t> pid_set = vm.vcpu_ids();
+        for (auto& pid : pid_set)
+            std::cout << "|" << pid;
+        std::cout << std::endl;
+        std::cout << "stable_vmthread: " << vm.stable_vmthread_num() << " ";
+        pid_set = vm.stable_vmthread_ids();
+        for (auto& pid : pid_set)
+            std::cout << "|" << pid;
+        std::cout << std::endl;
     }
 
     return;

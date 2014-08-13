@@ -30,7 +30,15 @@ TEST_F(VsfTest, vm_base)
 
     for (auto& vm : vms)
     {
-        cout << vm.vm_id() << ":" << vm.name() << ":" << vm.uuid() << ":" << vm.vsocket_num() << ":" << vm.vcore_num() << ":" << vm.vhpthread_num() << ":" << vm.total_mem_size() << endl;
+        cout << vm.vm_id() << ":" << vm.name() << ":" << vm.uuid() << ":" << vm.vsocket_num() << ":" << vm.vcore_num() << ":" << vm.vhpthread_num() << ":" << vm.total_mem_size() << ":" << vm.vcpu_num() << ":" << vm.stable_vmthread_num();
+        set<pid_t> pid_set = vm.vcpu_ids();
+        for (auto& pid : pid_set)
+            cout << "|" << pid;
+        cout << "^";
+        pid_set = vm.stable_vmthread_ids();
+        for (auto& pid : pid_set)
+            cout << "|" << pid;
+        cout << endl;
     }
 }
 

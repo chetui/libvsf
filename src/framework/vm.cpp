@@ -98,6 +98,26 @@ int VM::total_mem_size() const
     return vm_base_->get_total_mem_size(vm_id_);
 }
 
+set<pid_t> VM::vcpu_ids() const
+{
+    return vm_base_->get_vcpu_ids(vm_id_);
+}
+
+pid_t VM::vcpu_num() const
+{
+    return vm_base_->get_vcpu_num(vm_id_);
+}
+
+set<pid_t> VM::stable_vmthread_ids() const
+{
+    return vm_base_->get_stable_vmthread_ids(vm_id_);
+}
+
+pid_t VM::stable_vmthread_num() const
+{
+    return vm_base_->get_stable_vmthread_num(vm_id_);
+}
+
 VM& VM::operator=(const VM &v)
 {
     vm_id_ = v.vm_id();

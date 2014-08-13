@@ -34,6 +34,11 @@ public:
     int vcore_num() const;
     int vhpthread_num() const;
     int total_mem_size() const;
+    std::set<pid_t> vcpu_ids() const;
+    pid_t vcpu_num() const;
+    std::set<pid_t> stable_vmthread_ids() const;
+    pid_t stable_vmthread_num() const;
+
 private:
     VmId vm_id_;
 

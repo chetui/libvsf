@@ -139,20 +139,20 @@ void myscheduler(HOST *host, std::set<VM> &vms)
             //<<VM dynamic info>>
                 //OP_VM_BASE //Yu
                 vm.vm_id();//DONE
-                vm.name();//no use //DONE
-                vm.uuid();//no use //DONE
+                vm.name(); //DONE
+                vm.uuid(); //DONE //no use
                 vm.total_mem_size(); //DONE
                     //Host Perspective
-                vm.stable_vmthread_num();//typedef VmthreadId = VmId
-                vm.stable_vmthread_ids();//vcpu_ids + tgid
-                vm.volatile_vmthread_num();//volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
+                vm.stable_vmthread_num();//DONE //typedef VmthreadId = VmId
+                vm.stable_vmthread_ids();//DONE //vcpu_ids + tgid
+                vm.volatile_vmthread_num(); //volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
                 vm.volatile_vmthread_ids();
                     //VM Perspective
-                vm.vcpu_num();//Currently not support maxcpus. Throw Exception
-                vm.vcpu_ids();//typedef VcpuId = VmthreadId;
-                vm.vsocket_num();//no use //vsocket,vcore,vhpthread 's id may need vnuma's help //DONE
-                vm.vcore_num();//no use //DONE
-                vm.vhpthread_num();//no use //DONE
+                vm.vcpu_num();//DONE //Currently not support maxcpus. Throw Exception
+                vm.vcpu_ids();//DONE //typedef VcpuId = VmthreadId;
+                vm.vsocket_num();//DONE //no use //vsocket,vcore,vhpthread 's id may need vnuma's help
+                vm.vcore_num();//DONE //no use
+                vm.vhpthread_num();//DONE //no use
                 //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id/vmthread_id);
@@ -172,12 +172,10 @@ void myscheduler(HOST *host, std::set<VM> &vms)
 
         //OUTPUT: decide scheduling strategy
 
-                framework->set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu
-                framework->set_mem_mig(vm_id, node_ids); //Zuo
-                framework->set_mem_mig(vm_id, node_ids, addr_start, page_size); //Zuo
-                //which one??
-                framework->set_mem_mig(vm_id, vnode_id, node_id); //vNUMA //Zuo
-                //framework->set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
+                vm.set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu
+                vm.set_mem_mig(node_ids); //Zuo
+                vm.set_mem_mig(node_ids, addr_start, page_size); //Zuo
+                vm.set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
     }
 
     return;

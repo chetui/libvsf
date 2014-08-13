@@ -1,12 +1,13 @@
 #include "sysinfo/host/static/node_core_hpthread.h"
 
 #include <unistd.h>
-#include <dirent.h>
 
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
 #include <fstream>
+
+#include "utils/str_tools.h"
 
 using namespace std;
 
@@ -72,7 +73,7 @@ void NodeCoreHpthread::do_refresh()
     inited_ = true;
 
     vector<string> node_dirs;
-    get_node_dirs(&node_dirs);
+    str_tools::get_dirs(NODE_DIR, "node", &node_dirs);
     nodes_ = vector<set<int>>(node_dirs.size()); 
     for (size_t i=0; i<node_dirs.size(); ++i) {
         string cpulist;
@@ -128,33 +129,4 @@ void NodeCoreHpthread::do_refresh()
     }
 }
 
-int NodeCoreHpthread::node_and_digits(const struct dirent *dptr)
-{
-    auto *p = (char *)(dptr->d_name);
-    if (*p++ != 'n') return 0;
-    if (*p++ != 'o') return 0;
-    if (*p++ != 'd') return 0;
-    if (*p++ != 'e') return 0;
-    do {
-        if (!isdigit(*p++))
-            return 0;
-    } while (*p != '\0');
-    return 1;
-}
-
-void NodeCoreHpthread::get_node_dirs(vector<string>* node_dirs)
-{
-    struct dirent **namelist;
-    int num_nodes = scandir(NODE_DIR, &namelist, NodeCoreHpthread::node_and_digits, nullptr);
-    if (num_nodes < 0) {
-//        LOG(LogLevel::err) 
-//            << "NodeCoreHpthread::get_node_dirs: " << strerror(errno) << endl;
-    } else {
-        for (int i=0; i<num_nodes; ++i) {
-            node_dirs->push_back(string(namelist[i]->d_name));
-            free(namelist[i]);
-        }
-        free(namelist);
-    }
-}
 
