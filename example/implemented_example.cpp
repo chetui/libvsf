@@ -83,6 +83,11 @@ void myscheduler(Host *host, std::set<VM> &vms)
         for (auto& pid : pid_set)
             std::cout << "|" << pid;
         std::cout << std::endl;
+        std::cout << "volatile_vmthread: " << vm.volatile_vmthread_num() << " ";
+        pid_set = vm.volatile_vmthread_ids();
+        for (auto& pid : pid_set)
+            std::cout << "|" << pid;
+        std::cout << std::endl;
     }
 
     return;

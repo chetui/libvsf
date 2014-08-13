@@ -5,6 +5,8 @@
 #include <iostream>
 #include <regex>
 #include <fstream>
+#include <algorithm>
+#include <iterator>
 #include "utils/str_tools.h"
 
 using namespace std;
@@ -47,7 +49,7 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
     lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
     lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
     lock_guard<mutex> vcpu_ids_lock(vcpu_ids_mutex_);
-    lock_guard<mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
+    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
     has_data_most = false;
     has_data_vcpu = false;
 
@@ -170,7 +172,7 @@ set<pid_t> VmBase::get_vcpu_ids(VmId vm_id)
         return {};
 }
 
-pid_t VmBase::get_vcpu_num(VmId vm_id)
+int VmBase::get_vcpu_num(VmId vm_id)
 {
     if(!joinable())
         refresh_vcpu();
@@ -189,24 +191,34 @@ set<pid_t> VmBase::get_stable_vmthread_ids(VmId vm_id)
         refresh_vcpu();
     while(!has_data_vcpu) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
+    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
     if (stable_vmthread_ids_.find(vm_id) != stable_vmthread_ids_.end())
         return stable_vmthread_ids_[vm_id];
     else
         return {};
 }
 
-pid_t VmBase::get_stable_vmthread_num(VmId vm_id)
+int VmBase::get_stable_vmthread_num(VmId vm_id)
 {
     if(!joinable())
         refresh_vcpu();
     while(!has_data_vcpu) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
+    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
     if (stable_vmthread_ids_.find(vm_id) != stable_vmthread_ids_.end())
         return stable_vmthread_ids_[vm_id].size();
     else
         return -1;
+}
+
+set<pid_t> VmBase::get_volatile_vmthread_ids(VmId vm_id)
+{
+    return refresh_volatile_vmthread(vm_id);
+}
+
+int VmBase::get_volatile_vmthread_num(VmId vm_id)
+{
+    return refresh_volatile_vmthread(vm_id).size();
 }
 
 void VmBase::refresh_most()
@@ -325,7 +337,7 @@ void VmBase::refresh_vcpu()
 {
     lock_guard<mutex> vm_ids_lock(vm_ids_mutex_);
     lock_guard<mutex> vcpu_lock(vcpu_ids_mutex_);
-    lock_guard<mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
+    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
     has_data_vcpu = true;
     vcpu_ids_.clear();
     stable_vmthread_ids_.clear();
@@ -350,6 +362,30 @@ void VmBase::refresh_vcpu()
         stable_vmthread_ids_[vm_id] = vcpu_ids;
         stable_vmthread_ids_[vm_id].insert(vm_id.pid);
     }
+}
+
+set<pid_t> VmBase::refresh_volatile_vmthread(VmId vm_id)
+{
+    set<pid_t> vmthread_ids;
+    vector<string> vmthread_dirs;
+    str_tools::get_dirs("/proc/" + to_string(vm_id.pid) + "/task/", "", &vmthread_dirs);
+    for (auto& dir : vmthread_dirs) {
+        vmthread_ids.insert(stoi(dir));
+    }
+
+    set<pid_t> volatile_vmthread_ids;
+    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
+    if (stable_vmthread_ids_.find(vm_id) == stable_vmthread_ids_.end())
+    {
+        refresh_vcpu();
+        if (stable_vmthread_ids_.find(vm_id) == stable_vmthread_ids_.end())
+            //this VM is down.
+            return {};
+    }
+
+    set_difference(vmthread_ids.begin(), vmthread_ids.end(), stable_vmthread_ids_[vm_id].begin(), stable_vmthread_ids_[vm_id].end(),
+        inserter(volatile_vmthread_ids, volatile_vmthread_ids.end()));
+    return volatile_vmthread_ids;
 }
 
 void VmBase::run()

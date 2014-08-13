@@ -80,7 +80,7 @@ void NodeCoreHpthread::do_refresh()
 //#ifdef HARDWARE_DEBUG
 //        LOG() << "reading from " << NODE_DIR + node_dirs[i] << endl;
 //#endif
-        ifstream fin(string(NODE_DIR).append(node_dirs[i]).append("/cpulist"));
+        ifstream fin(NODE_DIR + node_dirs[i] + "/cpulist");
         if (!fin.good()) {
 //            LOG(LogLevel::err) 
 //                << "NodeCoreHpthread::refresh: " << strerror(errno) << endl;

@@ -103,7 +103,7 @@ set<pid_t> VM::vcpu_ids() const
     return vm_base_->get_vcpu_ids(vm_id_);
 }
 
-pid_t VM::vcpu_num() const
+int VM::vcpu_num() const
 {
     return vm_base_->get_vcpu_num(vm_id_);
 }
@@ -113,9 +113,19 @@ set<pid_t> VM::stable_vmthread_ids() const
     return vm_base_->get_stable_vmthread_ids(vm_id_);
 }
 
-pid_t VM::stable_vmthread_num() const
+int VM::stable_vmthread_num() const
 {
     return vm_base_->get_stable_vmthread_num(vm_id_);
+}
+
+set<pid_t> VM::volatile_vmthread_ids() const
+{
+    return vm_base_->get_volatile_vmthread_ids(vm_id_);
+}
+
+int VM::volatile_vmthread_num() const
+{
+    return vm_base_->get_volatile_vmthread_num(vm_id_);
 }
 
 VM& VM::operator=(const VM &v)

@@ -26,9 +26,11 @@ public:
     int get_vhpthread_num(VmId vm_id);
     int get_total_mem_size(VmId vm_id);
     std::set<pid_t> get_vcpu_ids(VmId vm_id);
-    pid_t get_vcpu_num(VmId vm_id);
+    int get_vcpu_num(VmId vm_id);
     std::set<pid_t> get_stable_vmthread_ids(VmId vm_id);
-    pid_t get_stable_vmthread_num(VmId vm_id);
+    int get_stable_vmthread_num(VmId vm_id);
+    std::set<pid_t> get_volatile_vmthread_ids(VmId vm_id);
+    int get_volatile_vmthread_num(VmId vm_id);
 
 private:
     VmBase();
@@ -36,6 +38,7 @@ private:
     void run();
     void refresh_most();
     void refresh_vcpu();
+    std::set<pid_t> refresh_volatile_vmthread(VmId vm_id);
 
     std::set<VmId> vm_ids_;
     std::map<VmId, std::string> name_;
@@ -55,10 +58,8 @@ private:
     std::map<VmId, std::set<pid_t>> vcpu_ids_;
     std::map<VmId, std::set<pid_t>> stable_vmthread_ids_;
     std::mutex vcpu_ids_mutex_;
-    std::mutex stable_vmthread_ids_mutex_;
+    std::recursive_mutex stable_vmthread_ids_mutex_;
 
-//    std::map<VmId, std::string> volatile_vmthread_ids_; //proc
-//
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
     std::atomic<bool> has_data_most;
