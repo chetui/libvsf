@@ -145,8 +145,8 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                     //Host Perspective
                 vm.stable_vmthread_num();//DONE //typedef VmthreadId = VmId
                 vm.stable_vmthread_ids();//DONE //vcpu_ids + tgid
-                vm.volatile_vmthread_num(); //volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
-                vm.volatile_vmthread_ids();
+                vm.volatile_vmthread_num();//DONE //volatile vmthreads would change frequently. Hence, its APIs always execute immediately.
+                vm.volatile_vmthread_ids();//DONE
                     //VM Perspective
                 vm.vcpu_num();//DONE //Currently not support maxcpus. Throw Exception
                 vm.vcpu_ids();//DONE //typedef VcpuId = VmthreadId;
