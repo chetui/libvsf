@@ -18,12 +18,12 @@ protected:
 TEST_F(FuncOptionTest, have_option) 
 {
     map<Option, map<OptionParam, OptionParamVal> > ops = {
-        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HS_NODE_CPU, { } },
         { Option::OP_VM_MEM_SAMPLE, { } }
     };
 
     fo->enable_option(ops);
-    bool has = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+    bool has = fo->check_option(Option::OP_HS_NODE_CPU);
 
     ASSERT_EQ(has, true);
 }
@@ -34,7 +34,7 @@ TEST_F(FuncOptionTest, have_option)
 //        { Option::OP_VM_MEM_BINDINFO, { } }
 //    };
 //    fo->enable_option(ops);
-//    bool has0 = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+//    bool has0 = fo->check_option(Option::OP_HS_NODE_CPU);
 //    bool has1 = fo->check_option(Option::OP_VM_VNODE);
 //
 //    ASSERT_EQ(has0, true);
@@ -45,11 +45,11 @@ TEST_F(FuncOptionTest, have_no_option)
 {
     map<Option, map<OptionParam, OptionParamVal> > ops = {
         { Option::OP_VM_MISS_RATE, { } },
-        { Option::OP_HS_NODE_CORE_HPTHREAD, { } }
+        { Option::OP_HS_NODE_CPU, { } }
     };
     fo->enable_option(ops);
-    fo->disable_option({Option::OP_HS_NODE_CORE_HPTHREAD});
-    bool has = fo->check_option(Option::OP_HS_NODE_CORE_HPTHREAD);
+    fo->disable_option({Option::OP_HS_NODE_CPU});
+    bool has = fo->check_option(Option::OP_HS_NODE_CPU);
 
     ASSERT_EQ(has, false);
 }

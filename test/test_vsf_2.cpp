@@ -18,7 +18,7 @@ protected:
 TEST_F(VsfTest, node_num_and_node_dist)
 {
     vsf->init({ 
-        { Option::OP_HS_NODE_CORE_HPTHREAD, {} },
+        { Option::OP_HS_NODE_CPU, {} },
         { Option::OP_HS_SYS_NODE_DIST, { } },
         { Option::OP_HS_TEST_NODE_DIST, 
             { 

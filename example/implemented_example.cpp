@@ -12,7 +12,7 @@ int main()
     //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
     //if others functions are called without set corresponding flags, info would be collected immediately.
     framework->init({
-        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HS_NODE_CPU, { } },
         { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },

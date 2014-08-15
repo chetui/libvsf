@@ -25,7 +25,7 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     ./test_vm_vm_base
     ./test_func_option
     ./test_compat
-    ./test_host_node_core_hpthread
+    ./test_host_node_cpu
     ./test_host_node_dist
     ./implemented_example
     #./test_all

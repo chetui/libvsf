@@ -46,7 +46,6 @@ void str_tools::get_dirs(std::string dir, std::string dir_prefix, std::vector<st
     if (num_nodes < 0) {
         //TODO throw 
 //        LOG(LogLevel::err) 
-//            << "NodeCoreHpthread::get_node_dirs: " << strerror(errno) << endl;
     } else {
         for (int i=0; i<num_nodes; ++i) {
             node_dirs->push_back(std::string(namelist[i]->d_name));

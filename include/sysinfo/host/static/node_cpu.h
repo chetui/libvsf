@@ -1,5 +1,5 @@
-#ifndef _HOST_NODE_CORE_HPTHREAD_H_
-#define _HOST_NODE_CORE_HPTHREAD_H_
+#ifndef _HOST_NODE_CPU_H_
+#define _HOST_NODE_CPU_H_
 
 #include <vector>
 #include <string>
@@ -11,13 +11,13 @@ using pus_t = const std::set<int>;
 /**
  * Singlton
  */
-class NodeCoreHpthread {
+class NodeCpu {
 public:
-    ~NodeCoreHpthread();
+    ~NodeCpu();
     /**
      * not thread-safe
      */
-    static NodeCoreHpthread* get_instance();
+    static NodeCpu* get_instance();
     /**
      * Get NUMA node number on this system.
      */
@@ -41,12 +41,12 @@ public:
     pus_t& get_pu_on_node(int nodeid) const;
 
     /**
-     * Reread the node_core_hpthread info.
+     * Reread the node_cpu info.
      */
     void refresh();
 
 private:
-    NodeCoreHpthread();
+    NodeCpu();
     void do_refresh();
 
     std::vector<std::set<int> > nodes_;

@@ -14,7 +14,7 @@ int main()
     //but if other functions are called without set corresponding flags, info would be collected immediately. It would have some performance cost depended on the collecting action/
     framework->init({
         //<<Optional Host Static Info>>
-        { Option::OP_HS_NODE_CORE_HPTHREAD, { } },
+        { Option::OP_HS_NODE_CPU, { } },
         { Option::OP_HS_TOTAL_MEM_SIZE, { } },
         { Option::OP_HS_SYS_NODE_DIST, { } },
         { Option::OP_HS_TEST_NODE_DIST, 
@@ -75,7 +75,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
         //INPUT: available info
 
             //<<host static info>>
-                //OP_HS_NODE_CORE_HPTHREAD //Yu
+                //OP_HS_NODE_CPU //Yu
                 host->node_num(); //DONE
                 host->node_ids();
                 host->node_id(socket_id);
@@ -89,41 +89,43 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->socket_id(hpthread_id);
                 host->core_num();
                 host->core_num(node_id);
+                host->core_num(socket_id);
                 host->core_ids();
                 host->core_ids(node_id);
                 host->core_ids(socket_id);
                 host->core_id(hpthread_id);
                 host->hpthread_num();
                 host->hpthread_num(node_id);
+                host->hpthread_num(socket_id);
                 host->hpthread_num(core_id);
                 host->hpthread_ids();
                 host->hpthread_ids(node_id);
                 host->hpthread_ids(socket_id);
                 host->hpthread_ids(core_id);
-                //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
+                //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
                 host->total_mem_size();
                 host->total_mem_size(node_id);
-                //OP_HS_SYS_NODE_DIST ((( OP_HS_NODE_CORE_HPTHREAD //Yu
+                //OP_HS_SYS_NODE_DIST ((( OP_HS_NODE_CPU //Yu
                 host->sys_node_dist(); //DONE
                 host->sys_node_dist(node_id_0, node_id_1); //DONE
-                //OP_HS_TEST_NODE_DIST ((( OP_HS_NODE_CORE_HPTHREAD //Yu
+                //OP_HS_TEST_NODE_DIST ((( OP_HS_NODE_CPU //Yu
                 host->test_node_dist(); //DONE
                 host->test_node_dist(MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
                 host->test_node_dist(node_id_0, node_id_1); //DONE
                 host->test_node_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
 
             //<<host dynamic info>>
-                //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CORE_HPTHREAD /Yu
+                //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CPU /Yu
                 host->cpu_reuse_ratio();
                 host->cpu_reuse_ratio(node_id);
                 host->cpu_reuse_ratio(socket_id);
-                //OP_HS_CPU_USAGE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
+                //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo
                 host->cpu_usage();
                 host->cpu_usage(node_id);
                 host->cpu_usage(socket_id);
                 host->cpu_usage(core_id);
                 host->cpu_usage(hpthread_id);
-                //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD //Zuo
+                //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
                 host->used_mem_size(); 
                 host->used_mem_size(node_id);
 
@@ -132,7 +134,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.vcpu_ids(vnode_id); //vNUMA 
                 vm.vnode_num(); //vNUMA
                 vm.vnode_ids(); //vNUMA //VnodeId need to have a VM start timestamp, because it would be used by set_mem
-                //OP_VM_MEM_POLICY ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
+                //OP_VM_MEM_POLICY ((( OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.mem_policy(); //memory policy is static currently, since it is hard to implement dynamicly
                 vm.bindinfo_mem_node_ids();
 
@@ -153,10 +155,10 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.vsocket_num();//DONE //no use //vsocket,vcore,vhpthread 's id may need vnuma's help
                 vm.vcore_num();//DONE //no use
                 vm.vhpthread_num();//DONE //no use
-                //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
+                //OP_VM_CPU_BINDINFO ((( OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.bindinfo_hpthread_ids();
                 vm.bindinfo_hpthread_ids(vcpu_id/vmthread_id);
-                //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
+                //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
                 //OP_VM_CPU_USAGE ((( OP_VM_BASE //Yu
                 vm.cpu_usage();
@@ -166,7 +168,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.miss_rate(MISS_RATE_TYPE, vcpu_id/vmthread_id);
                 //OP_VM_MEM_SAMPLE ((( OP_VM_BASE //Yu
                 vm.mem_sample(); //sample the latest visited page addr
-                //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CORE_HPTHREAD, OP_VM_BASE //Zuo
+                //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.used_mem_size();
                 vm.used_mem_size(node_id);
 

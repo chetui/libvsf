@@ -7,9 +7,9 @@ Host::Host()
 {
     func_option_ = FuncOption::get_instance();
 
-    node_core_hpthread_ = NodeCoreHpthread::get_instance();
-    if(func_option_->check_option(Option::OP_HS_NODE_CORE_HPTHREAD))
-        node_core_hpthread_->refresh();
+    node_cpu_ = NodeCpu::get_instance();
+    if(func_option_->check_option(Option::OP_HS_NODE_CPU))
+        node_cpu_->refresh();
 
     node_dist_ = NodeDist::get_instance();
     if(func_option_->check_option(Option::OP_HS_SYS_NODE_DIST))
@@ -26,10 +26,10 @@ Host* Host::get_instance()
     return &host;
 }
 
-//OP_HS_NODE_CORE_HPTHREAD
+//OP_HS_NODE_CPU
 int Host::node_num()
 {
-    return node_core_hpthread_->get_node_num();
+    return node_cpu_->get_node_num();
 }
 
 //OP_HS_SYS_NODE_DIST

@@ -352,7 +352,6 @@ void VmBase::refresh_vcpu()
             if (!fin.good()) {
                 //TODO throw
     //            LOG(LogLevel::err) 
-    //                << "NodeCoreHpthread::refresh: " << strerror(errno) << endl;
                 return;
             }
             fin >> pid;

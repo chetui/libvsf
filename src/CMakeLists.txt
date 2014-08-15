@@ -16,10 +16,9 @@ string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 
 # src files
 set (SRC_LIST 
-    sysinfo/host/static/node_core_hpthread.cpp
+    sysinfo/host/static/node_cpu.cpp
     sysinfo/host/static/node_dist.cpp
     sysinfo/vm/dynamic/vm_base.cpp
-    sysinfo/define_func_option.cpp
     utils/func_option.cpp
     utils/runnable.cpp
     utils/str_tools.cpp
@@ -32,11 +31,6 @@ set (SRC_LIST
 
 # build test_all ---------------------------------
 #set (TEST_LIST
-#    ${TEST_DIR}/test_host_node_core_hpthread.cpp
-#    ${TEST_DIR}/test_host_node_dist.cpp
-#    ${TEST_DIR}/test_func_option.cpp
-#    ${TEST_DIR}/test_vsf.cpp
-#    ${TEST_DIR}/test_compat.cpp
 #    )
 #add_executable (test_all ${TEST_LIST} ${SRC_LIST})
 #target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
@@ -46,7 +40,7 @@ set (SRC_LIST
         add_executable (${test_name} ${TEST_DIR}/${test_name}.cpp ${SRC_LIST})
         target_link_libraries (${test_name} gtest gtest_main)
     endmacro ()
-add_indi_test (test_host_node_core_hpthread)
+add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_func_option)

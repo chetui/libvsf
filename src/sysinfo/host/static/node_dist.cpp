@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "sysinfo/host/static/node_core_hpthread.h"
+#include "sysinfo/host/static/node_cpu.h"
 
 NodeDist::NodeDist()
 {
@@ -32,7 +32,7 @@ std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& p
 //    std::cout << param.size_in_mb << std::endl;
 //    std::cout << param.type << std::endl;
 //    std::cout << param.loop << std::endl;
-    int node_size = NodeCoreHpthread::get_instance()->get_node_num();
+    int node_size = NodeCpu::get_instance()->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
         std::vector<int> row;

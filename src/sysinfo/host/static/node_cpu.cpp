@@ -1,4 +1,4 @@
-#include "sysinfo/host/static/node_core_hpthread.h"
+#include "sysinfo/host/static/node_cpu.h"
 
 #include <unistd.h>
 
@@ -11,28 +11,28 @@
 
 using namespace std;
 
-NodeCoreHpthread::NodeCoreHpthread()
+NodeCpu::NodeCpu()
 {
 }
 
-NodeCoreHpthread::~NodeCoreHpthread()
+NodeCpu::~NodeCpu()
 {
 }
 
-NodeCoreHpthread* NodeCoreHpthread::get_instance()
+NodeCpu* NodeCpu::get_instance()
 {
-    static NodeCoreHpthread node_core_hpthread;
-    return &node_core_hpthread;
+    static NodeCpu node_cpu;
+    return &node_cpu;
 }
 
-int NodeCoreHpthread::get_node_num()
+int NodeCpu::get_node_num()
 {
     lock_guard<mutex> lock(nodes_mutex_);
     do_refresh();
     return nodes_.size();
 }
 
-int NodeCoreHpthread::puid_to_nodeid(int puid) const
+int NodeCpu::puid_to_nodeid(int puid) const
 {
     for (size_t i = 0; i < nodes_.size(); ++i) {
         if (nodes_[i].find(puid) != nodes_[i].end()) {
@@ -42,7 +42,7 @@ int NodeCoreHpthread::puid_to_nodeid(int puid) const
     return -1;
 }
 
-int NodeCoreHpthread::get_pu_num() const
+int NodeCpu::get_pu_num() const
 {
     int num_conf   = sysconf(_SC_NPROCESSORS_CONF);
     int num_online = sysconf(_SC_NPROCESSORS_ONLN);
@@ -52,21 +52,21 @@ int NodeCoreHpthread::get_pu_num() const
     return num_conf;
 }
 
-int NodeCoreHpthread::get_pu_num_on_node(int nodeid) const
+int NodeCpu::get_pu_num_on_node(int nodeid) const
 {
     return nodes_[nodeid].size();
 }
 
-pus_t& NodeCoreHpthread::get_pu_on_node(int nodeid) const
+pus_t& NodeCpu::get_pu_on_node(int nodeid) const
 {
     return nodes_[nodeid];
 }
-void NodeCoreHpthread::refresh()
+void NodeCpu::refresh()
 {
     lock_guard<mutex> lock(nodes_mutex_);
     do_refresh();
 }
-void NodeCoreHpthread::do_refresh()
+void NodeCpu::do_refresh()
 {
     if(inited_)
         return;
@@ -83,7 +83,7 @@ void NodeCoreHpthread::do_refresh()
         ifstream fin(NODE_DIR + node_dirs[i] + "/cpulist");
         if (!fin.good()) {
 //            LOG(LogLevel::err) 
-//                << "NodeCoreHpthread::refresh: " << strerror(errno) << endl;
+//                << "NodeCpu::refresh: " << strerror(errno) << endl;
             return;
         }
         fin >> cpulist;
