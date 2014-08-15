@@ -7,6 +7,7 @@
 
 namespace str_tools {
 
+std::string strip(const std::string& ret);
 void split(std::string& s, char delim, std::vector<std::string>& ret);
 int prefix_and_digits(const struct dirent *dptr);
 void get_dirs(std::string dir, std::string dir_prefix, std::vector<std::string>* node_dirs);

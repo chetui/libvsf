@@ -4,6 +4,29 @@ namespace str_tools {
 std::string dir_prefix_;
 }
 
+std::string str_tools::strip(const std::string& ret)
+{
+    std::string str;
+    size_t beg = 0;
+    size_t end = 0;
+    for (auto iter = ret.begin(); iter != ret.end(); ++iter) {
+        if (*iter != '\n' && *iter != '\r' && *iter != '\t' && *iter != ' ')
+        {
+            beg = iter - ret.begin();
+            break;
+        }
+    }
+    for (auto iter = ret.end(); iter != ret.begin();) {
+        --iter;
+        if (*iter != '\n' && *iter != '\r' && *iter != '\t' && *iter != ' ')
+        {
+            end = iter - ret.begin() + 1;
+            break;
+        }
+    }
+    return  ret.substr(beg, end - beg);
+}
+
 void str_tools::split(std::string& s, char delim, std::vector<std::string>& ret)
 {
     int len = s.size();

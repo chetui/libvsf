@@ -31,6 +31,106 @@ int Host::node_num()
 {
     return node_cpu_->get_node_num();
 }
+std::set<NodeId> Host::node_ids()
+{
+    return node_cpu_->get_node_ids();
+}
+NodeId Host::node_id(SocketId socket_id)
+{
+    return node_cpu_->get_node_id(socket_id);
+}
+NodeId Host::node_id(CoreId core_id)
+{
+    return node_cpu_->get_node_id(core_id);
+}
+NodeId Host::node_id(HpthreadId hpthread_id)
+{
+    return node_cpu_->get_node_id(hpthread_id);
+}
+int Host::socket_num()
+{
+    return node_cpu_->get_socket_num();
+}
+int Host::socket_num(NodeId node_id)
+{
+    return node_cpu_->get_socket_num(node_id);
+}
+std::set<SocketId> Host::socket_ids()
+{
+    return node_cpu_->get_socket_ids();
+}
+std::set<SocketId> Host::socket_ids(NodeId node_id)
+{
+    return node_cpu_->get_socket_ids(node_id);
+}
+SocketId Host::socket_id(CoreId core_id)
+{
+    return node_cpu_->get_socket_id(core_id);
+}
+SocketId Host::socket_id(HpthreadId hpthread_id)
+{
+    return node_cpu_->get_socket_id(hpthread_id);
+}
+int Host::core_num()
+{
+    return node_cpu_->get_core_num();
+}
+int Host::core_num(NodeId node_id)
+{
+    return node_cpu_->get_core_num(node_id);
+}
+int Host::core_num(SocketId socket_id)
+{
+    return node_cpu_->get_core_num(socket_id);
+}
+std::set<CoreId> Host::core_ids()
+{
+    return node_cpu_->get_core_ids();
+}
+std::set<CoreId> Host::core_ids(NodeId node_id)
+{
+    return node_cpu_->get_core_ids(node_id);
+}
+std::set<CoreId> Host::core_ids(SocketId socket_id)
+{
+    return node_cpu_->get_core_ids(socket_id);
+}
+CoreId Host::core_id(HpthreadId hpthread_id)
+{
+    return node_cpu_->get_core_id(hpthread_id);
+}
+int Host::hpthread_num()
+{
+    return node_cpu_->get_hpthread_num();
+}
+int Host::hpthread_num(NodeId node_id)
+{
+    return node_cpu_->get_hpthread_num(node_id);
+}
+int Host::hpthread_num(SocketId socket_id)
+{
+    return node_cpu_->get_hpthread_num(socket_id);
+}
+int Host::hpthread_num(CoreId core_id)
+{
+    return node_cpu_->get_hpthread_num(core_id);
+}
+std::set<HpthreadId> Host::hpthread_ids()
+{
+    return node_cpu_->get_hpthread_ids();
+}
+std::set<HpthreadId> Host::hpthread_ids(NodeId node_id)
+{
+    return node_cpu_->get_hpthread_ids(node_id);
+}
+std::set<HpthreadId> Host::hpthread_ids(SocketId socket_id)
+{
+    return node_cpu_->get_hpthread_ids(socket_id);
+}
+std::set<HpthreadId> Host::hpthread_ids(CoreId core_id)
+{
+    return node_cpu_->get_hpthread_ids(core_id);
+}
 
 //OP_HS_SYS_NODE_DIST
 std::vector<std::vector<int> > Host::sys_node_dist()

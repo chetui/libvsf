@@ -77,31 +77,31 @@ void myscheduler(HOST *host, std::set<VM> &vms)
             //<<host static info>>
                 //OP_HS_NODE_CPU //Yu
                 host->node_num(); //DONE
-                host->node_ids();
-                host->node_id(socket_id);
-                host->node_id(core_id); //core_id is a struct with 2 int. It is combined with node_id & core_id.
-                host->node_id(hpthread_id);
-                host->socket_num();
-                host->socket_num(node_id);
-                host->socket_ids();
-                host->socket_ids(node_id);
-                host->socket_id(core_id);
-                host->socket_id(hpthread_id);
-                host->core_num();
-                host->core_num(node_id);
-                host->core_num(socket_id);
-                host->core_ids();
-                host->core_ids(node_id);
-                host->core_ids(socket_id);
-                host->core_id(hpthread_id);
-                host->hpthread_num();
-                host->hpthread_num(node_id);
-                host->hpthread_num(socket_id);
-                host->hpthread_num(core_id);
-                host->hpthread_ids();
-                host->hpthread_ids(node_id);
-                host->hpthread_ids(socket_id);
-                host->hpthread_ids(core_id);
+                host->node_ids(); //DONE
+                host->node_id(socket_id); //DONE
+                host->node_id(core_id); //DONE //core_id is a struct with 2 int. It is combined with node_id & core_id.
+                host->node_id(hpthread_id); //DONE
+                host->socket_num(); //DONE
+                host->socket_num(node_id); //DONE
+                host->socket_ids(); //DONE
+                host->socket_ids(node_id); //DONE
+                host->socket_id(core_id); //DONE
+                host->socket_id(hpthread_id); //DONE
+                host->core_num(); //DONE
+                host->core_num(node_id); //DONE
+                host->core_num(socket_id); //DONE
+                host->core_ids(); //DONE
+                host->core_ids(node_id); //DONE
+                host->core_ids(socket_id); //DONE
+                host->core_id(hpthread_id); //DONE
+                host->hpthread_num(); //DONE
+                host->hpthread_num(node_id); //DONE
+                host->hpthread_num(socket_id); //DONE
+                host->hpthread_num(core_id); //DONE
+                host->hpthread_ids(); //DONE
+                host->hpthread_ids(node_id); //DONE
+                host->hpthread_ids(socket_id); //DONE
+                host->hpthread_ids(core_id); //DONE
                 //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
                 host->total_mem_size();
                 host->total_mem_size(node_id);
