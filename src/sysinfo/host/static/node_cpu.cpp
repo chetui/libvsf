@@ -434,7 +434,7 @@ bool operator<(const CoreId& lc, const CoreId& rc)
 
 std::ostream &operator<<(std::ostream &os, const CoreId &v)
 {
-    os << v.socket_id << ":" << v.core_id;
+    os << v.socket_id << "-" << v.core_id;
     return os;
 }
 

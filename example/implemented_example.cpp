@@ -32,7 +32,7 @@ int main()
     Host *host = framework->init_host();
     
     int cnt = 0;
-    while(cnt < 2) {
+    while(cnt < 1) {
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
@@ -42,7 +42,7 @@ int main()
         //your scheduler algorithm
         myscheduler(host, vms);
 
-        sleep(1); 
+//        sleep(1); 
 
         ++cnt;
     }
@@ -56,96 +56,120 @@ void myscheduler(Host *host, std::set<VM> &vms)
 {
     //OP_HS_NODE_CPU
     std::cout << "node_num:" << host->node_num() << std::endl;
-
+    std::set<NodeId> node_ids = host->node_ids();
     std::cout << "node_ids:";
-    for (auto& id : host->node_ids())
+    for (auto& id : node_ids)
         std::cout << id << ":";
     std::cout << std::endl;
 
-    std::cout << "node_id(socket_id(0)):" << host->node_id(SocketId(0));
-    std::cout << "node_id(core_id(1, 10)):" << host->node_id(CoreId(1, 10));
-    std::cout << "node_id(hpthread(14)):" << host->node_id(HpthreadId(14));
+    std::cout << "socket_num::" << host->socket_num() << std::endl;
+    std::set<SocketId> socket_ids = host->socket_ids();
+    std::cout << "socket_ids:";
+    for (auto& id : socket_ids)
+        std::cout << id << ":";
+    std::cout << std::endl;
 
-//    std::cout << "node_id:" << host->socket_num(), 2);
-//    std::cout << "node_id:" << host->socket_num(NodeId(0)), 1);
-//    
-//    res = host->socket_ids() == std::set<SocketId>{ SocketId(0), SocketId(1) };
-//    for (auto& id : host->socket_ids())
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->socket_ids(NodeId(1)) == std::set<SocketId>{ SocketId(0) };
-//    for (auto& id : host->socket_ids(NodeId(1)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    ASSERT_EQ(host->socket_id(CoreId(1, 10)), SocketId(1));
-//    ASSERT_EQ(host->socket_id(HpthreadId(9)), SocketId(0));
-//
-//    ASSERT_EQ(host->core_num(), 8);
-//    ASSERT_EQ(host->core_num(NodeId(1)), 4);
-//    ASSERT_EQ(host->core_num(SocketId(1)), 4);
-//
-//    res = host->core_ids() == std::set<CoreId>{ CoreId(0,0), CoreId(0,1), CoreId(0, 9), CoreId(0, 10), CoreId(1, 0), CoreId(1, 1), CoreId(1, 9), CoreId(1, 10) };
-//    for (auto& id : host->core_ids())
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->core_ids(NodeId(1)) == std::set<CoreId>{ CoreId(0,0), CoreId(0,1), CoreId(0, 9), CoreId(0, 10) };
-//    for (auto& id : host->core_ids(NodeId(1)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->core_ids(SocketId(0)) == std::set<CoreId>{ CoreId(0,0), CoreId(0,1), CoreId(0, 9), CoreId(0, 10) };
-//    for (auto& id : host->core_ids(SocketId(0)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    ASSERT_EQ(host->core_id(HpthreadId(4)), CoreId(1, 9));
-//
-//    ASSERT_EQ(host->hpthread_num(), 16);
-//    ASSERT_EQ(host->hpthread_num(NodeId(1)), 8);
-//    ASSERT_EQ(host->hpthread_num(SocketId(1)), 8);
-//    ASSERT_EQ(host->hpthread_num(CoreId(0, 9)), 2);
-//
-//    res = host->hpthread_ids() == std::set<HpthreadId>{ HpthreadId(0), HpthreadId(1), HpthreadId(2), HpthreadId(3), HpthreadId(4), HpthreadId(5), HpthreadId(6), HpthreadId(7), HpthreadId(8), HpthreadId(9), HpthreadId(10), HpthreadId(11), HpthreadId(12), HpthreadId(13), HpthreadId(14), HpthreadId(15) };
-//    for (auto& id : host->hpthread_ids())
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->hpthread_ids(NodeId(0)) == std::set<HpthreadId>{ HpthreadId(0), HpthreadId(2), HpthreadId(4), HpthreadId(6), HpthreadId(8), HpthreadId(10), HpthreadId(12), HpthreadId(14) };
-//    for (auto& id : host->hpthread_ids(NodeId(0)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->hpthread_ids(SocketId(1)) == std::set<HpthreadId>{ HpthreadId(0), HpthreadId(2), HpthreadId(4), HpthreadId(6), HpthreadId(8), HpthreadId(10), HpthreadId(12), HpthreadId(14) };
-//    for (auto& id : host->hpthread_ids(SocketId(1)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
-//
-//    res = host->hpthread_ids(CoreId(0, 9)) == std::set<HpthreadId>{ HpthreadId(5), HpthreadId(13) };
-//    for (auto& id : host->hpthread_ids(CoreId(0, 9)))
-//        cout << id << ":";
-//    cout << endl;
-//    ASSERT_EQ(res, true);
+    std::cout << "core_num::" << host->core_num() << std::endl;
+    std::set<CoreId> core_ids = host->core_ids();
+    std::cout << "core_ids:";
+    for (auto& id : core_ids)
+        std::cout << id << ":";
+    std::cout << std::endl;
+
+    std::cout << "hpthread_num::" << host->hpthread_num() << std::endl;
+    std::set<HpthreadId> hpthread_ids = host->hpthread_ids();
+    std::cout << "hpthread_ids:";
+    for (auto& id : hpthread_ids)
+        std::cout << id << ":";
+    std::cout << std::endl;
+
+    for (auto& id : socket_ids)
+        std::cout << "node_id[socket_id(" << id << ")]:" << host->node_id(id) << std::endl;
+
+    for (auto& id : core_ids)
+        std::cout << "node_id[core_id(" << id << ")]:" << host->node_id(id) << std::endl;
+
+    for (auto& id : hpthread_ids)
+        std::cout << "node_id[hpthread_id(" << id << ")]:" << host->node_id(id) << std::endl;
+
+    for (auto& id : node_ids)
+    {
+        std::cout << "socket_num[node_id(" << id << ")]:" << host->socket_num(id) << std::endl;
+        std::cout << "socket_ids[node_id(" << id << ")]:";
+        std::set<SocketId> ids = host->socket_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
+
+    for (auto& id : core_ids)
+        std::cout << "socket_id[core_id(" << id << ")]:" << host->socket_id(id) << std::endl;
+
+    for (auto& id : hpthread_ids)
+        std::cout << "socket_id[hpthread_id(" << id << ")]:" << host->socket_id(id) << std::endl;
+
+    for (auto& id : node_ids)
+    {
+        std::cout << "core_num[node_id(" << id << ")]:" << host->core_num(id) << std::endl;
+        std::cout << "core_ids[node_id(" << id << ")]:";
+        std::set<CoreId> ids = host->core_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
+
+    for (auto& id : socket_ids)
+    {
+        std::cout << "core_num[socket_id(" << id << ")]:" << host->core_num(id) << std::endl;
+        std::cout << "core_ids[socket_id(" << id << ")]:";
+        std::set<CoreId> ids = host->core_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
+
+    for (auto& id : hpthread_ids)
+        std::cout << "core_id(hpthread_id(" << id << ")):" << host->core_id(id) << std::endl;
+
+    for (auto& id : node_ids)
+    {
+        std::cout << "hpthread_num[node_id(" << id << ")]:" << host->hpthread_num(id) << std::endl;
+        std::cout << "hpthread_ids[node_id(" << id << ")]:";
+        std::set<HpthreadId> ids = host->hpthread_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
+
+    for (auto& id : socket_ids)
+    {
+        std::cout << "hpthread_num[socket_id(" << id << ")]:" << host->hpthread_num(id) << std::endl;
+        std::cout << "hpthread_ids[socket_id(" << id << ")]:";
+        std::set<HpthreadId> ids = host->hpthread_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
+
+    for (auto& id : core_ids)
+    {
+        std::cout << "hpthread_num[core_id(" << id << ")]:" << host->hpthread_num(id) << std::endl;
+        std::cout << "hpthread_ids[core_id(" << id << ")]:";
+        std::set<HpthreadId> ids = host->hpthread_ids(id);
+        for (auto& id2 : ids)
+            std::cout << id2 << ":";
+        std::cout << std::endl;
+    }
 
     //OP_HS_SYS_NODE_DIST
     print_dist(host->sys_node_dist());
     std::cout << "sys_node_dist 0-1: " << host->sys_node_dist(0, 1) << std::endl;
 
     //OP_HS_TEST_NODE_DIST
-    print_dist(host->test_node_dist());
-    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
-    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
-    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
+//    print_dist(host->test_node_dist());
+//    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
+//    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
+//    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
 
     for (auto& vm : vms)
     {

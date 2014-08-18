@@ -5,6 +5,7 @@
 #include <string>
 #include "utils/func_option.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
+#include <mutex>
 
 class Host;
 class VM;
@@ -16,7 +17,8 @@ public:
     std::set<VM> init_vms(Host *host, std::string vm_cmd);
 private:
     VmSet();
-    std::set<VM> vms_;
+    std::mutex init_vms_mutex_;
+
 
     FuncOption *func_option_;
     VmBase *vm_base_;

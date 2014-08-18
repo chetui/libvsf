@@ -22,10 +22,11 @@ std::set<VM> VmSet::init_vms(Host *host)
 
 std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
 {
+    lock_guard<mutex> lock(init_vms_mutex_);
     //TODO check whether host is inited
     host = host;
 
-    vms_.clear();
+    set<VM> vms;
 
     if (func_option_->check_option(Option::OP_VM_BASE))
     {
@@ -52,9 +53,9 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
     else
         vm_ids = vm_base_->get_vm_ids(vm_cmd);
     for (auto& vm_id : vm_ids)
-        vms_.insert(VM(vm_id));
+        vms.insert(VM(vm_id));
 
-    return vms_;
+    return vms;
 }
 
 VM::VM(VmId vm_id)
