@@ -22,8 +22,7 @@ VmBase::VmBase()
 //        fscanf(fp, "%llu", &pid_max_);
 //    }
 
-    has_data_most = false;
-    has_data_vcpu = false;
+    has_data = false;
     buf_ = new char[BUF_SIZE];
 }
 
@@ -41,27 +40,37 @@ VmBase *VmBase::get_instance()
 
 void VmBase::set_vm_cmd(std::string vm_cmd)
 {
-    lock_guard<mutex> ids_lock(vm_ids_mutex_);
-    lock_guard<mutex> name_lock(name_mutex_);
-    lock_guard<mutex> uuid_lock(uuid_mutex_);
-    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
-    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
-    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
-    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
-    lock_guard<mutex> vcpu_ids_lock(vcpu_ids_mutex_);
-    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
-    has_data_most = false;
-    has_data_vcpu = false;
+    has_data = false;
 
-    vm_ids_.clear();
-    name_.clear();
-    uuid_.clear();
-    vsocket_num_.clear();
-    vcore_num_.clear();
-    vhpthread_num_.clear();
-    total_mem_size_.clear();
-    vcpu_ids_.clear();
-    stable_vmthread_ids_.clear();
+    unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> uuid_lock(uuid_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vsocket_num_lock(vsocket_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vcore_num_lock(vcore_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vhpthread_num_lock(vhpthread_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> total_mem_size_lock(total_mem_size_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vcpu_ids_lock(vcpu_ids_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_.mutex_, defer_lock);
+    lock(
+        vm_ids_lock, 
+        name_lock,
+        uuid_lock,
+        vsocket_num_lock,
+        vcore_num_lock,
+        vhpthread_num_lock,
+        total_mem_size_lock,
+        vcpu_ids_lock,
+        stable_vmthread_ids_lock
+        );
+    vm_ids_.value_.clear();
+    name_.value_.clear();
+    uuid_.value_.clear();
+    vsocket_num_.value_.clear();
+    vcore_num_.value_.clear();
+    vhpthread_num_.value_.clear();
+    total_mem_size_.value_.clear();
+    vcpu_ids_.value_.clear();
+    stable_vmthread_ids_.value_.clear();
     vm_cmd_ = vm_cmd;
 }
 
@@ -74,141 +83,100 @@ std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
 std::set<VmId> VmBase::get_vm_ids()
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> ids_lock(vm_ids_mutex_);
-    return vm_ids_;
+    return vm_ids_.read();
 }
 
 string VmBase::get_name(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> name_lock(name_mutex_);
-    if (name_.find(vm_id) != name_.end())
-        return name_[vm_id];
-    else
-        return "";
+    return name_.find(vm_id, {vm_id, ""}).second;
 }
 
 string VmBase::get_uuid(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> uuid_lock(uuid_mutex_);
-    if (uuid_.find(vm_id) != uuid_.end())
-        return uuid_[vm_id];
-    else
-        return "";
+    return uuid_.find(vm_id, {vm_id, ""}).second;
 }
 
 int VmBase::get_vsocket_num(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
-    if (vsocket_num_.find(vm_id) != vsocket_num_.end())
-        return vsocket_num_[vm_id];
-    else
-        return -1;
+    return vsocket_num_.find(vm_id, {vm_id, -1}).second;
 }
 
 int VmBase::get_vcore_num(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
-    if (vcore_num_.find(vm_id) != vcore_num_.end())
-        return vcore_num_[vm_id];
-    else
-        return -1;
+    return vcore_num_.find(vm_id, {vm_id, -1}).second;
 }
 
 int VmBase::get_vhpthread_num(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
-    if (vhpthread_num_.find(vm_id) != vhpthread_num_.end())
-        return vhpthread_num_[vm_id];
-    else
-        return -1;
+    return vhpthread_num_.find(vm_id, {vm_id, -1}).second;
 }
 
 int VmBase::get_total_mem_size(VmId vm_id)
 {
     if(!joinable())
-        refresh_most();
-    while(!has_data_most) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
-    if (total_mem_size_.find(vm_id) != total_mem_size_.end())
-        return total_mem_size_[vm_id];
-    else
-        return -1;
+    return total_mem_size_.find(vm_id, {vm_id, -1}).second;
 }
 
 set<pid_t> VmBase::get_vcpu_ids(VmId vm_id)
 {
     if(!joinable())
-        refresh_vcpu();
-    while(!has_data_vcpu) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vcpu_ids_lock(vcpu_ids_mutex_);
-    if (vcpu_ids_.find(vm_id) != vcpu_ids_.end())
-        return vcpu_ids_[vm_id];
-    else
-        return {};
+    return vcpu_ids_.find(vm_id, {vm_id, {}}).second;
 }
 
 int VmBase::get_vcpu_num(VmId vm_id)
 {
     if(!joinable())
-        refresh_vcpu();
-    while(!has_data_vcpu) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<mutex> vcpu_ids_lock(vcpu_ids_mutex_);
-    if (vcpu_ids_.find(vm_id) != vcpu_ids_.end())
-        return vcpu_ids_[vm_id].size();
-    else
-        return -1;
+    return vcpu_ids_.find(vm_id, {vm_id, {}}).second.size();
 }
 
 set<pid_t> VmBase::get_stable_vmthread_ids(VmId vm_id)
 {
     if(!joinable())
-        refresh_vcpu();
-    while(!has_data_vcpu) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
-    if (stable_vmthread_ids_.find(vm_id) != stable_vmthread_ids_.end())
-        return stable_vmthread_ids_[vm_id];
-    else
-        return {};
+    return stable_vmthread_ids_.find(vm_id, {vm_id, {}}).second;
 }
 
 int VmBase::get_stable_vmthread_num(VmId vm_id)
 {
     if(!joinable())
-        refresh_vcpu();
-    while(!has_data_vcpu) 
+        refresh();
+    while(!has_data) 
         this_thread::sleep_for(chrono::milliseconds(10));
-    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
-    if (stable_vmthread_ids_.find(vm_id) != stable_vmthread_ids_.end())
-        return stable_vmthread_ids_[vm_id].size();
-    else
-        return -1;
+    return stable_vmthread_ids_.find(vm_id, {vm_id, {}}).second.size();
 }
 
 set<pid_t> VmBase::get_volatile_vmthread_ids(VmId vm_id)
@@ -221,24 +189,18 @@ int VmBase::get_volatile_vmthread_num(VmId vm_id)
     return refresh_volatile_vmthread(vm_id).size();
 }
 
-void VmBase::refresh_most()
+void VmBase::refresh()
 {
-    lock_guard<mutex> vm_ids_lock(vm_ids_mutex_);
-    lock_guard<mutex> name_lock(name_mutex_);
-    lock_guard<mutex> uuid_lock(uuid_mutex_);
-    lock_guard<mutex> vsocket_num_lock(vsocket_num_mutex_);
-    lock_guard<mutex> vcore_num_lock(vcore_num_mutex_);
-    lock_guard<mutex> vhpthread_num_lock(vhpthread_num_mutex_);
-    lock_guard<mutex> total_mem_size_lock(total_mem_size_mutex_);
-    has_data_most = true;
 
-    vm_ids_.clear();
-    name_.clear();
-    uuid_.clear();
-    vsocket_num_.clear();
-    vcore_num_.clear();
-    vhpthread_num_.clear();
-    total_mem_size_.clear();
+    //refresh most
+    set<VmId> vm_ids;
+    map<VmId, string> names;
+    map<VmId, string> uuids;
+    map<VmId, int> vsocket_nums;
+    map<VmId, int> vcore_nums;;
+    map<VmId, int> vhpthread_nums;;
+    map<VmId, int> total_mem_sizes;;
+
     string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
     time_t cur_time;
     time(&cur_time);
@@ -269,7 +231,7 @@ void VmBase::refresh_most()
 
         //add vm_ids
         VmId vm_id(cur_time, stoull(pid));
-        vm_ids_.insert(vm_id);
+        vm_ids.insert(vm_id);
 
         //add name
         string name = "";
@@ -283,7 +245,7 @@ void VmBase::refresh_most()
         {
             //TODO throw //because of cgroup need it
         }
-        name_[vm_id] = name;
+        names[vm_id] = name;
 
         //add uuid
         string uuid = "";
@@ -293,7 +255,7 @@ void VmBase::refresh_most()
             ++uuid_iter;
             uuid = *uuid_iter;
         }
-        uuid_[vm_id] = uuid;
+        uuids[vm_id] = uuid;
 
         //add vsocket vcore vhpthread
         auto iter = find(args.begin(), args.end(), "-smp");
@@ -308,11 +270,11 @@ void VmBase::refresh_most()
                 str_tools::split(op, '=', data);
                 if (data.size() == 2) {
                     if(data[0] == "sockets")
-                        vsocket_num_[vm_id] = stoi(data[1]);
+                        vsocket_nums[vm_id] = stoi(data[1]);
                     else if(data[0] == "cores")
-                        vcore_num_[vm_id] = stoi(data[1]);
+                        vcore_nums[vm_id] = stoi(data[1]);
                     else if(data[0] == "threads")
-                        vhpthread_num_[vm_id] = stoi(data[1]);
+                        vhpthread_nums[vm_id] = stoi(data[1]);
                 }
             }
         }
@@ -325,42 +287,67 @@ void VmBase::refresh_most()
             ++size_iter;
             size = stoi(*size_iter);
         }
-        total_mem_size_[vm_id] = size;
+        total_mem_sizes[vm_id] = size;
     }
     pclose(data);
-    
-    return;
 
-}
-
-void VmBase::refresh_vcpu()
-{
-    lock_guard<mutex> vm_ids_lock(vm_ids_mutex_);
-    lock_guard<mutex> vcpu_lock(vcpu_ids_mutex_);
-    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
-    has_data_vcpu = true;
-    vcpu_ids_.clear();
-    stable_vmthread_ids_.clear();
-
-    for (auto& vm_id : vm_ids_) {
-        set<pid_t> vcpu_ids;
+    //refresh_vcpu
+    map<VmId, set<pid_t> > vcpu_ids;
+    map<VmId, set<pid_t> > stable_vmthread_ids;
+    for (auto& vm_id : vm_ids) {
+        set<pid_t> ids;
         vector<string> vcpu_dirs;
-        str_tools::get_dirs(VCPU_DIR + name_[vm_id] + "/", "vcpu", &vcpu_dirs);
+        str_tools::get_dirs(VCPU_DIR + names[vm_id] + "/", "vcpu", &vcpu_dirs);
         for (size_t i = 0; i < vcpu_dirs.size(); ++i) {
             pid_t pid;
-            ifstream fin(VCPU_DIR + name_[vm_id] + "/" + vcpu_dirs[i] + "/tasks");
+            ifstream fin(VCPU_DIR + names[vm_id] + "/" + vcpu_dirs[i] + "/tasks");
             if (!fin.good()) {
                 //TODO throw
     //            LOG(LogLevel::err) 
                 return;
             }
             fin >> pid;
-            vcpu_ids.insert(pid);
+            ids.insert(pid);
         }
-        vcpu_ids_[vm_id] = vcpu_ids;
-        stable_vmthread_ids_[vm_id] = vcpu_ids;
-        stable_vmthread_ids_[vm_id].insert(vm_id.pid);
+        vcpu_ids[vm_id] = ids;
+        stable_vmthread_ids[vm_id] = ids;
+        stable_vmthread_ids[vm_id].insert(vm_id.pid);
     }
+    
+    //write_data
+    unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> uuid_lock(uuid_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vsocket_num_lock(vsocket_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vcore_num_lock(vcore_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vhpthread_num_lock(vhpthread_num_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> total_mem_size_lock(total_mem_size_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> vcpu_ids_lock(vcpu_ids_.mutex_, defer_lock);
+    unique_lock<shared_timed_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_.mutex_, defer_lock);
+    lock(
+        vm_ids_lock, 
+        name_lock,
+        uuid_lock,
+        vsocket_num_lock,
+        vcore_num_lock,
+        vhpthread_num_lock,
+        total_mem_size_lock,
+        vcpu_ids_lock,
+        stable_vmthread_ids_lock
+        );
+
+    vm_ids_.value_ = vm_ids;
+    name_.value_ = names;
+    uuid_.value_ = uuids;
+    vsocket_num_.value_ = vsocket_nums;
+    vcore_num_.value_ = vcore_nums;
+    vhpthread_num_.value_ = vhpthread_nums;
+    total_mem_size_.value_ = total_mem_sizes;
+    vcpu_ids_.value_ = vcpu_ids;
+    stable_vmthread_ids_.value_ = stable_vmthread_ids;
+    has_data = true;
+    return;
+
 }
 
 set<pid_t> VmBase::refresh_volatile_vmthread(VmId vm_id)
@@ -373,16 +360,14 @@ set<pid_t> VmBase::refresh_volatile_vmthread(VmId vm_id)
     }
 
     set<pid_t> volatile_vmthread_ids;
-    lock_guard<recursive_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_mutex_);
-    if (stable_vmthread_ids_.find(vm_id) == stable_vmthread_ids_.end())
+    set<pid_t> stable_vmthread_ids = stable_vmthread_ids_.find(vm_id, {vm_id, {}}).second;
+    if (stable_vmthread_ids.size() == 0)
     {
-        refresh_vcpu();
-        if (stable_vmthread_ids_.find(vm_id) == stable_vmthread_ids_.end())
-            //this VM is down.
-            return {};
+        //this VM is down.
+        return {};
     }
 
-    set_difference(vmthread_ids.begin(), vmthread_ids.end(), stable_vmthread_ids_[vm_id].begin(), stable_vmthread_ids_[vm_id].end(),
+    set_difference(vmthread_ids.begin(), vmthread_ids.end(), stable_vmthread_ids.begin(), stable_vmthread_ids.end(),
         inserter(volatile_vmthread_ids, volatile_vmthread_ids.end()));
     return volatile_vmthread_ids;
 }
@@ -391,9 +376,8 @@ void VmBase::run()
 {
     while(!stop_)
     {
-        refresh_most();
-        refresh_vcpu();
-        this_thread::sleep_for(chrono::seconds(1));
+        refresh();
+        this_thread::sleep_for(chrono::seconds(5));
     }
 }
 

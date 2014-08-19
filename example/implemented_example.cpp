@@ -32,7 +32,7 @@ int main()
     Host *host = framework->init_host();
     
     int cnt = 0;
-    while(cnt < 1) {
+    while(cnt < 2) {
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
@@ -42,7 +42,7 @@ int main()
         //your scheduler algorithm
         myscheduler(host, vms);
 
-//        sleep(1); 
+        sleep(1); 
 
         ++cnt;
     }
@@ -166,10 +166,10 @@ void myscheduler(Host *host, std::set<VM> &vms)
     std::cout << "sys_node_dist 0-1: " << host->sys_node_dist(0, 1) << std::endl;
 
     //OP_HS_TEST_NODE_DIST
-//    print_dist(host->test_node_dist());
-//    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
-//    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
-//    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
+    print_dist(host->test_node_dist());
+    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
+    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
+    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
 
     for (auto& vm : vms)
     {

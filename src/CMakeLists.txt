@@ -10,7 +10,7 @@ set (EXAMPLE_DIR ../example)
 #set (CMAKE_BUILD_TYPE "Debug")
 
 set (CMAKE_CXX_FLAGS_LIST 
-        -g -Wall -Wextra -Wunused-variable -std=c++11 -pthread -pipe -D_GLIBCXX_USE_NANOSLEEP 
+        -g -Wall -Wextra -Wunused-variable -std=c++14 -pthread -pipe -D_GLIBCXX_USE_NANOSLEEP 
     )
 string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 

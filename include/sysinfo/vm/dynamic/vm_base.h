@@ -10,6 +10,7 @@
 #include <mutex>
 #include <atomic>
 #include "../../../utils/runnable.h"
+#include "../../../utils/lock_proxy.h"
 
 struct VmId;
 
@@ -36,34 +37,23 @@ private:
     VmBase();
     ~VmBase();
     void run();
-    void refresh_most();
-    void refresh_vcpu();
+    void refresh();
     std::set<pid_t> refresh_volatile_vmthread(VmId vm_id);
 
-    std::set<VmId> vm_ids_;
-    std::map<VmId, std::string> name_;
-    std::map<VmId, std::string> uuid_;
-    std::map<VmId, int> vsocket_num_;
-    std::map<VmId, int> vcore_num_;
-    std::map<VmId, int> vhpthread_num_;
-    std::map<VmId, int> total_mem_size_;
-    std::mutex vm_ids_mutex_;
-    std::mutex name_mutex_;
-    std::mutex uuid_mutex_;
-    std::mutex vsocket_num_mutex_;
-    std::mutex vcore_num_mutex_;
-    std::mutex vhpthread_num_mutex_;
-    std::mutex total_mem_size_mutex_;
+    ReadWriteLock<std::set<VmId> > vm_ids_;
+    ReadWriteLock<std::map<VmId, std::string> > name_;
+    ReadWriteLock<std::map<VmId, std::string> > uuid_;
+    ReadWriteLock<std::map<VmId, int> > vsocket_num_;
+    ReadWriteLock<std::map<VmId, int> > vcore_num_;
+    ReadWriteLock<std::map<VmId, int> > vhpthread_num_;
+    ReadWriteLock<std::map<VmId, int> > total_mem_size_;
 
-    std::map<VmId, std::set<pid_t>> vcpu_ids_;
-    std::map<VmId, std::set<pid_t>> stable_vmthread_ids_;
-    std::mutex vcpu_ids_mutex_;
-    std::recursive_mutex stable_vmthread_ids_mutex_;
+    ReadWriteLock<std::map<VmId, std::set<pid_t> > > vcpu_ids_;
+    ReadWriteLock<std::map<VmId, std::set<pid_t> > > stable_vmthread_ids_;
 
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
-    std::atomic<bool> has_data_most;
-    std::atomic<bool> has_data_vcpu;
+    std::atomic<bool> has_data;
 
     static constexpr const int BUF_SIZE = 102400;
     static constexpr const char * VCPU_DIR = "/sys/fs/cgroup/cpu/libvirt/qemu/";
