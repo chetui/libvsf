@@ -40,27 +40,18 @@ VmBase *VmBase::get_instance()
 
 void VmBase::set_vm_cmd(std::string vm_cmd)
 {
-
-    unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> uuid_lock(uuid_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vsocket_num_lock(vsocket_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vcore_num_lock(vcore_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vhpthread_num_lock(vhpthread_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> total_mem_size_lock(total_mem_size_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vcpu_ids_lock(vcpu_ids_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_.mutex_, defer_lock);
-    lock(
-        vm_ids_lock, 
-        name_lock,
-        uuid_lock,
-        vsocket_num_lock,
-        vcore_num_lock,
-        vhpthread_num_lock,
-        total_mem_size_lock,
-        vcpu_ids_lock,
-        stable_vmthread_ids_lock
+    MultiWriteLock mwlock(
+        vm_ids_.mutex_,
+        name_.mutex_,
+        uuid_.mutex_,
+        vsocket_num_.mutex_,
+        vcore_num_.mutex_,
+        vhpthread_num_.mutex_,
+        total_mem_size_.mutex_,
+        vcpu_ids_.mutex_,
+        stable_vmthread_ids_.mutex_
         );
+
     has_data = false;
     vm_ids_.value_.clear();
     name_.value_.clear();
@@ -191,26 +182,16 @@ int VmBase::get_volatile_vmthread_num(VmId vm_id)
 
 void VmBase::refresh()
 {
-
-    unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> uuid_lock(uuid_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vsocket_num_lock(vsocket_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vcore_num_lock(vcore_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vhpthread_num_lock(vhpthread_num_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> total_mem_size_lock(total_mem_size_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> vcpu_ids_lock(vcpu_ids_.mutex_, defer_lock);
-    unique_lock<shared_timed_mutex> stable_vmthread_ids_lock(stable_vmthread_ids_.mutex_, defer_lock);
-    lock(
-        vm_ids_lock, 
-        name_lock,
-        uuid_lock,
-        vsocket_num_lock,
-        vcore_num_lock,
-        vhpthread_num_lock,
-        total_mem_size_lock,
-        vcpu_ids_lock,
-        stable_vmthread_ids_lock
+    MultiWriteLock mwlock(
+        vm_ids_.mutex_,
+        name_.mutex_,
+        uuid_.mutex_,
+        vsocket_num_.mutex_,
+        vcore_num_.mutex_,
+        vhpthread_num_.mutex_,
+        total_mem_size_.mutex_,
+        vcpu_ids_.mutex_,
+        stable_vmthread_ids_.mutex_
         );
 
     vm_ids_.value_.clear();

@@ -5,6 +5,8 @@
 #include <shared_mutex>
 #include <algorithm>
 #include <type_traits>
+#include <vector>
+#include <iostream>
 
 template <typename T>
 class has_key_type {
@@ -74,5 +76,29 @@ struct ReadWriteLock {
     C value_;
 };
 
+class MultiWriteLock {
+public:
+    template<typename... Args>
+    MultiWriteLock(Args&... args) {
+//        std::cout << "multi write lock all\n";
+        std::lock(std::forward<Args&>(args)...);
+        add_to(std::forward<Args&>(args)...);
+    }
+    ~MultiWriteLock() {
+        for (auto& m : mutexs_) 
+        {
+//        std::cout << "multi write unlock one\n";
+            m->unlock();
+        }
+    }
+private:
+    void add_to() {} //termination version
+    template<typename T, typename... Args>
+    void add_to(T& t, Args&... args) {
+        mutexs_.push_back(&t);
+        add_to(args...);
+    }
+    std::vector<std::shared_timed_mutex*> mutexs_;
+};
 
 #endif
