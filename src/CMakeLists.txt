@@ -7,10 +7,12 @@ set (TEST_DIR ../test)
 set (EXAMPLE_DIR ../example)
 
 # the debug flag is used by gdb
-#set (CMAKE_BUILD_TYPE "Debug")
+set (CMAKE_BUILD_TYPE "Debug")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -ggdb3")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set (CMAKE_CXX_FLAGS_LIST 
-        -g -Wall -Wextra -Wunused-variable -std=c++14 -pthread -pipe -D_GLIBCXX_USE_NANOSLEEP 
+        -Wall -Wextra -Wunused-variable -std=c++14 -pthread -pipe -D_GLIBCXX_USE_NANOSLEEP 
     )
 string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 

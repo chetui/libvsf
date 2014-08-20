@@ -40,7 +40,6 @@ VmBase *VmBase::get_instance()
 
 void VmBase::set_vm_cmd(std::string vm_cmd)
 {
-    has_data = false;
 
     unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
     unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
@@ -62,6 +61,7 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
         vcpu_ids_lock,
         stable_vmthread_ids_lock
         );
+    has_data = false;
     vm_ids_.value_.clear();
     name_.value_.clear();
     uuid_.value_.clear();
@@ -192,129 +192,6 @@ int VmBase::get_volatile_vmthread_num(VmId vm_id)
 void VmBase::refresh()
 {
 
-    //refresh most
-    set<VmId> vm_ids;
-    map<VmId, string> names;
-    map<VmId, string> uuids;
-    map<VmId, int> vsocket_nums;
-    map<VmId, int> vcore_nums;;
-    map<VmId, int> vhpthread_nums;;
-    map<VmId, int> total_mem_sizes;;
-
-    string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
-    time_t cur_time;
-    time(&cur_time);
-    FILE* data = popen(cmd.c_str(), "r");
-
-    string pid;
-    string start_timestamp;
-    vector<string> args;
-    string tmp_str;
-    while(fgets(buf_, BUF_SIZE, data))
-    {
-        istringstream is(buf_);
-        is >> start_timestamp;
-
-        int days;
-        int hours;
-        int minutes;
-        int seconds;
-        sscanf(start_timestamp.c_str(), "%d-%d:%d:%d", &days, &hours, &minutes, &seconds);
-        cur_time -= ((days * 24 + hours) * 60 + minutes) * 60 + seconds;
-
-        is >> pid;
-        while(is)
-        {
-            is >> tmp_str;
-            args.push_back(tmp_str);
-        }
-
-        //add vm_ids
-        VmId vm_id(cur_time, stoull(pid));
-        vm_ids.insert(vm_id);
-
-        //add name
-        string name = "";
-        auto name_iter = find(args.begin(), args.end(), "-name");
-        if (name_iter != args.end())
-        {
-            ++name_iter;
-            name = *name_iter;
-        }
-        else
-        {
-            //TODO throw //because of cgroup need it
-        }
-        names[vm_id] = name;
-
-        //add uuid
-        string uuid = "";
-        auto uuid_iter = find(args.begin(), args.end(), "-uuid");
-        if (uuid_iter != args.end())
-        {
-            ++uuid_iter;
-            uuid = *uuid_iter;
-        }
-        uuids[vm_id] = uuid;
-
-        //add vsocket vcore vhpthread
-        auto iter = find(args.begin(), args.end(), "-smp");
-        if (iter != args.end())
-        {
-            ++iter;
-            vector<string> ops;
-            str_tools::split(*iter, ',', ops);
-            for(auto& op : ops)
-            {
-                vector<string> data;
-                str_tools::split(op, '=', data);
-                if (data.size() == 2) {
-                    if(data[0] == "sockets")
-                        vsocket_nums[vm_id] = stoi(data[1]);
-                    else if(data[0] == "cores")
-                        vcore_nums[vm_id] = stoi(data[1]);
-                    else if(data[0] == "threads")
-                        vhpthread_nums[vm_id] = stoi(data[1]);
-                }
-            }
-        }
-
-        //add total_mem_size
-        int size = -1;
-        auto size_iter = find(args.begin(), args.end(), "-m");
-        if (size_iter != args.end())
-        {
-            ++size_iter;
-            size = stoi(*size_iter);
-        }
-        total_mem_sizes[vm_id] = size;
-    }
-    pclose(data);
-
-    //refresh_vcpu
-    map<VmId, set<pid_t> > vcpu_ids;
-    map<VmId, set<pid_t> > stable_vmthread_ids;
-    for (auto& vm_id : vm_ids) {
-        set<pid_t> ids;
-        vector<string> vcpu_dirs;
-        str_tools::get_dirs(VCPU_DIR + names[vm_id] + "/", "vcpu", &vcpu_dirs);
-        for (size_t i = 0; i < vcpu_dirs.size(); ++i) {
-            pid_t pid;
-            ifstream fin(VCPU_DIR + names[vm_id] + "/" + vcpu_dirs[i] + "/tasks");
-            if (!fin.good()) {
-                //TODO throw
-    //            LOG(LogLevel::err) 
-                return;
-            }
-            fin >> pid;
-            ids.insert(pid);
-        }
-        vcpu_ids[vm_id] = ids;
-        stable_vmthread_ids[vm_id] = ids;
-        stable_vmthread_ids[vm_id].insert(vm_id.pid);
-    }
-    
-    //write_data
     unique_lock<shared_timed_mutex> vm_ids_lock(vm_ids_.mutex_, defer_lock);
     unique_lock<shared_timed_mutex> name_lock(name_.mutex_, defer_lock);
     unique_lock<shared_timed_mutex> uuid_lock(uuid_.mutex_, defer_lock);
@@ -336,15 +213,139 @@ void VmBase::refresh()
         stable_vmthread_ids_lock
         );
 
-    vm_ids_.value_ = vm_ids;
-    name_.value_ = names;
-    uuid_.value_ = uuids;
-    vsocket_num_.value_ = vsocket_nums;
-    vcore_num_.value_ = vcore_nums;
-    vhpthread_num_.value_ = vhpthread_nums;
-    total_mem_size_.value_ = total_mem_sizes;
-    vcpu_ids_.value_ = vcpu_ids;
-    stable_vmthread_ids_.value_ = stable_vmthread_ids;
+    vm_ids_.value_.clear();
+    name_.value_.clear();
+    uuid_.value_.clear();
+    vsocket_num_.value_.clear();
+    vcore_num_.value_.clear();
+    vhpthread_num_.value_.clear();
+    total_mem_size_.value_.clear();
+    vcpu_ids_.value_.clear();
+    stable_vmthread_ids_.value_.clear();
+    //refresh most
+
+    string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
+    time_t cur_time;
+    time(&cur_time);
+    FILE* data = popen(cmd.c_str(), "r");
+
+    string pid;
+    string start_timestamp;
+    vector<string> args;
+    string tmp_str;
+    while(fgets(buf_, BUF_SIZE, data))
+    {
+        args.clear();
+        istringstream is(buf_);
+        is >> start_timestamp;
+
+        int days;
+        int hours;
+        int minutes;
+        int seconds;
+        time_t start_time;
+        sscanf(start_timestamp.c_str(), "%d-%d:%d:%d", &days, &hours, &minutes, &seconds);
+        start_time = cur_time - (((days * 24 + hours) * 60 + minutes) * 60 + seconds);
+
+        is >> pid;
+        while(is)
+        {
+            is >> tmp_str;
+            args.push_back(tmp_str);
+        }
+
+        //add vm_ids
+        VmId vm_id(start_time, stoull(pid));
+        vm_ids_.value_.insert(vm_id);
+
+        //add name
+        string name = "";
+        auto name_iter = find(args.begin(), args.end(), "-name");
+        if (name_iter != args.end())
+        {
+            ++name_iter;
+            name = *name_iter;
+        }
+        else
+        {
+            //TODO throw //because of cgroup need it
+        }
+        name_.value_[vm_id] = name;
+
+        //add uuid
+        string uuid = "";
+        auto uuid_iter = find(args.begin(), args.end(), "-uuid");
+        if (uuid_iter != args.end())
+        {
+            ++uuid_iter;
+            uuid = *uuid_iter;
+        }
+        uuid_.value_[vm_id] = uuid;
+
+        //add vsocket vcore vhpthread
+        auto iter = find(args.begin(), args.end(), "-smp");
+        if (iter != args.end())
+        {
+            ++iter;
+            vector<string> ops;
+            str_tools::split(*iter, ',', ops);
+            for(auto& op : ops)
+            {
+                vector<string> data;
+                str_tools::split(op, '=', data);
+                if (data.size() == 2) {
+                    if(data[0] == "sockets")
+                        vsocket_num_.value_[vm_id] = stoi(data[1]);
+                    else if(data[0] == "cores")
+                        vcore_num_.value_[vm_id] = stoi(data[1]);
+                    else if(data[0] == "threads")
+                        vhpthread_num_.value_[vm_id] = stoi(data[1]);
+                }
+            }
+        }
+
+        //add total_mem_size
+        int size = -1;
+        auto size_iter = find(args.begin(), args.end(), "-m");
+        if (size_iter != args.end())
+        {
+            ++size_iter;
+            size = stoi(*size_iter);
+        }
+        total_mem_size_.value_[vm_id] = size;
+    }
+    pclose(data);
+
+    //refresh_vcpu
+    for (auto& vm_id : vm_ids_.value_) {
+        set<pid_t> ids;
+        vector<string> vcpu_dirs;
+        str_tools::get_dirs(VCPU_DIR + name_.value_[vm_id] + "/", "vcpu", &vcpu_dirs);
+        for (size_t i = 0; i < vcpu_dirs.size(); ++i) {
+            pid_t pid;
+            ifstream fin(VCPU_DIR + name_.value_[vm_id] + "/" + vcpu_dirs[i] + "/tasks");
+            if (!fin.good()) {
+                //TODO throw
+    //            LOG(LogLevel::err) 
+                return;
+            }
+            fin >> pid;
+            ids.insert(pid);
+        }
+        vcpu_ids_.value_[vm_id] = ids;
+        stable_vmthread_ids_.value_[vm_id] = ids;
+        stable_vmthread_ids_.value_[vm_id].insert(vm_id.pid);
+    }
+
+
+//    cout << "DDD----" << endl;
+//    for (auto& vm_id : vm_ids_.value_) {
+//        cout << "DDD " << vm_id << ">>";
+//        for (auto& id : vcpu_ids_.value_[vm_id]) {
+//            cout << ":" << id;
+//        }
+//        cout << endl;
+//    }
     has_data = true;
     return;
 
@@ -389,10 +390,10 @@ bool operator==(const VmId &lv, const VmId &rv)
 
 bool operator<(const VmId &lv, const VmId &rv)
 {
-    if(lv.start_timestamp == rv.start_timestamp)
+    if (abs(difftime(lv.start_timestamp, rv.start_timestamp)) <= 2)
         return lv.pid < rv.pid;
     else
-        return lv.start_timestamp < rv.start_timestamp;
+        return difftime(lv.start_timestamp, rv.start_timestamp) > 2;
 }
 
 ostream &operator<<(ostream &os, const VmId &v)

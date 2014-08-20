@@ -16,19 +16,19 @@ protected:
     VmBase* vm_base;
 };
 
-TEST_F(VmBaseTest, set_vm_cmd_without_thread)
-{
-    vm_base->set_vm_cmd("sshd");
-    size_t size_before = vm_base->get_vm_ids().size();
-
-    vm_base->set_vm_cmd("bash");
-    vm_base->get_vm_ids();
-
-    vm_base->set_vm_cmd("sshd");
-    size_t size_after = vm_base->get_vm_ids().size();
-    cout << "size:" << size_after << endl;
-    ASSERT_EQ(size_before, size_after);
-}
+//TEST_F(VmBaseTest, set_vm_cmd_without_thread)
+//{
+//    vm_base->set_vm_cmd("sshd");
+//    size_t size_before = vm_base->get_vm_ids().size();
+//
+//    vm_base->set_vm_cmd("bash");
+//    vm_base->get_vm_ids();
+//
+//    vm_base->set_vm_cmd("sshd");
+//    size_t size_after = vm_base->get_vm_ids().size();
+//    cout << "size:" << size_after << endl;
+//    ASSERT_EQ(size_before, size_after);
+//}
 
 TEST_F(VmBaseTest, vm_ids_with_thread)
 {
