@@ -13,7 +13,7 @@
 
 using namespace std;
 
-NodeCpu::NodeCpu()
+NodeCpu::NodeCpu(): inited_(false)
 {
 }
 
@@ -27,253 +27,181 @@ NodeCpu* NodeCpu::get_instance()
     return &node_cpu;
 }
 
+template <typename K, typename V>
+std::set<K> NodeCpu::get_keys(std::map<K, std::set<V> >& data)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    set<K> ids;
+    for (auto& x : data)
+        ids.insert(x.first);
+    return ids;
+}
+
+template <typename T>
+std::set<T> NodeCpu::get_keys(std::set<T>& data)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    return data;
+}
+
+template <typename T>
+int NodeCpu::get_key_num(T& data)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    return data.size();
+}
+
+template <typename K, typename V>
+K NodeCpu::get_key_by_value(std::map<K, std::set<V> >& data, const V& value)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    for (auto& d : data) {
+        if (d.second.find(value) != d.second.end()) {
+            return d.first;
+        }
+    }
+    return {};
+}
+
+template <typename K, typename V>
+std::set<V> NodeCpu::get_value_by_key(std::map<K, std::set<V> >& data, const K& key)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    if (data.find(key) != data.end())
+        return data[key];
+    else
+        return {};
+}
+
+template <typename K, typename V>
+int NodeCpu::get_value_num_by_key(std::map<K, std::set<V> >& data, const K& key)
+{
+    refresh();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    if (data.find(key) != data.end())
+        return data[key].size();
+    else
+        return 0;
+}
+
 int NodeCpu::get_node_num()
 {
-    lock_guard<recursive_mutex> lock(node_hpthread_mutex_);
-    refresh();
-    return node_hpthread_.size();
+    return get_key_num(node_hpthread_);
 }
 
 std::set<NodeId> NodeCpu::get_node_ids() 
 {
-    lock_guard<recursive_mutex> lock(node_hpthread_mutex_);
-    refresh();
-    set<NodeId> ids;
-    for (auto& x : node_hpthread_)
-        ids.insert(x.first);
-    return ids;
+    return get_keys(node_hpthread_);
 }
 NodeId NodeCpu::get_node_id(SocketId socket_id) 
 {
-    lock_guard<recursive_mutex> lock(node_socket_mutex_);
-    refresh();
-    for (auto& node_socket : node_socket_) {
-        if (node_socket.second.find(socket_id) != node_socket.second.end()) {
-            return node_socket.first;
-        }
-    }
-    return {};
+    return get_key_by_value(node_socket_, socket_id);
 }
 NodeId NodeCpu::get_node_id(CoreId core_id) 
 {
-    lock_guard<recursive_mutex> lock(node_core_mutex_);
-    refresh();
-    for (auto& node_core : node_core_) {
-        if (node_core.second.find(core_id) != node_core.second.end()) {
-            return node_core.first;
-        }
-    }
-    return {};
+    return get_key_by_value(node_core_, core_id);
 }
 NodeId NodeCpu::get_node_id(HpthreadId hpthread_id) 
 {
-    lock_guard<recursive_mutex> lock(node_hpthread_mutex_);
-    refresh();
-    for (auto& node_hpthread : node_hpthread_) {
-        if (node_hpthread.second.find(hpthread_id) != node_hpthread.second.end()) {
-            return node_hpthread.first;
-        }
-    }
-    return {};
+    return get_key_by_value(node_hpthread_, hpthread_id);
 }
 int NodeCpu::get_socket_num() 
 {
-    lock_guard<recursive_mutex> lock(socket_hpthread_mutex_);
-    refresh();
-    return socket_hpthread_.size();
+    return get_key_num(socket_hpthread_);
 }
 int NodeCpu::get_socket_num(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_socket_mutex_);
-    refresh();
-    if (node_socket_.find(node_id) != node_socket_.end())
-        return node_socket_[node_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(node_socket_, node_id);
 }
 std::set<SocketId> NodeCpu::get_socket_ids() 
 {
-    lock_guard<recursive_mutex> lock(socket_hpthread_mutex_);
-    refresh();
-    set<SocketId> ids;
-    for (auto& x : socket_hpthread_)
-        ids.insert(x.first);
-    return ids;
+    return get_keys(socket_hpthread_);
 }
 std::set<SocketId> NodeCpu::get_socket_ids(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_socket_mutex_);
-    refresh();
-    if (node_socket_.find(node_id) != node_socket_.end())
-        return node_socket_[node_id];
-    else
-        return {};
+    return get_value_by_key(node_socket_, node_id);
 }
 SocketId NodeCpu::get_socket_id(CoreId core_id) 
 {
     return SocketId(core_id.socket_id);
-//    lock_guard<recursive_mutex> lock(socket_core_mutex_);
-//    refresh();
-//    for (auto& socket_core : socket_core_) {
-//        if (socket_core.find(core_id) != socket_core.end()) {
-//            return socket_core.first;
-//        }
-//    }
-//    return {};
+//    return get_key_by_value(socket_core_, core_id);
 }
 SocketId NodeCpu::get_socket_id(HpthreadId hpthread_id) 
 {
-    lock_guard<recursive_mutex> lock(socket_hpthread_mutex_);
-    refresh();
-    for (auto& socket_hpthread : socket_hpthread_) {
-        if (socket_hpthread.second.find(hpthread_id) != socket_hpthread.second.end()) {
-            return socket_hpthread.first;
-        }
-    }
-    return {};
+    return get_key_by_value(socket_hpthread_, hpthread_id);
 }
 int NodeCpu::get_core_num() 
 {
-    lock_guard<recursive_mutex> lock(core_hpthread_mutex_);
-    refresh();
-    return core_hpthread_.size();
+    return get_key_num(core_hpthread_);
 }
 int NodeCpu::get_core_num(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_core_mutex_);
-    refresh();
-    if (node_core_.find(node_id) != node_core_.end())
-        return node_core_[node_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(node_core_, node_id);
 }
 int NodeCpu::get_core_num(SocketId socket_id) 
 {
-    lock_guard<recursive_mutex> lock(socket_core_mutex_);
-    refresh();
-    if (socket_core_.find(socket_id) != socket_core_.end())
-        return socket_core_[socket_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(socket_core_, socket_id);
 }
 std::set<CoreId> NodeCpu::get_core_ids() 
 {
-    lock_guard<recursive_mutex> lock(core_hpthread_mutex_);
-    refresh();
-    set<CoreId> ids;
-    for (auto& x : core_hpthread_)
-        ids.insert(x.first);
-    return ids;
+    return get_keys(core_hpthread_);
 }
 std::set<CoreId> NodeCpu::get_core_ids(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_core_mutex_);
-    refresh();
-    if (node_core_.find(node_id) != node_core_.end())
-        return node_core_[node_id];
-    else
-        return {};
+    return get_value_by_key(node_core_, node_id);
 }
 std::set<CoreId> NodeCpu::get_core_ids(SocketId socket_id) 
 {
-    lock_guard<recursive_mutex> lock(socket_core_mutex_);
-    refresh();
-    if (socket_core_.find(socket_id) != socket_core_.end())
-        return socket_core_[socket_id];
-    else
-        return {};
+    return get_value_by_key(socket_core_, socket_id);
 }
 CoreId NodeCpu::get_core_id(HpthreadId hpthread_id) 
 {
-    lock_guard<recursive_mutex> lock(core_hpthread_mutex_);
-    refresh();
-    for (auto& core_hpthread : core_hpthread_) {
-        if (core_hpthread.second.find(hpthread_id) != core_hpthread.second.end()) {
-            return core_hpthread.first;
-        }
-    }
-    return {};
+    return get_key_by_value(core_hpthread_, hpthread_id);
 }
 int NodeCpu::get_hpthread_num() 
 {
-    lock_guard<recursive_mutex> lock(hpthread_mutex_);
-    refresh();
-    return hpthread_.size();
+    return get_key_num(hpthread_);
 }
 int NodeCpu::get_hpthread_num(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_hpthread_mutex_);
-    refresh();
-    if (node_hpthread_.find(node_id) != node_hpthread_.end())
-        return node_hpthread_[node_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(node_hpthread_, node_id);
 }
 int NodeCpu::get_hpthread_num(SocketId socket_id) 
 {
-    lock_guard<recursive_mutex> lock(socket_hpthread_mutex_);
-    refresh();
-    if (socket_hpthread_.find(socket_id) != socket_hpthread_.end())
-        return socket_hpthread_[socket_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(socket_hpthread_, socket_id);
 }
 int NodeCpu::get_hpthread_num(CoreId core_id) 
 {
-    lock_guard<recursive_mutex> lock(core_hpthread_mutex_);
-    refresh();
-    if (core_hpthread_.find(core_id) != core_hpthread_.end())
-        return core_hpthread_[core_id].size();
-    else
-        return 0;
+    return get_value_num_by_key(core_hpthread_, core_id);
 }
 std::set<HpthreadId> NodeCpu::get_hpthread_ids() 
 {
-    lock_guard<recursive_mutex> lock(hpthread_mutex_);
-    refresh();
-    return hpthread_;
+    return get_keys(hpthread_);
 }
 std::set<HpthreadId> NodeCpu::get_hpthread_ids(NodeId node_id) 
 {
-    lock_guard<recursive_mutex> lock(node_hpthread_mutex_);
-    refresh();
-    if (node_hpthread_.find(node_id) != node_hpthread_.end())
-        return node_hpthread_[node_id];
-    else
-        return {};
+    return get_value_by_key(node_hpthread_, node_id);
 }
 std::set<HpthreadId> NodeCpu::get_hpthread_ids(SocketId socket_id) 
 {
-    lock_guard<recursive_mutex> lock(socket_hpthread_mutex_);
-    refresh();
-    if (socket_hpthread_.find(socket_id) != socket_hpthread_.end())
-        return socket_hpthread_[socket_id];
-    else
-        return {};
+    return get_value_by_key(socket_hpthread_, socket_id);
 }
 std::set<HpthreadId> NodeCpu::get_hpthread_ids(CoreId core_id) 
 {
-    lock_guard<recursive_mutex> lock(core_hpthread_mutex_);
-    refresh();
-    if (core_hpthread_.find(core_id) != core_hpthread_.end())
-        return core_hpthread_[core_id];
-    else
-        return {};
+    return get_value_by_key(core_hpthread_, core_id);
 }
 
 void NodeCpu::refresh()
 {
-    lock_guard<recursive_mutex> node_socket_lock(node_socket_mutex_);
-    lock_guard<recursive_mutex> node_core_lock(node_core_mutex_);
-    lock_guard<recursive_mutex> node_hpthread_lock(node_hpthread_mutex_);
-    lock_guard<recursive_mutex> socket_core_lock(socket_core_mutex_);
-    lock_guard<recursive_mutex> socket_hpthread_lock(socket_hpthread_mutex_);
-    lock_guard<recursive_mutex> core_hpthread_lock(core_hpthread_mutex_);
-    lock_guard<recursive_mutex> hpthread_lock(hpthread_mutex_);
     if(inited_)
         return;
-    inited_ = true;
 
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
     //read cpulist
     vector<string> node_dirs;
     str_tools::get_dirs(NODE_DIR, "node", &node_dirs);
@@ -382,6 +310,7 @@ void NodeCpu::refresh()
             }
         }
     }
+    inited_ = true;
 }
 
 

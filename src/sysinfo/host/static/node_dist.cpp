@@ -18,10 +18,12 @@ NodeDist *NodeDist::get_instance()
 
 std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& param) 
 {
-    std::lock_guard<std::mutex> lock(test_mutex);
+    std::shared_lock<std::shared_timed_mutex> read_lock(test_mutex_);
 //    std::cout << "AA" << std::endl;
     if(test_inited_ && param == test_param_)
         return test_node_dist_;
+    read_lock.unlock();
+    std::unique_lock<std::shared_timed_mutex> write_lock(test_mutex_);
     test_inited_ = true;
     test_param_ = param;
     test_node_dist_.clear();
@@ -80,9 +82,11 @@ int NodeDist::get_test_node_dist(int node_id_0, int node_id_1, const MicroParam&
 
 std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
 {
-    std::lock_guard<std::mutex> lock(sys_mutex);
+    std::shared_lock<std::shared_timed_mutex> read_lock(sys_mutex_);
     if(sys_inited_)
         return sys_node_dist_;
+    read_lock.unlock();
+    std::unique_lock<std::shared_timed_mutex> write_lock(sys_mutex_);
     sys_inited_ = true;
     sys_node_dist_.clear();
 

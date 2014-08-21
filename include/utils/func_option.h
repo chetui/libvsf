@@ -6,6 +6,7 @@
 #include <string>
 #include <initializer_list>
 #include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include "sysinfo/define_func_option.h"
 
@@ -23,7 +24,7 @@ public:
 private:
     FuncOption();
     std::map<Option, std::map<OptionParam, OptionParamVal> > options_;
-    std::mutex options_mutex_;
+    std::shared_timed_mutex options_mutex_;
 };
 
 class OptionParamVal 

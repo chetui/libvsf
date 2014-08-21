@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <shared_mutex>
 #include "utils/str_tools.h"
 
 #define WORKLOADTYPE_RANDOM 'r'
@@ -42,8 +43,8 @@ private:
     std::vector<std::vector<int> > test_node_dist_;
     bool sys_inited_ = false;
     bool test_inited_ = false;
-    std::mutex sys_mutex;
-    std::mutex test_mutex;
+    std::shared_timed_mutex sys_mutex_;
+    std::shared_timed_mutex test_mutex_;
     MicroParam test_param_;
 
     static constexpr int BUF_SIZE = 1024;

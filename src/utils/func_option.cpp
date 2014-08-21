@@ -16,7 +16,7 @@ FuncOption* FuncOption::get_instance()
 
 void FuncOption::enable_option(std::map<Option, std::map<OptionParam, OptionParamVal> > &ops)
 {
-    lock_guard<mutex> lock(options_mutex_);
+    unique_lock<shared_timed_mutex> lock(options_mutex_);
 
     //enable ops
     options_.insert(ops.begin(), ops.end());
@@ -38,7 +38,7 @@ void FuncOption::enable_option(std::map<Option, std::map<OptionParam, OptionPara
 
 void FuncOption::disable_option(initializer_list<Option> ops)
 {
-    lock_guard<mutex> lock(options_mutex_);
+    unique_lock<shared_timed_mutex> lock(options_mutex_);
 
     for (auto& op : ops) {
         options_.erase(op);
@@ -49,13 +49,13 @@ void FuncOption::disable_option(initializer_list<Option> ops)
 
 bool FuncOption::check_option(Option op)
 {
-    lock_guard<mutex> lock(options_mutex_);
+    shared_lock<shared_timed_mutex> lock(options_mutex_);
     return options_.count(op) > 0;
 }
 
 std::map<OptionParam, OptionParamVal> &FuncOption::get_param(Option op)
 {
-    lock_guard<mutex> lock(options_mutex_);
+    shared_lock<shared_timed_mutex> lock(options_mutex_);
     return options_[op];
 }
 

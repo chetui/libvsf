@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 #include <mutex>
+#include <shared_mutex>
+#include <atomic>
 
 struct NodeId;
 struct SocketId;
@@ -58,6 +60,18 @@ public:
 
 private:
     NodeCpu();
+    template <typename K, typename V>
+        std::set<K> get_keys(std::map<K, std::set<V> >& data);
+    template <typename T>
+        std::set<T> get_keys(std::set<T>& data);
+    template <typename T>
+        int get_key_num(T& data);
+    template <typename K, typename V>
+        K get_key_by_value(std::map<K, std::set<V> >& data, const V& value);
+    template <typename K, typename V>
+        std::set<V> get_value_by_key(std::map<K, std::set<V> >& data, const K& key);
+    template <typename K, typename V>
+        int get_value_num_by_key(std::map<K, std::set<V> >& data, const K& key);
 
     std::map<NodeId, std::set<SocketId> > node_socket_;
     std::map<NodeId, std::set<CoreId> > node_core_;
@@ -66,14 +80,8 @@ private:
     std::map<SocketId, std::set<HpthreadId> > socket_hpthread_;
     std::map<CoreId, std::set<HpthreadId> > core_hpthread_;
     std::set<HpthreadId> hpthread_;
-    bool inited_ = false;
-    std::recursive_mutex node_socket_mutex_;
-    std::recursive_mutex node_core_mutex_;
-    std::recursive_mutex node_hpthread_mutex_;
-    std::recursive_mutex socket_core_mutex_;
-    std::recursive_mutex socket_hpthread_mutex_;
-    std::recursive_mutex core_hpthread_mutex_;
-    std::recursive_mutex hpthread_mutex_;
+    std::atomic<bool> inited_;
+    std::shared_timed_mutex data_mutex_;
 
 
     static constexpr char const * NODE_DIR = "/sys/devices/system/node/";

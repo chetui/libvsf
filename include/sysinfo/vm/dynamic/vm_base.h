@@ -8,9 +8,9 @@
 #include <string>
 #include <iostream>
 #include <mutex>
+#include <shared_mutex>
 #include <atomic>
 #include "../../../utils/runnable.h"
-#include "../../../utils/lock_proxy.h"
 
 struct VmId;
 
@@ -39,17 +39,20 @@ private:
     void run();
     void refresh();
     std::set<pid_t> refresh_volatile_vmthread(VmId vm_id);
+    template <typename T>
+    T get_data_by_vm_id(std::map<VmId, T>& data, VmId vm_id, const T& failed_ret);
 
-    ReadWriteLock<std::set<VmId> > vm_ids_;
-    ReadWriteLock<std::map<VmId, std::string> > name_;
-    ReadWriteLock<std::map<VmId, std::string> > uuid_;
-    ReadWriteLock<std::map<VmId, int> > vsocket_num_;
-    ReadWriteLock<std::map<VmId, int> > vcore_num_;
-    ReadWriteLock<std::map<VmId, int> > vhpthread_num_;
-    ReadWriteLock<std::map<VmId, int> > total_mem_size_;
+    std::set<VmId> vm_ids_;
+    std::map<VmId, std::string> name_;
+    std::map<VmId, std::string> uuid_;
+    std::map<VmId, int> vsocket_num_;
+    std::map<VmId, int> vcore_num_;
+    std::map<VmId, int> vhpthread_num_;
+    std::map<VmId, int> total_mem_size_;
+    std::map<VmId, std::set<pid_t> > vcpu_ids_;
+    std::map<VmId, std::set<pid_t> > stable_vmthread_ids_;
 
-    ReadWriteLock<std::map<VmId, std::set<pid_t> > > vcpu_ids_;
-    ReadWriteLock<std::map<VmId, std::set<pid_t> > > stable_vmthread_ids_;
+    std::shared_timed_mutex data_mutex_;
 
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
