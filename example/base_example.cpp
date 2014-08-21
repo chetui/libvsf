@@ -26,7 +26,6 @@ int main()
             }
         },
         //<<Optional Host Dynamic Info>>
-        { Option::OP_HS_CPU_REUSE_RATIO, { } },
         { Option::OP_HS_CPU_USAGE, { } },
         { Option::OP_HS_USED_MEM_SIZE, { } },
         //<<Optional VM Static Info>>
@@ -115,10 +114,6 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->test_node_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
 
             //<<host dynamic info>>
-                //OP_HS_CPU_REUSE_RATIO ((( OP_HS_NODE_CPU /Yu
-                host->cpu_reuse_ratio();
-                host->cpu_reuse_ratio(node_id);
-                host->cpu_reuse_ratio(socket_id);
                 //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo
                 host->cpu_usage();
                 host->cpu_usage(node_id);

@@ -11,15 +11,13 @@ enum class Option : unsigned int {
     OP_HS_SYS_NODE_DIST,
     OP_HS_TEST_NODE_DIST,
     //<<host dynamic info>>
-    OP_HS_CPU_REUSE_RATIO,
     OP_HS_CPU_USAGE,
     OP_HS_USED_MEM_SIZE,
     //<<vm static info>>
-    OP_VM_BASE,
-    OP_VM_VCPU_VMTHREAD,
     OP_VM_VNODE,
     OP_VM_MEM_POLICY,
     //<<vm dynamic info>>
+    OP_VM_BASE,
     OP_VM_CPU_BINDINFO,
     OP_VM_MEM_BINDINFO,
     OP_VM_CPU_USAGE,
