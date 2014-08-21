@@ -38,6 +38,9 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
             case OptionParam::VM_CMD:
                 vm_base_->set_vm_cmd(p.second.get_string());
                 break;
+            case OptionParam::INTERVAL:
+                vm_base_->set_interval(p.second.get_int());
+                break;
             default:
                 //cerr message "invalid parameter for OP_VM_BASE"
                 break;

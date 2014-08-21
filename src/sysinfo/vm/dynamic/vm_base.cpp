@@ -11,7 +11,7 @@
 
 using namespace std;
 
-VmBase::VmBase()
+VmBase::VmBase(): has_data_(false), ms_interval_(5000)
 {
 //    FILE* fp = fopen(PID_MAX_FILE, "r");
 //    if (fp == nullptr) {
@@ -22,7 +22,6 @@ VmBase::VmBase()
 //        fscanf(fp, "%llu", &pid_max_);
 //    }
 
-    has_data = false;
     buf_ = new char[BUF_SIZE];
 }
 
@@ -42,7 +41,7 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
 {
     unique_lock<shared_timed_mutex> lock(data_mutex_);
 
-    has_data = false;
+    has_data_ = false;
     vm_ids_.clear();
     name_.clear();
     uuid_.clear();
@@ -55,7 +54,10 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
     vm_cmd_ = vm_cmd;
 }
 
-
+void VmBase::set_interval(int ms_interval) 
+{
+    ms_interval_ = ms_interval;
+}
 
 std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
 {
@@ -67,7 +69,7 @@ std::set<VmId> VmBase::get_vm_ids()
 {
     if(!joinable())
         refresh();
-    while(!has_data) 
+    while(!has_data_) 
         this_thread::sleep_for(chrono::milliseconds(10));
     std::shared_lock<std::shared_timed_mutex> lock(data_mutex_);
     return vm_ids_;
@@ -77,7 +79,7 @@ template <typename T>
 T VmBase::get_data_by_vm_id(std::map<VmId, T>& data, VmId vm_id, const T& failed_ret) {
     if(!joinable())
         refresh();
-    while(!has_data) 
+    while(!has_data_) 
         this_thread::sleep_for(chrono::milliseconds(10));
     std::shared_lock<std::shared_timed_mutex> lock(data_mutex_);
     if (data.find(vm_id) != data.end())
@@ -288,7 +290,7 @@ void VmBase::refresh()
 //        }
 //        cout << endl;
 //    }
-    has_data = true;
+    has_data_ = true;
     return;
 
 }
@@ -320,7 +322,7 @@ void VmBase::run()
     while(!stop_)
     {
         refresh();
-        this_thread::sleep_for(chrono::seconds(5));
+        this_thread::sleep_for(chrono::milliseconds(ms_interval_));
     }
 }
 

@@ -20,7 +20,8 @@ TEST_F(VsfTest, vm_base)
     vsf->init({ 
         { Option::OP_VM_BASE,
             {
-                { OptionParam::VM_CMD, "qemu-system-x86_64" }
+                { OptionParam::VM_CMD, "qemu-system-x86_64" },
+                { OptionParam::INTERVAL, 2000 }
             }
         }
     });

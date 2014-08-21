@@ -35,7 +35,8 @@ enum class OptionParam : unsigned int {
     SIZE_IN_MB,
     WORKLOAD_TYPE,
     LOOP,
-    VM_CMD
+    VM_CMD,
+    INTERVAL
 };
 
 #endif
