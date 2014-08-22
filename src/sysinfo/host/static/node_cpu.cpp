@@ -202,7 +202,16 @@ void NodeCpu::refresh()
         return;
 
     unique_lock<shared_timed_mutex> lock(data_mutex_);
-    //read cpulist
+
+    refresh_node_hpthread();
+    refresh_socket_core_hpthread();
+    refresh_others();
+
+    inited_ = true;
+}
+
+void NodeCpu::refresh_node_hpthread()
+{
     vector<string> node_dirs;
     str_tools::get_dirs(NODE_DIR, "node", &node_dirs);
     for (size_t i = 0; i < node_dirs.size(); ++i) {
@@ -215,16 +224,6 @@ void NodeCpu::refresh()
             return;
         }
         fin >> cpulist;
-//        int cpu_id = 0;
-//        for (auto c : cpulist) {
-//            if (c == ',') {
-//                node_hpthread_[i].insert(cpu_id); 
-//                cpu_id = 0;
-//            } else {
-//                cpu_id = cpu_id * 10 + (c - '0');
-//            }
-//        }
-//        node_hpthread_[i].insert(cpu_id);
         int beg_idx = 0;
         int cnt = 0;
         int clsize = cpulist.size();
@@ -254,8 +253,10 @@ void NodeCpu::refresh()
             cnt++;
         }
     }
+}
 
-    //read cpuinfo
+void NodeCpu::refresh_socket_core_hpthread()
+{
     ifstream fin(CPUINFO_FILE);
     if(!fin.good()) {
         //TODO throw
@@ -284,8 +285,10 @@ void NodeCpu::refresh()
             hpthread_.insert(hpthread_id);
         }
     }
+}
 
-    //reasoning 
+void NodeCpu::refresh_others()
+{
     for (auto& socket_hpthread : socket_hpthread_) {
         for (auto& node_hpthread : node_hpthread_) {
             if (includes(node_hpthread.second.begin(), node_hpthread.second.end(),
@@ -310,9 +313,7 @@ void NodeCpu::refresh()
             }
         }
     }
-    inited_ = true;
 }
-
 
 bool operator==(const NodeId& lc, const NodeId& rc)
 {

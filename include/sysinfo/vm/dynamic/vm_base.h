@@ -39,6 +39,8 @@ private:
     ~VmBase();
     void run();
     void refresh();
+    void refresh_most();
+    void refresh_vcpu_stable_vmthread();
     std::set<pid_t> refresh_volatile_vmthread(VmId vm_id);
     template <typename T>
     T get_data_by_vm_id(std::map<VmId, T>& data, VmId vm_id, const T& failed_ret);
@@ -62,8 +64,6 @@ private:
 
     static constexpr const int BUF_SIZE = 102400;
     static constexpr const char * VCPU_DIR = "/sys/fs/cgroup/cpu/libvirt/qemu/";
-//    pid_t pid_max_;
-//    static constexpr const char* PID_MAX_FILE = "/proc/sys/kernel/pid_max";
 };
 
 struct VmId {

@@ -60,6 +60,9 @@ public:
 
 private:
     NodeCpu();
+    void refresh_node_hpthread();
+    void refresh_socket_core_hpthread();
+    void refresh_others();
     template <typename K, typename V>
         std::set<K> get_keys(std::map<K, std::set<V> >& data);
     template <typename T>

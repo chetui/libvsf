@@ -21,6 +21,7 @@ set (SRC_LIST
     sysinfo/host/static/node_cpu.cpp
     sysinfo/host/static/node_dist.cpp
     sysinfo/vm/dynamic/vm_base.cpp
+    sysinfo/vm/dynamic/vm_cpu_usage.cpp
     utils/func_option.cpp
     utils/runnable.cpp
     utils/str_tools.cpp
@@ -40,11 +41,12 @@ set (SRC_LIST
 # build individual tests ------------------------
     macro (add_indi_test test_name)
         add_executable (${test_name} ${TEST_DIR}/${test_name}.cpp ${SRC_LIST})
-        target_link_libraries (${test_name} gtest gtest_main)
+        target_link_libraries (${test_name} gtest gtest_main proc)
     endmacro ()
 add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)
+add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_func_option)
 add_indi_test (test_vsf_0)
 add_indi_test (test_vsf_1)
@@ -53,6 +55,7 @@ add_indi_test (test_compat)
 
 # build examples -------------------------------
 add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})
+target_link_libraries (implemented_example proc)
 
 # build other dep exec ------------------------
 add_executable (microbench utils/microbench.c)

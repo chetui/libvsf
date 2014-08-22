@@ -34,7 +34,8 @@ int main()
         //<<Optional VM Dynamic Info>>
         { Option::OP_VM_BASE, 
             { 
-                { OptionParam::VM_CMD, "qemu-system-x86_64" }
+                { OptionParam::VM_CMD, "qemu-system-x86_64" },
+                { OptionParam::INTERVAL, 3000 }
             } 
         },
         { Option::OP_VM_CPU_BINDINFO, { } },

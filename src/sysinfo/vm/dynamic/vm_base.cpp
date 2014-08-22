@@ -13,15 +13,6 @@ using namespace std;
 
 VmBase::VmBase(): has_data_(false), ms_interval_(5000)
 {
-//    FILE* fp = fopen(PID_MAX_FILE, "r");
-//    if (fp == nullptr) {
-//        //TODO throw except
-////        LOG(LogLevel::err) 
-////            << "VmProcs::get_pid_max: " << strerror(errno) << endl;
-//    } else {
-//        fscanf(fp, "%llu", &pid_max_);
-//    }
-
     buf_ = new char[BUF_SIZE];
 }
 
@@ -152,6 +143,24 @@ void VmBase::refresh()
 {
     unique_lock<shared_timed_mutex> lock(data_mutex_);
 
+    refresh_most();
+    refresh_vcpu_stable_vmthread();
+
+//    cout << "DDD----" << endl;
+//    for (auto& vm_id : vm_ids_) {
+//        cout << "DDD " << vm_id << ">>";
+//        for (auto& id : vcpu_ids_[vm_id]) {
+//            cout << ":" << id;
+//        }
+//        cout << endl;
+//    }
+    has_data_ = true;
+    return;
+
+}
+
+void VmBase::refresh_most()
+{
     vm_ids_.clear();
     name_.clear();
     uuid_.clear();
@@ -159,9 +168,6 @@ void VmBase::refresh()
     vcore_num_.clear();
     vhpthread_num_.clear();
     total_mem_size_.clear();
-    vcpu_ids_.clear();
-    stable_vmthread_ids_.clear();
-    //refresh most
 
     string cmd = "ps -C " + vm_cmd_ + " -wwo etime=,pid=,args=";
     time_t cur_time;
@@ -259,8 +265,13 @@ void VmBase::refresh()
         total_mem_size_[vm_id] = size;
     }
     pclose(data);
+}
 
-    //refresh_vcpu
+void VmBase::refresh_vcpu_stable_vmthread()
+{
+    vcpu_ids_.clear();
+    stable_vmthread_ids_.clear();
+
     for (auto& vm_id : vm_ids_) {
         set<pid_t> ids;
         vector<string> vcpu_dirs;
@@ -280,19 +291,6 @@ void VmBase::refresh()
         stable_vmthread_ids_[vm_id] = ids;
         stable_vmthread_ids_[vm_id].insert(vm_id.pid);
     }
-
-
-//    cout << "DDD----" << endl;
-//    for (auto& vm_id : vm_ids_) {
-//        cout << "DDD " << vm_id << ">>";
-//        for (auto& id : vcpu_ids_[vm_id]) {
-//            cout << ":" << id;
-//        }
-//        cout << endl;
-//    }
-    has_data_ = true;
-    return;
-
 }
 
 set<pid_t> VmBase::refresh_volatile_vmthread(VmId vm_id)
