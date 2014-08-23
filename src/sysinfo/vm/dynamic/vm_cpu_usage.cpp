@@ -5,12 +5,14 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
-#include "sysinfo/vm/dynamic/vm_base.h"
 
 using namespace std;
 
+unsigned int VmCpuUsage::cpu_num_;
+
 VmCpuUsage::VmCpuUsage(): has_data_(false), ms_interval_(1000)
 {
+    cpu_num_ = static_cast<unsigned int>(sysconf(_SC_NPROCESSORS_CONF));
 }
 
 VmCpuUsage::~VmCpuUsage()
@@ -26,7 +28,64 @@ VmCpuUsage *VmCpuUsage::get_instance()
 
 void VmCpuUsage::set_interval(int ms_interval) 
 {
+    cout << "HEHE:" << ms_interval << endl;
     ms_interval_ = ms_interval;
+    cout << "HEHE22:" << ms_interval << ":" << ms_interval_ << endl;
+}
+
+int VmCpuUsage::get_sys_cpu_usage()
+{
+    refresh_and_wait();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    return static_cast<int>((total_cpu_time_old == 0 || total_cpu_time_delta == 0) ?
+        0 : (1 - idle_time_delta * 1.0 / total_cpu_time_delta) * 100);
+}
+
+int VmCpuUsage::get_cpu_usage(VmId vm_id)
+{
+    refresh_and_wait();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    auto iter = vms_.find(vm_id);
+    if (iter != vms_.end())
+        return static_cast<int>(iter->second);
+    else
+        return -1;
+}
+
+int VmCpuUsage::get_cpu_usage(pid_t vmthread_id)
+{
+    refresh_and_wait();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    auto iter = vm_threads_.find(vmthread_id);
+    if (iter != vm_threads_.end() && iter->second.valid_)
+        return static_cast<int>(iter->second.cpu_usage_);
+    else
+        return -1;
+}
+
+HpthreadId VmCpuUsage::get_running_on_hpthread(pid_t vmthread_id)
+{
+    refresh_and_wait();
+    shared_lock<shared_timed_mutex> lock(data_mutex_);
+    auto iter = vm_threads_.find(vmthread_id);
+    if (iter != vm_threads_.end())
+        return HpthreadId(iter->second.processor_);
+    else
+        return HpthreadId();
+}
+
+void VmCpuUsage::refresh_and_wait()
+{
+    if(!joinable())
+        refresh();
+    while(!has_data_) 
+        this_thread::sleep_for(chrono::milliseconds(10));
+}
+
+unsigned int VmCpuUsage::get_total_cpu_time_delta() const
+{
+    return (total_cpu_time_old == 0)?
+        0: total_cpu_time_delta;
 }
 
 void VmCpuUsage::refresh()
@@ -89,21 +148,39 @@ void VmCpuUsage::refresh_vm()
     PROCTAB* proctab = openproc(READ_PROC_FLAG, vm_pids); 
     proc_t proc_info;
     memset(&proc_info, 0, sizeof(proc_info));
+    proc_t task_info;
+    memset(&task_info, 0, sizeof(task_info));
     // invalid old data
-    for_each(vm_threads_.begin(), vm_threads_.end(), [](std::pair<const pid_t, VmThread>& p) { p.second.valid = false; });
+    for_each(vm_threads_.begin(), vm_threads_.end(), [](std::pair<const pid_t, VmThread>& p) { p.second.valid_ = false; });
 
 
+    vms_.clear();
     while (readproc(proctab, &proc_info) != nullptr) {
-        vm_threads_[proc_info.tid].update(&proc_info);
-        vm_threads_[proc_info.tid].valid = true;
-//       LOG() << proc->tid << " " 
-//           << vm_threads_[proc->tid].get_cpu_usage() << endl;
+        VmId vm_id;
+        for (auto& vi : vm_ids) {
+            if (vi.pid == proc_info.tid) {
+                vm_id = vi;
+                break;
+            }
+        }
+        if (vm_id.pid == 0) //not find in VmBase, it means this VM is just started and has not been detected by VmBase;
+            continue;
+        vms_[vm_id] = 0;
+        int cnt = 0;
+        while (readtask(proctab, &proc_info, &task_info) != nullptr) {
+            vm_threads_[task_info.tid].update(&task_info);
+            vm_threads_[task_info.tid].valid_ = true;
+            vms_[vm_id] += vm_threads_[task_info.tid].proctime_new_ - vm_threads_[task_info.tid].proctime_old_;
+            ++cnt;
+        }        
+//        cout << "DDD:" << vm_id << ":" << vms_[vm_id] << endl;
+        vms_[vm_id] = (total_cpu_time_old == 0 || total_cpu_time_delta == 0) ?
+            0 : (vms_[vm_id] / cnt * 100 * cpu_num_ / total_cpu_time_delta);
     }        
-//    LOG() << "size:" << vm_threads_.size();
 
     // erase data of invalid proc
     for (auto& p : vm_threads_) {
-        if (!p.second.valid) {
+        if (!p.second.valid_) {
             p.second.clear_data();
         }
     }
@@ -116,52 +193,46 @@ void VmCpuUsage::run()
 {
     while(!stop_)
     {
-        cout << "--------------------" << endl;
         refresh();
         this_thread::sleep_for(chrono::milliseconds(ms_interval_));
     }
 }
 
-unsigned int VmCpuUsage::get_total_cpu_time_delta() const
-{
-    return total_cpu_time_delta;
-}
-
 VmThread::VmThread():
-    valid(false),proctime_new(0),proctime_old(0)
+    valid_(false),proctime_new_(0),proctime_old_(0)
 {
 }
 
-void VmThread::update(const proc_t* proc)
+void VmThread::update(const proc_t* task)
 {
-    processor = proc->processor;
-    tgid = proc->tgid;
-    if(proctime_new == 0)
+    processor_ = task->processor;
+    tgid_ = task->tgid;
+    if(proctime_new_ == 0)
     {
-        proctime_new = proc->utime + proc->stime;
-        proctime_old = proctime_new;
+        proctime_new_ = task->utime + task->stime;
+        proctime_old_ = proctime_new_;
     }
     else
     {
-        proctime_old = proctime_new;
-        proctime_new = proc->utime + proc->stime;
+        proctime_old_ = proctime_new_;
+        proctime_new_ = task->utime + task->stime;
     }
     auto vm_cpu_usage = VmCpuUsage::get_instance();
     unsigned int sys_cpu = vm_cpu_usage->get_total_cpu_time_delta();
-    unsigned int proctime_delta = proctime_new - proctime_old;
-    int num_cpus = sysconf(_SC_NPROCESSORS_CONF);
-    cpu_usage = (sys_cpu == 0) ? 
-        0 : static_cast<unsigned int>(proctime_delta * 100 * num_cpus
+    unsigned int proctime_delta = proctime_new_ - proctime_old_;
+    cpu_usage_ = (sys_cpu == 0) ? 
+        0 : (proctime_delta * 100 * VmCpuUsage::cpu_num_
             / sys_cpu);
-    cout << "TTT" << proc->tid << ":" << processor << ":" << tgid << ":" << cpu_usage << endl;
-    cout << "sys_cpu:" << sys_cpu << " proctime_delta:" << proctime_delta << " num_cpus:" << num_cpus << endl;
-    cout << "proctime_old:" << proctime_old << " proctime_new:" << proctime_new << " utime:" << proc->utime << " stime:" << proc->stime << endl;
+
+//    cout << "TTT" << task->tid << ":" << processor_ << ":" << tgid_ << ":" << cpu_usage_ << endl;
+//    cout << "sys_cpu:" << sys_cpu << " proctime_delta:" << proctime_delta << " num_cpus:" << VmCpuUsage::cpu_num_ << endl;
+//    cout << "proctime_old_:" << proctime_old_ << " proctime_new_:" << proctime_new_ << " utime:" << task->utime << " stime:" << task->stime << endl;
 
 }
 
 void VmThread::clear_data()
 {
-    proctime_new = 0;
-    proctime_old = 0;
-    cpu_usage = 0;
+    proctime_new_ = 0;
+    proctime_old_ = 0;
+    cpu_usage_ = 0;
 }

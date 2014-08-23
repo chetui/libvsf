@@ -48,9 +48,10 @@ add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_func_option)
-add_indi_test (test_vsf_0)
-add_indi_test (test_vsf_1)
-add_indi_test (test_vsf_2)
+add_indi_test (test_vsf_init_twice)
+add_indi_test (test_vsf_vm_base)
+add_indi_test (test_vsf_vm_cpu_usage)
+add_indi_test (test_vsf_node_cpu)
 add_indi_test (test_compat)
 
 # build examples -------------------------------

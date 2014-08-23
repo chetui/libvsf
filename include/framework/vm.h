@@ -5,6 +5,7 @@
 #include <string>
 #include "utils/func_option.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
+#include "sysinfo/vm/dynamic/vm_cpu_usage.h"
 #include <mutex>
 
 class Host;
@@ -22,6 +23,7 @@ private:
 
     FuncOption *func_option_;
     VmBase *vm_base_;
+    VmCpuUsage *vm_cpu_usage_;
 };
 
 class VM {
@@ -29,6 +31,7 @@ public:
     VM(VmId vm_id);
     VM &operator=(const VM &v);
     
+    //OP_VM_BASE
     VmId vm_id() const;
     std::string name() const;
     std::string uuid() const;
@@ -42,11 +45,17 @@ public:
     int stable_vmthread_num() const;
     std::set<pid_t> volatile_vmthread_ids() const;
     int volatile_vmthread_num() const;
+    //OP_VM_CPU_USAGE
+    int sys_cpu_usage() const;
+    int cpu_usage() const;
+    int cpu_usage(pid_t vmthread_id) const;
+    HpthreadId running_on_hpthread(pid_t vmthread_id) const;
 
 private:
     VmId vm_id_;
 
     VmBase *vm_base_;
+    VmCpuUsage *vm_cpu_usage_;
 };
 
 bool operator<(const VM &lv, const VM &rv);

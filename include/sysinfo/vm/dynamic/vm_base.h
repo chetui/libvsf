@@ -67,7 +67,8 @@ private:
 };
 
 struct VmId {
-    VmId() {};
+    VmId(): 
+        start_timestamp(0), pid(0) {};
     VmId(std::time_t start_timestamp, pid_t pid): 
         start_timestamp(start_timestamp), pid(pid) {}
     std::time_t start_timestamp;

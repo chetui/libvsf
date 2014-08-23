@@ -1,5 +1,6 @@
 #include "framework/vm.h"
 #include <map>
+#include <iostream>
 
 using namespace std;
 
@@ -28,8 +29,10 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
 
     set<VM> vms;
 
+    cout << "AAA" << endl;
     if (func_option_->check_option(Option::OP_VM_BASE))
     {
+        cout << "BBB" << endl;
         map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
         for (auto & p : param) 
         {
@@ -49,7 +52,34 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         if (!vm_base_->joinable())
             vm_base_->start();
     }
+    cout << "CCC" << endl;
+    if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
+        cout << "DDD" << endl;
+        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
+        cout << "DDD1" << endl;
+        for (auto & p : param) 
+        {
+            cout << "DDD1" << endl;
+            switch(p.first)
+            {
+            case OptionParam::INTERVAL:
+                cout << "DDD2:" << p.second.get_int() << endl;
+                vm_cpu_usage_->set_interval(p.second.get_int());
+                cout << "DDD3" << endl;
+                break;
+            default:
+                //cerr message "invalid parameter"
+                break;
+            }
+            cout << "DDD4" << endl;
+        }
+        cout << "DDD5" << endl;
+        if (!vm_cpu_usage_->joinable())
+            vm_cpu_usage_->start();
+        cout << "DDD6" << endl;
+    }
 
+    cout << "EEE" << endl;
     set<VmId> vm_ids;
     if (vm_cmd == "")
         vm_ids = vm_base_->get_vm_ids();
@@ -57,6 +87,7 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         vm_ids = vm_base_->get_vm_ids(vm_cmd);
     for (auto& vm_id : vm_ids)
         vms.insert(VM(vm_id));
+    cout << "FFF" << endl;
 
     return vms;
 }
@@ -64,9 +95,11 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
 VM::VM(VmId vm_id)
 {
     vm_base_ = VmBase::get_instance();
+    vm_cpu_usage_ = VmCpuUsage::get_instance();
     vm_id_ = vm_id;
 }
 
+//OP_VM_BASE
 VmId VM::vm_id() const
 {
     return vm_id_;
@@ -130,6 +163,24 @@ set<pid_t> VM::volatile_vmthread_ids() const
 int VM::volatile_vmthread_num() const
 {
     return vm_base_->get_volatile_vmthread_num(vm_id_);
+}
+
+//OP_VM_CPU_USAGE
+int VM::sys_cpu_usage() const 
+{
+    return vm_cpu_usage_->get_sys_cpu_usage();
+}
+int VM::cpu_usage() const
+{
+    return vm_cpu_usage_->get_cpu_usage(vm_id_);
+}
+int VM::cpu_usage(pid_t vmthread_id) const
+{
+    return vm_cpu_usage_->get_cpu_usage(vmthread_id);
+}
+HpthreadId VM::running_on_hpthread(pid_t vmthread_id) const
+{
+    return vm_cpu_usage_->get_running_on_hpthread(vmthread_id);
 }
 
 VM& VM::operator=(const VM &v)

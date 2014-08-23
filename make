@@ -19,11 +19,12 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     echo "==================<<<UnitTest: GTest>>>=================="
     echo ""
     cd ./bin
-#    ./test_vsf_0
-#    ./test_vsf_1
-#    ./test_vsf_2
+#    ./test_vsf_init_twice
+#    ./test_vsf_vm_base
+    ./test_vsf_vm_cpu_usage
+#    ./test_vsf_node_cpu
 #    ./test_vm_vm_base
-    ./test_vm_vm_cpu_usage
+#    ./test_vm_vm_cpu_usage
 #    ./test_func_option
 #    ./test_compat
 #    ./test_host_node_cpu
