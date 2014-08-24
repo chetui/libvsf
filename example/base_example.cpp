@@ -40,7 +40,11 @@ int main()
         },
         { Option::OP_VM_CPU_BINDINFO, { } },
         { Option::OP_VM_MEM_BINDINFO, { } },
-        { Option::OP_VM_CPU_USAGE, { } },
+        { Option::OP_VM_CPU_USAGE, 
+            { 
+                { OptionParam::INTERVAL, 3000 }
+            } 
+        },
         { Option::OP_VM_MISS_RATE, { } },
         { Option::OP_VM_MEM_SAMPLE, { } },
         { Option::OP_VM_USED_MEM_SIZE { } }
@@ -156,9 +160,11 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.bindinfo_hpthread_ids(vcpu_id/vmthread_id);
                 //OP_VM_MEM_BINDINFO ((( OP_VM_VNODE, OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.bindinfo_mem_node_id(vnode_id); //vNUMA
-                //OP_VM_CPU_USAGE ((( OP_VM_BASE //Yu
-                vm.cpu_usage();
-                vm.cpu_usage(vcpu_id/vmthread_id);
+                //OP_VM_CPU_USAGE ((( OP_VM_BASE // Notice! In the non-thread mode, call any function in OP_VM_CPU_USAGE, the cpu_usage is the stat from last calling of any function in OP_VM_CPU_USAGE. In the non-thread mode, the first calling of any function in OP_VM_CPU_USAGE would return 0 or {}; in the thread mode, the calling of any function in OP_VM_CPU_USAGE before the second refresh of thread would return 0 or {}.//Yu 
+                vm.sys_cpu_usage(); //DONE //sync with vm.cpu_usage(). Hence, there is a little difference with host->cpu_usage()
+                vm.cpu_usage(); //DONE
+                vm.cpu_usage(vcpu_id/vmthread_id); //DONE
+                vm.running_on_hpthread(vcpu_id/vmthread_id); //DONE
                 //OP_VM_MISS_RATE ((( OP_VM_BASE //Yu
                 vm.miss_rate(MISS_RATE_TYPE);
                 vm.miss_rate(MISS_RATE_TYPE, vcpu_id/vmthread_id);

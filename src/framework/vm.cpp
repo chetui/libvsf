@@ -8,6 +8,7 @@ VmSet::VmSet()
 {
     func_option_ = FuncOption::get_instance();
     vm_base_ = VmBase::get_instance();
+    vm_cpu_usage_ = VmCpuUsage::get_instance();
 }
 
 VmSet* VmSet::get_instance()
@@ -29,10 +30,8 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
 
     set<VM> vms;
 
-    cout << "AAA" << endl;
     if (func_option_->check_option(Option::OP_VM_BASE))
     {
-        cout << "BBB" << endl;
         map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
         for (auto & p : param) 
         {
@@ -52,34 +51,24 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         if (!vm_base_->joinable())
             vm_base_->start();
     }
-    cout << "CCC" << endl;
     if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
-        cout << "DDD" << endl;
         map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
-        cout << "DDD1" << endl;
         for (auto & p : param) 
         {
-            cout << "DDD1" << endl;
             switch(p.first)
             {
             case OptionParam::INTERVAL:
-                cout << "DDD2:" << p.second.get_int() << endl;
                 vm_cpu_usage_->set_interval(p.second.get_int());
-                cout << "DDD3" << endl;
                 break;
             default:
                 //cerr message "invalid parameter"
                 break;
             }
-            cout << "DDD4" << endl;
         }
-        cout << "DDD5" << endl;
         if (!vm_cpu_usage_->joinable())
             vm_cpu_usage_->start();
-        cout << "DDD6" << endl;
     }
 
-    cout << "EEE" << endl;
     set<VmId> vm_ids;
     if (vm_cmd == "")
         vm_ids = vm_base_->get_vm_ids();
@@ -87,7 +76,6 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         vm_ids = vm_base_->get_vm_ids(vm_cmd);
     for (auto& vm_id : vm_ids)
         vms.insert(VM(vm_id));
-    cout << "FFF" << endl;
 
     return vms;
 }

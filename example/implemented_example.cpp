@@ -26,6 +26,11 @@ int main()
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
                 { OptionParam::INTERVAL, 3000 }
             }
+        },
+        { Option::OP_VM_CPU_USAGE,
+            {
+                { OptionParam::INTERVAL, 3000 }
+            }
         }
     });
 
@@ -188,15 +193,22 @@ void myscheduler(Host *host, std::set<VM> &vms)
             std::cout << "|" << pid;
         std::cout << std::endl;
         std::cout << "stable_vmthread: " << vm.stable_vmthread_num() << " ";
-        pid_set = vm.stable_vmthread_ids();
-        for (auto& pid : pid_set)
+        std::set<pid_t> stable_pid_set = vm.stable_vmthread_ids();
+        for (auto& pid : stable_pid_set)
             std::cout << "|" << pid;
         std::cout << std::endl;
         std::cout << "volatile_vmthread: " << vm.volatile_vmthread_num() << " ";
-        pid_set = vm.volatile_vmthread_ids();
-        for (auto& pid : pid_set)
+        std::set<pid_t> volatile_pid_set = vm.volatile_vmthread_ids();
+        for (auto& pid : volatile_pid_set)
             std::cout << "|" << pid;
         std::cout << std::endl;
+        //OP_VM_CPU_USAGE
+        std::cout << "sys_cpu_usage:" << vm.sys_cpu_usage() << ":" << std::endl;
+        std::cout << "cpu_usage:" << vm.cpu_usage() << std::endl;
+        for (auto& pid : stable_pid_set)
+            std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
+        for (auto& pid : volatile_pid_set)
+            std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
     }
 
     return;

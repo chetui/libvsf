@@ -10,8 +10,9 @@ using namespace std;
 
 unsigned int VmCpuUsage::cpu_num_;
 
-VmCpuUsage::VmCpuUsage(): has_data_(false), ms_interval_(1000)
+VmCpuUsage::VmCpuUsage(): has_data_(false)
 {
+    ms_interval_ = 1000;
     cpu_num_ = static_cast<unsigned int>(sysconf(_SC_NPROCESSORS_CONF));
 }
 
@@ -28,9 +29,7 @@ VmCpuUsage *VmCpuUsage::get_instance()
 
 void VmCpuUsage::set_interval(int ms_interval) 
 {
-    cout << "HEHE:" << ms_interval << endl;
     ms_interval_ = ms_interval;
-    cout << "HEHE22:" << ms_interval << ":" << ms_interval_ << endl;
 }
 
 int VmCpuUsage::get_sys_cpu_usage()
