@@ -4,21 +4,11 @@
 #include <map>
 #include <string>
 #include <mutex>
-#include <stdexcept>
+#include "framework/exception.h"
 
 enum class CompatItem : unsigned int { 
     UBUNTU,
     KERNEL_3_8_0_LATER
-};
-
-class CompatCheckFailed : public std::logic_error 
-{
-public:
-    explicit CompatCheckFailed(const std::string &str):
-        std::logic_error(
-            "Compatibility checking is failed. " + str
-        ) 
-    {}
 };
 
 

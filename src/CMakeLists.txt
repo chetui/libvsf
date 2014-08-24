@@ -8,7 +8,7 @@ set (EXAMPLE_DIR ../example)
 
 # the debug flag is used by gdb
 set (CMAKE_BUILD_TYPE "Debug")
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -ggdb3")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -ggdb3 -D NDEBUG")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set (CMAKE_CXX_FLAGS_LIST 
@@ -24,10 +24,13 @@ set (SRC_LIST
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     utils/func_option.cpp
     utils/runnable.cpp
+    utils/log.cpp
     utils/str_tools.cpp
+    utils/perf_event.cpp
     framework/host.cpp
     framework/vm.cpp
     framework/compat.cpp
+    framework/version.cpp
     vsf.cpp
     )
 

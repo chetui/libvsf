@@ -8,7 +8,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <stdexcept>
-#include "sysinfo/define_func_option.h"
+#include "framework/define_func_option.h"
 
 class OptionParamVal;
 

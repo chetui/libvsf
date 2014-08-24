@@ -4,21 +4,11 @@
 #include <set>
 #include <map>
 #include <string>
-#include <stdexcept>
 #include <initializer_list>
 #include "utils/func_option.h"
+#include "framework/exception.h"
 #include "framework/host.h"
 #include "framework/vm.h"
-
-class FrameworkInitMoreThanTwice : public std::logic_error 
-{
-public:
-    explicit FrameworkInitMoreThanTwice(const std::string &str):
-        std::logic_error(
-            "Framework can not be initialized more than twice by function " + str
-        ) 
-    {}
-};
 
 class Vsf {
 public:
