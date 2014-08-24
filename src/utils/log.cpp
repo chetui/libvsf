@@ -1,52 +1,55 @@
 #include "utils/log.h"
 #include <execinfo.h>
 #include <unistd.h>
+#include <errno.h>
+#include <cstring>
 #include "framework/version.h"
-
-using namespace std;
-
-int Log::option = LOG_PERROR;
-int Log::facility = LOG_DAEMON;
 
 Log::Log()
 {
-    openlog(indent().c_str(), option, facility);
+    openlog(indent().c_str(), option_, facility_);
+    str_buf_ = new char[STR_BUF_SIZE];
+    trace_buf_ = new void*[TRACE_BUF_SIZE];
 } 
 
 Log::~Log()
 {
     closelog();
+    delete[] str_buf_;
+    delete[] trace_buf_;
 }
 
-const string& Log::indent()
+const std::string& Log::indent()
 {
-    static const string INDENT = Version::name();
+    static const std::string INDENT = Version::name();
     return INDENT;
 }
 
 Log* Log::get()
 {
-    static Log slog;
-    return &slog;
+    static Log log;
+    return &log;
 }
 
 void Log::puts(LogLevel priority, const std::string& msg)
 {
-    ostringstream out_str;
+    std::ostringstream out_str;
+    out_str << "\n" << msg << "\n";
     if (priority == LogLevel::err 
         || priority == LogLevel::crit
         || priority == LogLevel::alert
         || priority == LogLevel::emerg)
     {
-        void *func_trace[128];
+        out_str << RED << "[Errno Info]\n " << NC << strerror_r(errno, str_buf_, sizeof(char) * STR_BUF_SIZE) << "\n";
+
         size_t size;
-        size = backtrace(func_trace, 128);
-        char **traces = backtrace_symbols(func_trace, size);
-        out_str << "[backtrace] return " << size << " addresses:" << "\n";
+        size = backtrace(trace_buf_, TRACE_BUF_SIZE);
+        char **traces = backtrace_symbols(trace_buf_, size);
+        out_str << RED << "[Funtion Call Trace]\n " << NC << "return " << size << " addresses:" << "\n";
         for (size_t i = 0; i < size; ++i)
             out_str << traces[i] << "\n";
         free(traces);
     }
-    out_str << msg << "\n";
+    out_str << RED << "[Exception Info]" << NC;
     syslog(static_cast<int>(priority), "%s", out_str.str().c_str());
 }

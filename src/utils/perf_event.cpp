@@ -4,8 +4,8 @@
 #include <asm/unistd.h>
 #include <unistd.h>
 #include <sys/mman.h>
-
 #include <cstring>
+#include "framework/exception.h"
 
 using namespace std;
 
@@ -47,10 +47,8 @@ void perf_event::perf_mmap_read(struct perf_mmap* mmap_data, int fd, int page_nu
     unsigned int mmap_len = (page_num + 1) * page_size;
     mmap_data->base = mmap(nullptr, mmap_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (mmap_data->base == MAP_FAILED) {
-        //TODO: throw
-//        LOG(LogLevel::err) << __FILE__ << "::perf_mmap_read:" 
-//            << strerror(errno) << endl;
-        close(fd);
+        THROW(MmapFailed, "perf_event::perf_mmap_read");
+        //close(fd);
     }
 }
 

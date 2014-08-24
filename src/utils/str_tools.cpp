@@ -1,4 +1,5 @@
 #include "utils/str_tools.h"
+#include "framework/exception.h"
 
 namespace str_tools {
 std::string dir_prefix_;
@@ -67,8 +68,7 @@ void str_tools::get_dirs(std::string dir, std::string dir_prefix, std::vector<st
     struct dirent **namelist;
     int num_nodes = scandir(dir.c_str(), &namelist, prefix_and_digits, nullptr);
     if (num_nodes < 0) {
-        //TODO throw 
-//        LOG(LogLevel::err) 
+        THROW(ScandirFailed, "To scan directory: " + dir);
     } else {
         for (int i=0; i<num_nodes; ++i) {
             node_dirs->push_back(std::string(namelist[i]->d_name));

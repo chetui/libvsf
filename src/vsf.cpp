@@ -20,7 +20,7 @@ void Vsf::init(std::map<Option, std::map<OptionParam, OptionParamVal> > ops)
 {
     static int inited_cnt = 0;
     if(++inited_cnt > 1)
-        THROW(FrameworkInitMoreThanTwice, "");
+        THROW(FrameworkInitMoreThanTwice, "Vsf is inited twice.");
 
     func_option_->enable_option(ops);
     return;

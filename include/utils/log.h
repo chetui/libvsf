@@ -10,11 +10,13 @@
 
 #ifdef NDEBUG
 #define LERR() LogStream(LogLevel::err) \
-    << "[Error] file : " << __FILE__  \
-    << " : in function " << __func__  \
-    << " at line " << __LINE__  \
-    << " (Compiled on " << __DATE__  \
-    << " at " << __TIME__ << ")\n" 
+    << "\e[0;31m[Error Location] \e[0m\n"\
+    << "in file: " << __FILE__  << "\n" \
+    << "in function: " << __func__  << "\n" \
+    << "at line: " << __LINE__  << "\n" \
+    << "(Compiled on " << __DATE__  \
+    << " at " << __TIME__ << ")\n" \
+    << "\e[0;31m[Program Msg]\n \e[0m"
 #else
 #define LERR() LogStream(LogLevel::err)
 #endif
@@ -32,7 +34,6 @@ enum class LogLevel: int {
 
 /**
  * Wrapper for syslog.
- * @author zsy
  */
 class Log {
     friend class LogStream;
@@ -46,8 +47,14 @@ private:
     void puts(LogLevel priority, const std::string& msg);
     static const std::string& indent();
 
-    static int option;
-    static int facility;
+    char* str_buf_;
+    void** trace_buf_;
+    static constexpr int option_ = LOG_PERROR;
+    static constexpr int facility_ = LOG_DAEMON;
+    static constexpr const int STR_BUF_SIZE = 10240;
+    static constexpr const int TRACE_BUF_SIZE = 128;
+    static constexpr const char *RED = "\e[0;31m";
+    static constexpr const char *NC = "\e[0m";
 };
 
 /**

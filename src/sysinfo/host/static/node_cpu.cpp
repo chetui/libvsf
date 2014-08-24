@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "utils/str_tools.h"
+#include "framework/exception.h"
 
 using namespace std;
 
@@ -215,14 +216,13 @@ void NodeCpu::refresh_node_hpthread()
     vector<string> node_dirs;
     str_tools::get_dirs(NODE_DIR, "node", &node_dirs);
     for (size_t i = 0; i < node_dirs.size(); ++i) {
-        string cpulist;
-        ifstream fin(NODE_DIR + node_dirs[i] + "/cpulist");
+        string file_path = NODE_DIR + node_dirs[i] + "/cpulist";
+        ifstream fin(file_path);
         if (!fin.good()) {
-            //TODO throw
-//            LOG(LogLevel::err) 
-//                << "NodeCpu::refresh: " << strerror(errno) << endl;
+            THROW(FileOpenFailed, "To open file: " + file_path);
             return;
         }
+        string cpulist;
         fin >> cpulist;
         int beg_idx = 0;
         int cnt = 0;
@@ -259,7 +259,7 @@ void NodeCpu::refresh_socket_core_hpthread()
 {
     ifstream fin(CPUINFO_FILE);
     if(!fin.good()) {
-        //TODO throw
+        THROW(FileOpenFailed, "To open file: " + string(CPUINFO_FILE));
         return;
     }
     string s;

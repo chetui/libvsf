@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include "framework/exception.h"
 
 using namespace std;
 
@@ -116,9 +117,7 @@ void VmCpuUsage::refresh_system()
 
     FILE* fp = fopen(SYS_PROC_STAT, "r");
     if (fp == nullptr) {
-        //TODO throw
-//        LOG(LogLevel::err) << "Procs::system_wide_refresh: "
-//            << strerror(errno) << endl;
+        THROW(FileOpenFailed, "To open file: " + string(SYS_PROC_STAT));
         return;
     }
     fscanf(fp, "%*s %llu %llu %llu %llu", &user_time, &nice_time,

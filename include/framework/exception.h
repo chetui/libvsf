@@ -21,8 +21,14 @@
         }\
     };\
 
+LOGIC_ERROR(FileOpenFailed, "file open is failed. ")
+
+LOGIC_ERROR(ScandirFailed, "scandir() is failed. ")
+
+LOGIC_ERROR(MmapFailed, "mmap() is failed. ")
+
 //vsf.h
-LOGIC_ERROR(FrameworkInitMoreThanTwice, "Framework can not be initialized more than twice.")
+LOGIC_ERROR(FrameworkInitMoreThanTwice, "Framework can not be initialized more than twice. ")
 //compat.h
 LOGIC_ERROR(CompatCheckFailed, "Compatibility checking is failed. ")
 

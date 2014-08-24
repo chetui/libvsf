@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include "utils/str_tools.h"
+#include "framework/exception.h"
 
 using namespace std;
 
@@ -278,10 +279,10 @@ void VmBase::refresh_vcpu_stable_vmthread()
         str_tools::get_dirs(VCPU_DIR + name_[vm_id] + "/", "vcpu", &vcpu_dirs);
         for (size_t i = 0; i < vcpu_dirs.size(); ++i) {
             pid_t pid;
-            ifstream fin(VCPU_DIR + name_[vm_id] + "/" + vcpu_dirs[i] + "/tasks");
+            string file_path = VCPU_DIR + name_[vm_id] + "/" + vcpu_dirs[i] + "/tasks";
+            ifstream fin(file_path);
             if (!fin.good()) {
-                //TODO throw
-    //            LOG(LogLevel::err) 
+                THROW(FileOpenFailed, "To open file: " + file_path);
                 return;
             }
             fin >> pid;
