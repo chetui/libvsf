@@ -6,10 +6,9 @@
 #include <sstream>
 
 #define LOG(x) LogStream(x)
-#define LDEBUG() LogStream(LogLevel::debug)
+#define LDEBUG LogStream(LogLevel::debug)
 
-#ifdef NDEBUG
-#define LERR() LogStream(LogLevel::err) \
+#define LERR LogStream(LogLevel::err) \
     << "\e[0;31m[Error Location] \e[0m\n"\
     << "in file: " << __FILE__  << "\n" \
     << "in function: " << __func__  << "\n" \
@@ -17,9 +16,6 @@
     << "(Compiled on " << __DATE__  \
     << " at " << __TIME__ << ")\n" \
     << "\e[0;31m[Program Msg]\n \e[0m"
-#else
-#define LERR() LogStream(LogLevel::err)
-#endif
 
 enum class LogLevel: int {
     emerg  = LOG_EMERG,

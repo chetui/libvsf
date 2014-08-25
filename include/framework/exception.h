@@ -5,7 +5,7 @@
 #include "utils/log.h"
 
 #define THROW(except, str) {\
-    LERR() << str;\
+    LERR << str;\
     throw except(str);\
 }\
 
