@@ -34,35 +34,36 @@ Log* Log::get()
 
 void Log::puts(LogLevel priority, const std::string& msg)
 {
+    syslog(static_cast<int>(priority), "%s", msg.c_str());
+}
+
+void Log::puts_exception(LogLevel priority, const std::string& msg)
+{
+    priority = priority; //to suppresss unused warnning
+
     std::ostringstream out_str;
-    if (priority == LogLevel::err 
-        || priority == LogLevel::crit
-        || priority == LogLevel::alert
-        || priority == LogLevel::emerg) {
-        out_str << "\n";
-    }
-        out_str << msg;
-    if (priority == LogLevel::err 
-        || priority == LogLevel::crit
-        || priority == LogLevel::alert
-        || priority == LogLevel::emerg) {
-        out_str << "\n" << RED << "[Errno Info]\n " << NC << strerror_r(errno, str_buf_, sizeof(char) * STR_BUF_SIZE) << "\n";
+    out_str << "\n" << msg << "\n";
+    out_str << RED << "[Errno Info]\n " << NC << strerror_r(errno, str_buf_, sizeof(char) * STR_BUF_SIZE) << "\n";
 
-        size_t size;
-        size = backtrace(trace_buf_, TRACE_BUF_SIZE);
-        char **traces = backtrace_symbols(trace_buf_, size);
-        out_str << RED << "[Funtion Call Trace]\n " << NC << "return " << size << " addresses:" << "\n";
-        for (size_t i = 0; i < size; ++i)
-            out_str << traces[i] << "\n";
-        free(traces);
+    size_t size;
+    size = backtrace(trace_buf_, TRACE_BUF_SIZE);
+    char **traces = backtrace_symbols(trace_buf_, size);
+    out_str << RED << "[Funtion Call Trace]\n " << NC << "return " << size << " addresses:" << "\n";
+    for (size_t i = 0; i < size; ++i)
+        out_str << traces[i] << "\n";
+    free(traces);
 
-        out_str << RED << "[Exception Info]" << NC;
-    }
-    if (priority == LogLevel::debug) {
+    out_str << RED << "[Exception Info]" << NC;
+
+    syslog(static_cast<int>(priority), "%s", out_str.str().c_str());
+}
+
+void Log::puts_debug_without_syslog(LogLevel priority, const std::string& msg)
+{
+    priority = priority; //to suppresss unused warnning
 #ifdef DEBUG
-        std::cout << RED << "[Debug] " << NC << out_str.str() << "\n";
+    std::cout << RED << "[Debug] " << NC << msg << "\n";
+#else
+    msg = msg; //to suppresss unused warnning
 #endif
-    } else {
-        syslog(static_cast<int>(priority), "%s", out_str.str().c_str());
-    }
 }

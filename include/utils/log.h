@@ -6,9 +6,8 @@
 #include <sstream>
 
 #define LOG(x) LogStream(x)
-#define LDEBUG LogStream(LogLevel::debug)
-
-#define LERR LogStream(LogLevel::err) \
+#define LDEBUG LogStream(LogLevel::debug, PutsFunc::puts_debug_without_syslog)
+#define LEXCEPT LogStream(LogLevel::err, PutsFunc::puts_exception) \
     << "\e[0;31m[Error Location] \e[0m\n"\
     << "in file: " << __FILE__  << "\n" \
     << "in function: " << __func__  << "\n" \
@@ -28,6 +27,12 @@ enum class LogLevel: int {
     debug  = LOG_DEBUG
 };
 
+enum class PutsFunc: int {
+    puts,
+    puts_exception,
+    puts_debug_without_syslog
+};
+
 /**
  * Wrapper for syslog.
  */
@@ -40,8 +45,10 @@ private:
     /**
      * Using syslog priority
      */
-    void puts(LogLevel priority, const std::string& msg);
     static const std::string& indent();
+    void puts(LogLevel priority, const std::string& msg);
+    void puts_exception(LogLevel priority, const std::string& msg);
+    void puts_debug_without_syslog(LogLevel priority, const std::string& msg);
 
     char* str_buf_;
     void** trace_buf_;
@@ -59,16 +66,29 @@ private:
 class LogStream: public std::ostringstream 
 {
 public:
-    explicit inline LogStream(LogLevel level = LogLevel::info):
-        level(level) {}
+    explicit inline LogStream(LogLevel level = LogLevel::info, PutsFunc puts_func = PutsFunc::puts):
+        level(level), puts_func(puts_func) {}
     inline ~LogStream();
 private:
     LogLevel level;
+    PutsFunc puts_func;
 };
 
 LogStream::~LogStream()
 {
-    Log::get()->puts(level, this->str());
+    switch(puts_func) {
+    case PutsFunc::puts:
+        Log::get()->puts(level, this->str());
+        break;
+    case PutsFunc::puts_exception:
+        Log::get()->puts_exception(level, this->str());
+        break;
+    case PutsFunc::puts_debug_without_syslog:
+        Log::get()->puts_debug_without_syslog(level, this->str());
+        break;
+    default:
+        break;
+    }
 }
 
 #endif  // UMS_UTILS_LOG_H_
