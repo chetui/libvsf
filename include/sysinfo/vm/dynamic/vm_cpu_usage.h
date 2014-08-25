@@ -20,7 +20,7 @@ class VmCpuUsage : public Runnable {
     friend class VmThread;
 public:
     static VmCpuUsage *get_instance();
-    void set_interval(int ms_interval);
+    void set_interval(int interval_ms);
     int get_sys_cpu_usage();
     int get_cpu_usage(VmId vm_id);
     int get_cpu_usage(pid_t vmthread_id);
@@ -48,7 +48,7 @@ private:
     unsigned int idle_time_new = 0;
     unsigned int idle_time_delta = 0;
     std::atomic<bool> has_data_;
-    std::atomic<int> ms_interval_;
+    std::atomic<int> interval_ms_;
     static unsigned int cpu_num_;
 
     static constexpr const char * SYS_PROC_STAT = "/proc/stat";

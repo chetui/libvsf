@@ -21,7 +21,7 @@ TEST_F(VsfTest, vm_base)
         { Option::OP_VM_BASE,
             {
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::INTERVAL, 2000 }
+                { OptionParam::LOOP_INTERVAL, 2000 }
             }
         }
     });

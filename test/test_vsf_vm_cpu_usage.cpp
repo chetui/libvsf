@@ -21,7 +21,7 @@ TEST_F(VsfTest, vm_cpu_usage)
     vsf->init({ 
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::INTERVAL, 1000 }
+                { OptionParam::LOOP_INTERVAL, 1000 }
             }
         }
     });

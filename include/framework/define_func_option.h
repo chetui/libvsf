@@ -34,7 +34,8 @@ enum class OptionParam : unsigned int {
     WORKLOAD_TYPE,
     LOOP,
     VM_CMD,
-    INTERVAL
+    LOOP_INTERVAL,
+    SAMPLE_INTERVAL
 };
 
 #endif

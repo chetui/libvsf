@@ -22,6 +22,7 @@ set (SRC_LIST
     sysinfo/host/static/node_dist.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
+    sysinfo/vm/dynamic/cache_miss.cpp
     utils/func_option.cpp
     utils/runnable.cpp
     utils/log.cpp

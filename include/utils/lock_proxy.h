@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <vector>
-#include <iostream>
+#include "utils/log.h"
 
 template <typename T>
 class has_key_type {
@@ -101,19 +101,19 @@ class MultiLock {
 public:
     template<typename... Args>
     MultiLock(Args&... args) {
-        std::cout << "multi lock all\n";
+        LDEBUG << "multi lock all\n";
         std::lock(std::forward<Args&>(args)...);
         add_to(std::forward<Args&>(args)...);
     }
     ~MultiLock() {
         for (auto& l : unique_locks_) 
         {
-            std::cout << "multi write unlock one\n";
+            LDEBUG << "multi write unlock one\n";
             delete l;
         }
         for (auto& l : shared_locks_) 
         {
-            std::cout << "multi read unlock one\n";
+            LDEBUG << "multi read unlock one\n";
             delete l;
         }
     }

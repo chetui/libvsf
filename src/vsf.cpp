@@ -1,5 +1,4 @@
 #include "vsf.h"
-#include <iostream>
 #include "utils/log.h"
 
 using namespace std;

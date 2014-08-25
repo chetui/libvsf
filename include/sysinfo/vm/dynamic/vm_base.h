@@ -6,7 +6,6 @@
 #include <map>
 #include <sys/types.h>
 #include <string>
-#include <iostream>
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
@@ -18,7 +17,7 @@ class VmBase : public Runnable {
 public:
     static VmBase *get_instance();
     void set_vm_cmd(std::string vm_cmd);
-    void set_interval(int ms_interval);
+    void set_interval(int interval_ms);
     std::set<VmId> get_vm_ids();
     std::set<VmId> get_vm_ids(std::string vm_cmd);
     std::string get_name(VmId vm_id);
@@ -60,7 +59,7 @@ private:
     char *buf_;
     std::string vm_cmd_ = "qemu-system-x86_64";
     std::atomic<bool> has_data_;
-    std::atomic<int> ms_interval_;
+    std::atomic<int> interval_ms_;
 
     static constexpr const int BUF_SIZE = 102400;
     static constexpr const char * VCPU_DIR = "/sys/fs/cgroup/cpu/libvirt/qemu/";

@@ -2,18 +2,17 @@
 
 #include <cstdio>
 #include <cstring>
-#include <iostream>
 #include <algorithm>
 #include <functional>
+#include "utils/log.h"
 #include "framework/exception.h"
 
 using namespace std;
 
 unsigned int VmCpuUsage::cpu_num_;
 
-VmCpuUsage::VmCpuUsage(): has_data_(false)
+VmCpuUsage::VmCpuUsage(): has_data_(false), interval_ms_(1000)
 {
-    ms_interval_ = 1000;
     cpu_num_ = static_cast<unsigned int>(sysconf(_SC_NPROCESSORS_CONF));
 }
 
@@ -28,9 +27,9 @@ VmCpuUsage *VmCpuUsage::get_instance()
     return &vm_cpu_usage;
 }
 
-void VmCpuUsage::set_interval(int ms_interval) 
+void VmCpuUsage::set_interval(int interval_ms) 
 {
-    ms_interval_ = ms_interval;
+    interval_ms_ = interval_ms;
 }
 
 int VmCpuUsage::get_sys_cpu_usage()
@@ -95,13 +94,13 @@ void VmCpuUsage::refresh()
     refresh_system();
     refresh_vm();
 
-//    cout << "DDD----" << endl;
+//    LDEBUG << "DDD----" << endl;
 //    for (auto& vm_id : vm_ids_) {
-//        cout << "DDD " << vm_id << ">>";
+//        LDEBUG << "DDD " << vm_id << ">>";
 //        for (auto& id : vcpu_ids_[vm_id]) {
-//            cout << ":" << id;
+//            LDEBUG << ":" << id;
 //        }
-//        cout << endl;
+//        LDEBUG << endl;
 //    }
     has_data_ = true;
     return;
@@ -171,7 +170,7 @@ void VmCpuUsage::refresh_vm()
             vms_[vm_id] += vm_threads_[task_info.tid].proctime_new_ - vm_threads_[task_info.tid].proctime_old_;
             ++cnt;
         }        
-//        cout << "DDD:" << vm_id << ":" << vms_[vm_id] << endl;
+//        LDEBUG << "DDD:" << vm_id << ":" << vms_[vm_id] << endl;
         vms_[vm_id] = (total_cpu_time_old == 0 || total_cpu_time_delta == 0) ?
             0 : (vms_[vm_id] / cnt * 100 * cpu_num_ / total_cpu_time_delta);
     }        
@@ -192,7 +191,7 @@ void VmCpuUsage::run()
     while(!stop_)
     {
         refresh();
-        this_thread::sleep_for(chrono::milliseconds(ms_interval_));
+        this_thread::sleep_for(chrono::milliseconds(interval_ms_));
     }
 }
 
@@ -222,9 +221,9 @@ void VmThread::update(const proc_t* task)
         0 : (proctime_delta * 100 * VmCpuUsage::cpu_num_
             / sys_cpu);
 
-//    cout << "TTT" << task->tid << ":" << processor_ << ":" << tgid_ << ":" << cpu_usage_ << endl;
-//    cout << "sys_cpu:" << sys_cpu << " proctime_delta:" << proctime_delta << " num_cpus:" << VmCpuUsage::cpu_num_ << endl;
-//    cout << "proctime_old_:" << proctime_old_ << " proctime_new_:" << proctime_new_ << " utime:" << task->utime << " stime:" << task->stime << endl;
+//    LDEBUG << "TTT" << task->tid << ":" << processor_ << ":" << tgid_ << ":" << cpu_usage_ << endl;
+//    LDEBUG << "sys_cpu:" << sys_cpu << " proctime_delta:" << proctime_delta << " num_cpus:" << VmCpuUsage::cpu_num_ << endl;
+//    LDEBUG << "proctime_old_:" << proctime_old_ << " proctime_new_:" << proctime_new_ << " utime:" << task->utime << " stime:" << task->stime << endl;
 
 }
 

@@ -2,17 +2,17 @@
 
 #include <cstdio>
 #include <cmath>
-#include <iostream>
 #include <regex>
 #include <fstream>
 #include <algorithm>
 #include <iterator>
 #include "utils/str_tools.h"
+#include "utils/log.h"
 #include "framework/exception.h"
 
 using namespace std;
 
-VmBase::VmBase(): has_data_(false), ms_interval_(5000)
+VmBase::VmBase(): has_data_(false), interval_ms_(5000)
 {
     buf_ = new char[BUF_SIZE];
 }
@@ -46,9 +46,9 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
     vm_cmd_ = vm_cmd;
 }
 
-void VmBase::set_interval(int ms_interval) 
+void VmBase::set_interval(int interval_ms) 
 {
-    ms_interval_ = ms_interval;
+    interval_ms_ = interval_ms;
 }
 
 std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
@@ -147,13 +147,13 @@ void VmBase::refresh()
     refresh_most();
     refresh_vcpu_stable_vmthread();
 
-//    cout << "DDD----" << endl;
+//    LDEBUG << "DDD----" << endl;
 //    for (auto& vm_id : vm_ids_) {
-//        cout << "DDD " << vm_id << ">>";
+//        LDEBUG << "DDD " << vm_id << ">>";
 //        for (auto& id : vcpu_ids_[vm_id]) {
-//            cout << ":" << id;
+//            LDEBUG << ":" << id;
 //        }
-//        cout << endl;
+//        LDEBUG << endl;
 //    }
     has_data_ = true;
     return;
@@ -321,7 +321,7 @@ void VmBase::run()
     while(!stop_)
     {
         refresh();
-        this_thread::sleep_for(chrono::milliseconds(ms_interval_));
+        this_thread::sleep_for(chrono::milliseconds(interval_ms_));
     }
 }
 

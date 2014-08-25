@@ -1,9 +1,9 @@
 #include "sysinfo/host/static/node_dist.h"
 
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include "utils/log.h"
 #include "sysinfo/host/static/node_cpu.h"
 
 NodeDist::NodeDist()
@@ -19,7 +19,7 @@ NodeDist *NodeDist::get_instance()
 std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& param) 
 {
     std::shared_lock<std::shared_timed_mutex> read_lock(test_mutex_);
-//    std::cout << "AA" << std::endl;
+//    LDEBUG << "AA" << std::endl;
     if(test_inited_ && param == test_param_)
         return test_node_dist_;
     read_lock.unlock();
@@ -28,12 +28,12 @@ std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& p
     test_param_ = param;
     test_node_dist_.clear();
 
-//    std::cout << "BB" << std::endl;
-//    std::cout << "loop in get_test_node_dist" << param.loop << std::endl;
-//    std::cout << param.path << std::endl;
-//    std::cout << param.size_in_mb << std::endl;
-//    std::cout << param.type << std::endl;
-//    std::cout << param.loop << std::endl;
+//    LDEBUG << "BB" << std::endl;
+//    LDEBUG << "loop in get_test_node_dist" << param.loop << std::endl;
+//    LDEBUG << param.path << std::endl;
+//    LDEBUG << param.size_in_mb << std::endl;
+//    LDEBUG << param.type << std::endl;
+//    LDEBUG << param.loop << std::endl;
     int node_size = NodeCpu::get_instance()->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
@@ -71,7 +71,7 @@ std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& p
         test_node_dist_.push_back(row);
     }
 
-//    std::cout << "CC" << std::endl;
+//    LDEBUG << "CC" << std::endl;
     return test_node_dist_;
 }
 

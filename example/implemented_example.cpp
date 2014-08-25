@@ -24,12 +24,12 @@ int main()
         { Option::OP_VM_BASE,
             {
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 }
             }
         },
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 }
             }
         }
     });

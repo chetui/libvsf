@@ -1,6 +1,5 @@
 #include "framework/vm.h"
 #include <map>
-#include <iostream>
 
 using namespace std;
 
@@ -40,7 +39,7 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
             case OptionParam::VM_CMD:
                 vm_base_->set_vm_cmd(p.second.get_string());
                 break;
-            case OptionParam::INTERVAL:
+            case OptionParam::LOOP_INTERVAL:
                 vm_base_->set_interval(p.second.get_int());
                 break;
             default:
@@ -57,7 +56,7 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         {
             switch(p.first)
             {
-            case OptionParam::INTERVAL:
+            case OptionParam::LOOP_INTERVAL:
                 vm_cpu_usage_->set_interval(p.second.get_int());
                 break;
             default:
