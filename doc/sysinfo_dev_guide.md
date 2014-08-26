@@ -1,6 +1,6 @@
 Sysinfo Development Guide
 ======
-
+[This doc is out of date currently]
 The purpose of this guide is to help the developers who want to add new sysinfo class into libvsf.
 
 ## General Requirement
