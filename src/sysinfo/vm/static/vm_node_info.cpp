@@ -5,6 +5,7 @@
 #include<vector>
 #include<atomic>
 #include<mutex>
+#include<cstring>
 using namespace std;
 
 struct vm_vnode_static_info
@@ -133,27 +134,28 @@ class vm_node_info
 	int vnode_num;
 	vector<vm_vnode_static_info> vnode_info;
 	atomic<bool> init;
-	mutex lock;
-	vm_node_info():vnode_num(-1),init(false);
+	mutex mtx;
+        uint32_t pid;
+	vm_node_info(uint32_t pid):vnode_num(-1),init(false),pid(pid){};
 public:
-	vm_node_info *get_instance();
+	static vm_node_info * get_instance(uint32_t pid);
 	
-	int update(uint32_t pid);
+	int update();
 	int get_vnode_num();
-}
+    vector<int> get_vnode_ids();
+    vector<int> get_vcpu_ids(int vnode_id,int vcpu_num);
+};
 
-	vm_node_info *vm_node_info::get_instance()
+	vm_node_info* vm_node_info::get_instance(uint32_t pid)
 	{
-		static vm_node_info instance;
-		return *instance;
+		static vm_node_info instance(pid);
+		return &instance;
 	}
 	
-	int vm_node_info::update(uint32_t pid)
+	int vm_node_info::update()
 	{
 		string cmdline=read_cmd_line(pid);
-		mutex.lock();
 		*((vm_vnode_return_structure *) this)=get_vm_vnode_static_info_from_cmdline(cmdline);
-		mutex.unlock();
 		init=true;
 		return 0;
 	}
@@ -188,7 +190,7 @@ public:
 			}
 		if(ret.size()==0&&vcpu_num>0)
 		{
-			for(int i=vnode_id*(vcpu_num/vnode_num);i<(vnode_id+1)*(vcpu_num/vnode_num))]
+			for(int i=vnode_id*(vcpu_num/vnode_num);i<(vnode_id+1)*(vcpu_num/vnode_num);i++)
 				ret.push_back(i);
 		}
 		return ret;
