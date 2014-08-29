@@ -11,12 +11,17 @@
 
 class CacheMissData;
 
+typedef std::function<void(const CacheMissData&)> cache_miss_callback_t;
+
 class CacheMiss : public Runnable {
 public:
     static CacheMiss *get_instance();
 
     void set_loop_interval(int interval_ms);
     void set_sample_interval(int interval_ms);
+    void set_callback(cache_miss_callback_t);
+    std::shared_timed_mutex& get_data_mutex();
+    std::atomic<bool>& get_has_data();
 
     CacheMissData get_cache_miss(pid_t pid);
 
@@ -24,12 +29,12 @@ public:
     void stop_watching(pid_t pid);
     void start_sample();
     void stop_sample();
+    void refresh();
 
 private:
     CacheMiss();
     ~CacheMiss();
     void clear();
-    void refresh();
     void run();
 
     std::map<pid_t, CacheMissData> cache_miss_data_;
@@ -41,6 +46,8 @@ private:
     std::atomic<bool> has_data_;
     std::atomic<int> loop_interval_ms_;
     std::atomic<int> sample_interval_us_;
+
+    cache_miss_callback_t callback_func_;
 };
 
 class CacheMissData {
@@ -50,6 +57,8 @@ public:
     CacheMissData(pid_t pid);
     CacheMissData(const CacheMissData& c);
     CacheMissData& operator=(const CacheMissData& c);
+    void update_miss_rate();
+
     pid_t pid = -1;
     /**
      * Miss per thousand cycles

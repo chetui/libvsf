@@ -7,7 +7,7 @@
 
 using namespace std;
 
-CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(1000), sample_interval_us_(50000)
+CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(1000), sample_interval_us_(50000), callback_func_(nullptr)
 {
 }
 
@@ -30,6 +30,21 @@ void CacheMiss::set_loop_interval(int interval_ms)
 void CacheMiss::set_sample_interval(int interval_us) 
 {
     sample_interval_us_ = interval_us;
+}
+
+void CacheMiss::set_callback(cache_miss_callback_t callback_func) 
+{
+    callback_func_ = callback_func;
+}
+
+std::shared_timed_mutex& CacheMiss::get_data_mutex()
+{
+    return data_mutex_;
+}
+
+std::atomic<bool>& CacheMiss::get_has_data()
+{
+    return has_data_;
 }
 
 CacheMissData CacheMiss::get_cache_miss(pid_t pid)
@@ -91,11 +106,11 @@ void CacheMiss::stop_sample()
         if (!data.second.second_read())
             to_stop_watching_.push_back(data.first);
     }
-//    for (auto& data : cache_miss_data_) {
-//    if (perf_callback) {
-//        perf_callback(data.first, cmdata.mphc, cmdata.mphi, cmdata.mphr);
-//    }
-//    }
+    for (const auto& data : cache_miss_data_) {
+        if (callback_func_) {
+            callback_func_(data);
+        }
+    }
     for (auto pid : to_stop_watching_) {
         auto iter = cache_miss_data_.find(pid);
         if (iter != cache_miss_data_.end()) {
@@ -233,20 +248,25 @@ bool CacheMissData::second_read()
         && cpu_cycles.second_read()
         && instructions.second_read()
         && cache_references.second_read()) {
-        if (cpu_cycles.count > 0) 
-            mptc = cache_misses.count * 1.0 / cpu_cycles.count * 1000;
-        if (cache_references.count > 0) 
-            mptr = cache_misses.count * 1.0 / cache_references.count * 1000;
-        if (instructions.count > 0) {
-            mpti = cache_misses.count * 1.0 / instructions.count * 1000;
-            rpti = cache_references.count * 1.0 / instructions.count * 1000;
-            cpi = cpu_cycles.count * 1.0 / instructions.count;
         }
+        update_miss_rate();
         return true;
     } else {
         clear_data();
         return false;
     }
+}
+
+void CacheMissData::update_miss_rate()
+{
+    if (cpu_cycles.count > 0) 
+        mptc = cache_misses.count * 1.0 / cpu_cycles.count * 1000;
+    if (cache_references.count > 0) 
+        mptr = cache_misses.count * 1.0 / cache_references.count * 1000;
+    if (instructions.count > 0) {
+        mpti = cache_misses.count * 1.0 / instructions.count * 1000;
+        rpti = cache_references.count * 1.0 / instructions.count * 1000;
+        cpi = cpu_cycles.count * 1.0 / instructions.count;
 }
 
 void CacheMissData::clear_fd()
