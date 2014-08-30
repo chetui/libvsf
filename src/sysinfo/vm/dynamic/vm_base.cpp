@@ -35,7 +35,7 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
 
     has_data_ = false;
     vm_ids_.clear();
-    pid_to_vm_id_.clear();
+    stable_vmthread_id_to_vm_id_.clear();
     name_.clear();
     uuid_.clear();
     vsocket_num_.clear();
@@ -68,14 +68,18 @@ std::set<VmId> VmBase::get_vm_ids()
     return vm_ids_;
 }
 
-VmId VmBase::pid_to_vm_id(pid_t pid)
+VmId VmBase::stable_vmthread_id_to_vm_id(pid_t pid)
 {
     if(!joinable())
         refresh();
     while(!has_data_) 
         this_thread::sleep_for(chrono::milliseconds(10));
     std::shared_lock<std::shared_timed_mutex> lock(data_mutex_);
-    return pid_to_vm_id_[pid];
+    auto iter = stable_vmthread_id_to_vm_id_.find(pid);
+    if (iter != stable_vmthread_id_to_vm_id_.end())
+        return iter->second;
+    else
+        return {};
 }
 
 template <typename T>
@@ -174,7 +178,7 @@ void VmBase::refresh()
 void VmBase::refresh_most()
 {
     vm_ids_.clear();
-    pid_to_vm_id_.clear();
+    stable_vmthread_id_to_vm_id_.clear();
     name_.clear();
     uuid_.clear();
     vsocket_num_.clear();
@@ -220,7 +224,6 @@ void VmBase::refresh_most()
         //add vm_ids
         VmId vm_id(start_time, stoull(pid));
         vm_ids_.insert(vm_id);
-        pid_to_vm_id_[vm_id.pid] = vm_id;
 
         //add name
         string name = "";
@@ -304,6 +307,8 @@ void VmBase::refresh_vcpu_stable_vmthread()
         vcpu_ids_[vm_id] = ids;
         stable_vmthread_ids_[vm_id] = ids;
         stable_vmthread_ids_[vm_id].insert(vm_id.pid);
+        for (auto& id : stable_vmthread_ids_[vm_id])
+            stable_vmthread_id_to_vm_id_[id] = vm_id;
     }
 }
 

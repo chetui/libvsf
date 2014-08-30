@@ -62,7 +62,7 @@ void Log::puts_debug_without_syslog(LogLevel priority, const std::string& msg)
 {
     priority = priority; //to suppresss unused warnning
 #ifdef DEBUG
-    std::cout << RED << "[Debug] " << NC << msg << "\n";
+    std::cout << RED << "[Debug] " << NC << msg << std::endl;
 #else
     msg = msg; //to suppresss unused warnning
 #endif

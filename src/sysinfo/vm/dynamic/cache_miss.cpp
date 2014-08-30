@@ -7,13 +7,16 @@
 
 using namespace std;
 
-CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(1000), sample_interval_us_(50000), callback_func_(nullptr)
+CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(1000), sample_interval_us_(50000)
 {
+    callback_func_ = new cache_miss_callback_t;
+    *callback_func_ = nullptr;
 }
 
 CacheMiss::~CacheMiss()
 {
     stop();
+    delete callback_func_;
 }
 
 CacheMiss *CacheMiss::get_instance()
@@ -34,7 +37,7 @@ void CacheMiss::set_sample_interval(int interval_us)
 
 void CacheMiss::set_callback(cache_miss_callback_t callback_func) 
 {
-    callback_func_ = callback_func;
+    *callback_func_ = callback_func;
 }
 
 std::shared_timed_mutex& CacheMiss::get_data_mutex()
@@ -47,10 +50,8 @@ std::atomic<bool>& CacheMiss::get_has_data()
     return has_data_;
 }
 
-CacheMissData CacheMiss::get_cache_miss(pid_t pid)
+CacheMissData CacheMiss::get_cache_miss_without_refresh(pid_t pid)
 {
-    if(!joinable())
-        refresh();
     while(!has_data_) 
         this_thread::sleep_for(chrono::milliseconds(10));
 
@@ -62,15 +63,21 @@ CacheMissData CacheMiss::get_cache_miss(pid_t pid)
         return {pid};
 }
 
+CacheMissData CacheMiss::get_cache_miss(pid_t pid)
+{
+    if(!joinable())
+        refresh();
+
+    return get_cache_miss_without_refresh(pid);
+}
+
 void CacheMiss::start_watching(pid_t pid) 
 {
-    unique_lock<shared_timed_mutex> lock(data_mutex_);
     to_start_watching_.push_back(pid);
 }
 
 void CacheMiss::stop_watching(pid_t pid) 
 {
-    unique_lock<shared_timed_mutex> lock(data_mutex_);
     to_stop_watching_.push_back(pid);
 }
 
@@ -92,8 +99,10 @@ void CacheMiss::start_sample()
     to_start_watching_.clear();
 
     for (auto& data : cache_miss_data_) {
-        if (!data.second.first_read())
+        if (!data.second.first_read()) {
             to_stop_watching_.push_back(data.first);
+            LDEBUG << "pid:" << data.first << " first_read() failed";
+        }
     }
 
     return;
@@ -103,12 +112,14 @@ void CacheMiss::stop_sample()
 {
     unique_lock<shared_timed_mutex> lock(data_mutex_);
     for (auto& data : cache_miss_data_) {
-        if (!data.second.second_read())
+        if (!data.second.second_read()) {
             to_stop_watching_.push_back(data.first);
+            LDEBUG << "pid:" << data.first << " second_read() failed";
+        }
     }
     for (const auto& data : cache_miss_data_) {
-        if (callback_func_) {
-            callback_func_(data);
+        if (*callback_func_) {
+            (*callback_func_)(data.second);
         }
     }
     for (auto pid : to_stop_watching_) {
@@ -126,11 +137,11 @@ void CacheMiss::stop_sample()
 
 void CacheMiss::clear()
 {
-    unique_lock<shared_timed_mutex> lock(data_mutex_);
     for (auto& data : cache_miss_data_) {
         data.second.clear_fd();
     }
     cache_miss_data_.clear();
+    *callback_func_ = nullptr;
     has_data_ = false;
 }
 
@@ -151,6 +162,7 @@ void CacheMiss::run()
         refresh();
         this_thread::sleep_for(chrono::milliseconds(loop_interval_ms_));
     }
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
     clear();
 }
 
@@ -248,7 +260,6 @@ bool CacheMissData::second_read()
         && cpu_cycles.second_read()
         && instructions.second_read()
         && cache_references.second_read()) {
-        }
         update_miss_rate();
         return true;
     } else {
@@ -267,6 +278,7 @@ void CacheMissData::update_miss_rate()
         mpti = cache_misses.count * 1.0 / instructions.count * 1000;
         rpti = cache_references.count * 1.0 / instructions.count * 1000;
         cpi = cpu_cycles.count * 1.0 / instructions.count;
+    }
 }
 
 void CacheMissData::clear_fd()
@@ -300,6 +312,7 @@ CacheMissData::PerfData::PerfData(const PerfData& pd)
     fd_ = pd.fd_;
     first_time_ = pd.first_time_;
     second_time_ = pd.second_time_;
+    count = pd.count;
     attr_.config = pd.attr_.config;
     attr_.type = pd.attr_.type;
     attr_.size = pd.attr_.size;
@@ -312,6 +325,7 @@ CacheMissData::PerfData& CacheMissData::PerfData::operator=(const PerfData& pd)
     fd_ = pd.fd_;
     first_time_ = pd.first_time_;
     second_time_ = pd.second_time_;
+    count = pd.count;
     attr_.config = pd.attr_.config;
     attr_.type = pd.attr_.type;
     attr_.size = pd.attr_.size;
@@ -341,10 +355,16 @@ bool CacheMissData::PerfData::open_fd(pid_t pid, int fd_dep)
 
 bool CacheMissData::PerfData::first_read()
 {
-    if (read(fd_, &first_time_, sizeof(first_time_)) < 0)
+
+    ssize_t cnt = read(fd_, &first_time_, sizeof(first_time_));
+    LDEBUG << "cnt:" << cnt;
+    if (cnt < 0)
+//    if (read(fd_, &first_time_, sizeof(first_time_)) < 0)
         return false;
-    else
+    else {
+        LDEBUG << "first_read:" << first_time_;
         return true;
+    }
 }
 
 bool CacheMissData::PerfData::second_read()
@@ -355,6 +375,7 @@ bool CacheMissData::PerfData::second_read()
         count = second_time_ - first_time_;
     else
         count = 0;
+    LDEBUG << "second_read:" << second_time_ << " " << "count:" << count;;
     return true;
 }
 
@@ -369,4 +390,20 @@ void CacheMissData::PerfData::clear_fd()
 {
     ioctl(fd_, PERF_EVENT_IOC_DISABLE, 1);
     close(fd_);
+}
+
+std::ostream &operator<<(std::ostream &os, const CacheMissData&v)
+{
+    os << "[" 
+        << v.mptc << ":" 
+        << v.mpti << ":" 
+        << v.mptr << ":" 
+        << v.rpti << ":" 
+        << v.cpi << "|" 
+        << v.cache_misses.count << ":" 
+        << v.cpu_cycles.count << ":" 
+        << v.instructions.count << ":" 
+        << v.cache_references.count
+        << "]";
+    return os;
 }

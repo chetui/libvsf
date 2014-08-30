@@ -19,22 +19,6 @@ protected:
     VmBase* vm_base;
 };
 
-TEST_F(CacheMissTest, sys_cpu_usage_without_thread)
-{
-    cout << "system_cpu_usage:" << cache_miss->get_sys_cpu_usage() << endl;
-    sleep(2);
-    cout << "system_cpu_usage:" << cache_miss->get_sys_cpu_usage() << endl;
-}
-
-TEST_F(CacheMissTest, sys_cpu_usage_with_thread)
-{
-    cache_miss->start();
-    cout << "system_cpu_usage:" << cache_miss->get_sys_cpu_usage() << endl;
-    sleep(2);
-    cout << "system_cpu_usage:" << cache_miss->get_sys_cpu_usage() << endl;
-    cache_miss->stop();
-}
-
 TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
 {
     vm_base->start();

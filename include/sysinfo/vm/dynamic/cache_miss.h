@@ -22,19 +22,23 @@ public:
     void set_callback(cache_miss_callback_t);
     std::shared_timed_mutex& get_data_mutex();
     std::atomic<bool>& get_has_data();
+    CacheMissData get_cache_miss_without_refresh(pid_t pid);
 
     CacheMissData get_cache_miss(pid_t pid);
 
+    //not mutex protected. need get_data_mutex() to protect
     void start_watching(pid_t pid);
+    //not mutex protected. need get_data_mutex() to protect
     void stop_watching(pid_t pid);
     void start_sample();
     void stop_sample();
     void refresh();
+    //not mutex protected. need get_data_mutex() to protect
+    void clear();
 
 private:
     CacheMiss();
     ~CacheMiss();
-    void clear();
     void run();
 
     std::map<pid_t, CacheMissData> cache_miss_data_;
@@ -47,7 +51,7 @@ private:
     std::atomic<int> loop_interval_ms_;
     std::atomic<int> sample_interval_us_;
 
-    cache_miss_callback_t callback_func_;
+    std::atomic<cache_miss_callback_t*> callback_func_;
 };
 
 class CacheMissData {
@@ -114,5 +118,6 @@ private:
 
 };
 
+std::ostream &operator<<(std::ostream &os, const CacheMissData&v);
 
 #endif

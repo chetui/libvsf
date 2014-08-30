@@ -23,6 +23,7 @@ set (SRC_LIST
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cache_miss.cpp
+    sysinfo/vm/dynamic/vm_cache_miss.cpp
     utils/func_option.cpp
     utils/runnable.cpp
     utils/log.cpp
@@ -51,6 +52,7 @@ add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
+add_indi_test (test_vm_vm_cache_miss)
 add_indi_test (test_func_option)
 add_indi_test (test_vsf_init_twice)
 add_indi_test (test_vsf_vm_base)

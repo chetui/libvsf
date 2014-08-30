@@ -33,7 +33,7 @@ public:
     std::set<pid_t> get_volatile_vmthread_ids(VmId vm_id);
     int get_volatile_vmthread_num(VmId vm_id);
 
-    VmId pid_to_vm_id(pid_t pid);
+    VmId stable_vmthread_id_to_vm_id(pid_t pid);
 
 private:
     VmBase();
@@ -47,7 +47,7 @@ private:
     T get_data_by_vm_id(std::map<VmId, T>& data, VmId vm_id, const T& failed_ret);
 
     std::set<VmId> vm_ids_;
-    std::map<pid_t, VmId> pid_to_vm_id_;
+    std::map<pid_t, VmId> stable_vmthread_id_to_vm_id_;
     std::map<VmId, std::string> name_;
     std::map<VmId, std::string> uuid_;
     std::map<VmId, int> vsocket_num_;
