@@ -22,12 +22,9 @@ protected:
 TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base)
 {
     vm_base->start();
-    cout << "TTT" << endl;
     vm_cache_miss->start();
-    cout << "TTT1" << endl;
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
-        cout << "TTT2" << endl;
         cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;
         set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
         set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
@@ -38,10 +35,59 @@ TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base)
             cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
         }
     }
-    cout << "TTT3" << endl;
     vm_cache_miss->stop();
-    cout << "TTT4" << endl;
     vm_base->stop();
-    cout << "TTT5" << endl;
+}
+
+TEST_F(VmCacheMissTest, vm_cache_miss_without_thread_with_vm_base)
+{
+    vm_base->start();
+    set<VmId> vm_ids = vm_base->get_vm_ids();
+    for(auto& vm_id : vm_ids) {
+        cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;
+        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
+        for (auto& v : stable_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+        for (auto& v : volatile_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+    }
+    vm_base->stop();
+}
+
+TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_without_vm_base)
+{
+    vm_cache_miss->start();
+    set<VmId> vm_ids = vm_base->get_vm_ids();
+    for(auto& vm_id : vm_ids) {
+        cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;
+        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
+        for (auto& v : stable_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+        for (auto& v : volatile_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+    }
+    vm_cache_miss->stop();
+}
+
+TEST_F(VmCacheMissTest, vm_cache_miss_without_thread_without_vm_base)
+{
+    set<VmId> vm_ids = vm_base->get_vm_ids();
+    for(auto& vm_id : vm_ids) {
+        cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;
+        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
+        for (auto& v : stable_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+        for (auto& v : volatile_vmthreads) {
+            cout << v << ":" << vm_cache_miss->get_cache_miss(v) << endl;
+        }
+    }
 }
 

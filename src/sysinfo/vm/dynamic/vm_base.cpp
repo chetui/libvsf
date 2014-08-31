@@ -334,6 +334,23 @@ set<pid_t> VmBase::refresh_volatile_vmthread(VmId vm_id)
     return volatile_vmthread_ids;
 }
 
+void VmBase::clear()
+{
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
+    vm_ids_.clear();
+    stable_vmthread_id_to_vm_id_.clear();
+    name_.clear();
+    uuid_.clear();
+    vsocket_num_.clear();
+    vcore_num_.clear();
+    vhpthread_num_.clear();
+    total_mem_size_.clear();
+    vcpu_ids_.clear();
+    stable_vmthread_ids_.clear();
+
+    has_data_ = false;
+}
+
 void VmBase::run()
 {
     while(!stop_)
@@ -341,6 +358,7 @@ void VmBase::run()
         refresh();
         this_thread::sleep_for(chrono::milliseconds(interval_ms_));
     }
+    clear();
 }
 
 bool operator==(const VmId &lv, const VmId &rv)

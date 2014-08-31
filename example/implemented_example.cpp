@@ -31,6 +31,12 @@ int main()
             {
                 { OptionParam::LOOP_INTERVAL, 3000 }
             }
+        },
+        { Option::OP_VM_CACHE_MISS,
+            {
+                { OptionParam::LOOP_INTERVAL, 2000 },
+                { OptionParam::SAMPLE_INTERVAL, 50000 }
+            }
         }
     });
 
@@ -209,6 +215,12 @@ void myscheduler(Host *host, std::set<VM> &vms)
             std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
         for (auto& pid : volatile_pid_set)
             std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
+        //OP_VM_CACHE_MISS
+        std::cout << "cpu_usage:" << vm.cache_miss() << std::endl;
+        for (auto& pid : stable_pid_set)
+            std::cout << "cache_miss[" << pid << "]:" << vm.cache_miss(pid) << std::endl;
+        for (auto& pid : volatile_pid_set)
+            std::cout << "cache_miss[" << pid << "]:" << vm.cache_miss(pid) << std::endl;
     }
 
     return;

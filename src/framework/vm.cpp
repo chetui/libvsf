@@ -8,6 +8,7 @@ VmSet::VmSet()
     func_option_ = FuncOption::get_instance();
     vm_base_ = VmBase::get_instance();
     vm_cpu_usage_ = VmCpuUsage::get_instance();
+    vm_cache_miss_ = VmCacheMiss::get_instance();
 }
 
 VmSet* VmSet::get_instance()
@@ -67,6 +68,26 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
         if (!vm_cpu_usage_->joinable())
             vm_cpu_usage_->start();
     }
+    if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
+        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CACHE_MISS);
+        for (auto & p : param) 
+        {
+            switch(p.first)
+            {
+            case OptionParam::LOOP_INTERVAL:
+                vm_cache_miss_->set_loop_interval(p.second.get_int());
+                break;
+            case OptionParam::SAMPLE_INTERVAL:
+                vm_cache_miss_->set_sample_interval(p.second.get_int());
+                break;
+            default:
+                //cerr message "invalid parameter"
+                break;
+            }
+        }
+        if (!vm_cache_miss_->joinable())
+            vm_cache_miss_->start();
+    }
 
     set<VmId> vm_ids;
     if (vm_cmd == "")
@@ -83,6 +104,7 @@ VM::VM(VmId vm_id)
 {
     vm_base_ = VmBase::get_instance();
     vm_cpu_usage_ = VmCpuUsage::get_instance();
+    vm_cache_miss_ = VmCacheMiss::get_instance();
     vm_id_ = vm_id;
 }
 
@@ -157,17 +179,31 @@ int VM::sys_cpu_usage() const
 {
     return vm_cpu_usage_->get_sys_cpu_usage();
 }
+
 int VM::cpu_usage() const
 {
     return vm_cpu_usage_->get_cpu_usage(vm_id_);
 }
+
 int VM::cpu_usage(pid_t vmthread_id) const
 {
     return vm_cpu_usage_->get_cpu_usage(vmthread_id);
 }
+
 HpthreadId VM::running_on_hpthread(pid_t vmthread_id) const
 {
     return vm_cpu_usage_->get_running_on_hpthread(vmthread_id);
+}
+
+//OP_VM_CACHE_MISS
+CacheMissData VM::cache_miss() const
+{
+    return vm_cache_miss_->get_cache_miss(vm_id_);
+}
+
+CacheMissData VM::cache_miss(pid_t vmthread_id) const
+{
+    return vm_cache_miss_->get_cache_miss(vmthread_id);
 }
 
 VM& VM::operator=(const VM &v)

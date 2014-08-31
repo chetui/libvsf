@@ -57,6 +57,7 @@ add_indi_test (test_func_option)
 add_indi_test (test_vsf_init_twice)
 add_indi_test (test_vsf_vm_base)
 add_indi_test (test_vsf_vm_cpu_usage)
+add_indi_test (test_vsf_vm_cache_miss)
 add_indi_test (test_vsf_node_cpu)
 add_indi_test (test_compat)
 

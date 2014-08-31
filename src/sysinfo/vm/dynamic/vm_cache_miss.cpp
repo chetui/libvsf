@@ -18,6 +18,11 @@ VmCacheMiss::VmCacheMiss():
     cache_miss->set_callback(cal_vm_miss_rate);
 }
 
+VmCacheMiss::~VmCacheMiss()
+{
+    stop();
+}
+
 VmCacheMiss* VmCacheMiss::get_instance()
 {
     static VmCacheMiss vm_cache_miss;
@@ -73,22 +78,21 @@ void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
     cache_miss_data.instructions.count += data.instructions.count;
     cache_miss_data.cache_references.count += data.cache_references.count;
     cache_miss_data.update_miss_rate();
-    LDEBUG << "callback:" 
-        << vm_id << ":"
-        << data.pid << ":"
-        << data.cache_misses.count << ":"
-        << data.cpu_cycles.count << ":"
-        << data.instructions.count << ":"
-        << data.cache_references.count;
+//    LDEBUG << "callback:" 
+//        << vm_id << ":"
+//        << data.pid << ":"
+//        << data.cache_misses.count << ":"
+//        << data.cpu_cycles.count << ":"
+//        << data.instructions.count << ":"
+//        << data.cache_references.count;
 }
 
 void VmCacheMiss::refresh()
 {
-    LDEBUG << "before refersh";
     shared_timed_mutex& lock(cache_miss->get_data_mutex());
     lock.lock();
+    vm_cache_miss_data_.clear();
 
-    LDEBUG << "AAAA";
     set<VmId> vm_ids = vm_base->get_vm_ids();
     set<pid_t> pids;
     for (auto& vm_id : vm_ids) {
@@ -100,7 +104,6 @@ void VmCacheMiss::refresh()
             volatile_vmthread_id_to_vm_id_[pid] = vm_id;
     }
 
-    LDEBUG << "BBBB";
     vector<pid_t> to_start;
     vector<pid_t> to_stop;
     set_difference(
@@ -117,12 +120,9 @@ void VmCacheMiss::refresh()
     for (auto& pid : to_stop)
         cache_miss->stop_watching(pid);
 
-    LDEBUG << "CCCC";
     lock.unlock();
 
-    LDEBUG << "DDDD";
     cache_miss->refresh();
-    LDEBUG << "after refersh";
 }
 
 void VmCacheMiss::clear()
@@ -139,9 +139,7 @@ void VmCacheMiss::clear()
 void VmCacheMiss::run()
 {
     while(!stop_) {
-        LDEBUG << "before run";
         refresh();
-        LDEBUG << "after run";
         this_thread::sleep_for(chrono::milliseconds(loop_interval_ms_));
     }
     clear();

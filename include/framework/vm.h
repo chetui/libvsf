@@ -6,6 +6,7 @@
 #include "utils/func_option.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
 #include "sysinfo/vm/dynamic/vm_cpu_usage.h"
+#include "sysinfo/vm/dynamic/vm_cache_miss.h"
 #include <mutex>
 
 class Host;
@@ -20,10 +21,10 @@ private:
     VmSet();
     std::mutex init_vms_mutex_;
 
-
     FuncOption *func_option_;
     VmBase *vm_base_;
     VmCpuUsage *vm_cpu_usage_;
+    VmCacheMiss *vm_cache_miss_;
 };
 
 class VM {
@@ -50,12 +51,16 @@ public:
     int cpu_usage() const;
     int cpu_usage(pid_t vmthread_id) const;
     HpthreadId running_on_hpthread(pid_t vmthread_id) const;
+    //OP_VM_CACHE_MISS
+    CacheMissData cache_miss() const;
+    CacheMissData cache_miss(pid_t vmthread_id) const;
 
 private:
     VmId vm_id_;
 
     VmBase *vm_base_;
     VmCpuUsage *vm_cpu_usage_;
+    VmCacheMiss *vm_cache_miss_;
 };
 
 bool operator<(const VM &lv, const VM &rv);

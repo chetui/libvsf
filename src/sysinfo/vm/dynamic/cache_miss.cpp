@@ -341,6 +341,7 @@ bool CacheMissData::PerfData::open_fd(pid_t pid)
     if (fd_ < 0)
         return false;
     ioctl(fd_, PERF_EVENT_IOC_RESET, 0);
+    ioctl(fd_, PERF_EVENT_IOC_ENABLE, 0);
     return true;
 }
 
@@ -350,6 +351,7 @@ bool CacheMissData::PerfData::open_fd(pid_t pid, int fd_dep)
     if (fd_ < 0)
         return false;
     ioctl(fd_, PERF_EVENT_IOC_RESET, 0);
+    ioctl(fd_, PERF_EVENT_IOC_ENABLE, 0);
     return true;
 }
 
@@ -357,12 +359,10 @@ bool CacheMissData::PerfData::first_read()
 {
 
     ssize_t cnt = read(fd_, &first_time_, sizeof(first_time_));
-    LDEBUG << "cnt:" << cnt;
     if (cnt < 0)
 //    if (read(fd_, &first_time_, sizeof(first_time_)) < 0)
         return false;
     else {
-        LDEBUG << "first_read:" << first_time_;
         return true;
     }
 }
@@ -375,7 +375,6 @@ bool CacheMissData::PerfData::second_read()
         count = second_time_ - first_time_;
     else
         count = 0;
-    LDEBUG << "second_read:" << second_time_ << " " << "count:" << count;;
     return true;
 }
 

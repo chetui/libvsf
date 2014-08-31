@@ -44,7 +44,7 @@ TEST_F(FuncOptionTest, have_option)
 TEST_F(FuncOptionTest, have_no_option) 
 {
     map<Option, map<OptionParam, OptionParamVal> > ops = {
-        { Option::OP_VM_MISS_RATE, { } },
+        { Option::OP_VM_CACHE_MISS, { } },
         { Option::OP_HS_NODE_CPU, { } }
     };
     fo->enable_option(ops);

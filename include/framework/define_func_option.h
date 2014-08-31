@@ -21,7 +21,7 @@ enum class Option : unsigned int {
     OP_VM_CPU_BINDINFO,
     OP_VM_MEM_BINDINFO,
     OP_VM_CPU_USAGE,
-    OP_VM_MISS_RATE,
+    OP_VM_CACHE_MISS,
     OP_VM_MEM_SAMPLE,
     OP_VM_USED_MEM_SIZE
 };

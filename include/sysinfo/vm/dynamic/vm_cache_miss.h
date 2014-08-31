@@ -21,6 +21,7 @@ public:
 
 private:
     VmCacheMiss();
+    ~VmCacheMiss();
     void refresh();
     void clear();
     void run();

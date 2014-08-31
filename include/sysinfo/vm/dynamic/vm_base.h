@@ -39,6 +39,7 @@ private:
     VmBase();
     ~VmBase();
     void run();
+    void clear();
     void refresh();
     void refresh_most();
     void refresh_vcpu_stable_vmthread();
