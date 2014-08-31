@@ -166,8 +166,8 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.cpu_usage(vcpu_id/vmthread_id); //DONE
                 vm.running_on_hpthread(vcpu_id/vmthread_id); //DONE
                 //OP_VM_CACHE_MISS ((( OP_VM_BASE //Yu
-                vm.cache_miss();
-                vm.cache_miss(vcpu_id/vmthread_id);
+                vm.cache_miss(); //DONE
+                vm.cache_miss(vcpu_id/vmthread_id); //DONE
                 //OP_VM_MEM_SAMPLE ((( OP_VM_BASE //Yu
                 vm.mem_sample(); //sample the latest visited page addr
                 //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CPU, OP_VM_BASE //Zuo
