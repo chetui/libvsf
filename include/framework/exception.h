@@ -31,6 +31,8 @@ LOGIC_ERROR(MmapFailed, "mmap() is failed. ")
 LOGIC_ERROR(FrameworkInitMoreThanTwice, "Framework can not be initialized more than twice. ")
 //compat.h
 LOGIC_ERROR(CompatCheckFailed, "Compatibility checking is failed. ")
+//cpu_mig.h
+LOGIC_ERROR(CpuAllocFailed, "CPU_ALLOC is failed. ")
 
 
 #endif

@@ -7,6 +7,7 @@
 #include "sysinfo/vm/dynamic/vm_base.h"
 #include "sysinfo/vm/dynamic/vm_cpu_usage.h"
 #include "sysinfo/vm/dynamic/vm_cache_miss.h"
+#include "exec/cpu_mig.h"
 #include <mutex>
 
 class Host;
@@ -55,12 +56,16 @@ public:
     CacheMissData cache_miss() const;
     CacheMissData cache_miss(pid_t vmthread_id) const;
 
+    //VCPU MIG
+    void set_vcpu_mig(pid_t vmthread_id, std::set<HpthreadId> hpthread_ids) const;
+
 private:
     VmId vm_id_;
 
     VmBase *vm_base_;
     VmCpuUsage *vm_cpu_usage_;
     VmCacheMiss *vm_cache_miss_;
+    CpuMig *cpu_mig_;
 };
 
 bool operator<(const VM &lv, const VM &rv);

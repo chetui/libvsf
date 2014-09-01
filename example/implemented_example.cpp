@@ -1,11 +1,13 @@
 #include <unistd.h>
 #include <iostream>
 #include <set>
+#include <string>
 #include <vector>
 #include "vsf.h"
 
 void myscheduler(Host *host, std::set<VM> &vms);
 Vsf* framework = Vsf::get_instance();
+void print_and_clean_mig(Host *host, std::set<VM> &vms);
 
 int main()
 {
@@ -53,6 +55,10 @@ int main()
 
         //your scheduler algorithm
         myscheduler(host, vms);
+
+        framework->exec_mig();
+
+        print_and_clean_mig(host, vms);
 
         sleep(1); 
 
@@ -183,6 +189,7 @@ void myscheduler(Host *host, std::set<VM> &vms)
     std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
     std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
 
+    std::set<HpthreadId> affinity_set = {1, 3, 5};
     for (auto& vm : vms)
     {
         //OP_VM_BASE
@@ -221,6 +228,11 @@ void myscheduler(Host *host, std::set<VM> &vms)
             std::cout << "cache_miss[" << pid << "]:" << vm.cache_miss(pid) << std::endl;
         for (auto& pid : volatile_pid_set)
             std::cout << "cache_miss[" << pid << "]:" << vm.cache_miss(pid) << std::endl;
+        //CPU MIG
+        for (auto& pid : stable_pid_set)
+            vm.set_vcpu_mig(pid, affinity_set);
+        for (auto& pid : volatile_pid_set)
+            vm.set_vcpu_mig(pid, affinity_set);
     }
 
     return;
@@ -237,3 +249,34 @@ void print_dist(const std::vector<std::vector<int> >& dist)
 
 }
 
+
+void print_and_clean_mig(Host *host, std::set<VM> &vms)
+{
+    std::set<HpthreadId> all_ids = host->hpthread_ids();
+    char buf[10240];
+    for (auto& vm : vms) {
+        std::cout << "----before clean----" << std::endl;
+        std::string cmd = "virsh vcpuinfo " + vm.name() + "| grep 'Affinity'";
+        FILE* data = popen(cmd.c_str(), "r");
+        while (fgets(buf, sizeof(buf), data)) {
+            std::cout << buf;
+        }
+        pclose(data);
+
+        std::set<pid_t> stable_pid_set = vm.stable_vmthread_ids();
+        for (auto& pid : stable_pid_set)
+            vm.set_vcpu_mig(pid, all_ids);
+        std::set<pid_t> volatile_pid_set = vm.volatile_vmthread_ids();
+        for (auto& pid : volatile_pid_set)
+            vm.set_vcpu_mig(pid, all_ids);
+
+        framework->exec_mig();
+        std::cout << "----after clean----" << std::endl;
+
+        data = popen(cmd.c_str(), "r");
+        while (fgets(buf, sizeof(buf), data)) {
+            std::cout << buf;
+        }
+        pclose(data);
+    }
+}

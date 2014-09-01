@@ -9,6 +9,7 @@
 #include "framework/exception.h"
 #include "framework/host.h"
 #include "framework/vm.h"
+#include "framework/exec.h"
 
 class Vsf {
 public:
@@ -19,8 +20,6 @@ public:
     Host *init_host();
     std::set<VM> init_vms(Host *host);
     std::set<VM> init_vms(Host *host, std::string vm_cmd);
-
-    //exec
     void exec_mig();
 
 private:
@@ -28,6 +27,7 @@ private:
 
     Host *host_;
     VmSet *vm_set_;
+    Exec *exec_;
 
     FuncOption* func_option_;
 };

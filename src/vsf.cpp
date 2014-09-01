@@ -7,6 +7,7 @@ Vsf::Vsf()
 {
     func_option_ = FuncOption::get_instance();
     vm_set_ = VmSet::get_instance();
+    exec_ = Exec::get_instance();
 }
 
 Vsf* Vsf::get_instance()
@@ -40,4 +41,9 @@ set<VM> Vsf::init_vms(Host *host, string vm_cmd)
 set<VM> Vsf::init_vms(Host *host)
 {
     return vm_set_->init_vms(host);
+}
+
+void Vsf::exec_mig()
+{
+    exec_->exec_mig();
 }

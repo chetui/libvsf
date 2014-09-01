@@ -14,10 +14,10 @@ int main()
     //but if other functions are called without set corresponding flags, info would be collected immediately. It would have some performance cost depended on the collecting action/
     framework->init({
         //<<Optional Host Static Info>>
-        { Option::OP_HS_NODE_CPU, { } },
+        { Option::OP_HS_NODE_CPU, { } }, //DONE
         { Option::OP_HS_TOTAL_MEM_SIZE, { } },
-        { Option::OP_HS_SYS_NODE_DIST, { } },
-        { Option::OP_HS_TEST_NODE_DIST, 
+        { Option::OP_HS_SYS_NODE_DIST, { } }, //DONE
+        { Option::OP_HS_TEST_NODE_DIST, //DONE
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
@@ -32,7 +32,7 @@ int main()
         { Option::OP_VM_VNODE, { } },
         { Option::OP_VM_MEM_POLICY, { } },
         //<<Optional VM Dynamic Info>>
-        { Option::OP_VM_BASE, 
+        { Option::OP_VM_BASE,  //DONE
             { 
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
                 { OptionParam::LOOP_INTERVAL, 3000 }
@@ -40,18 +40,18 @@ int main()
         },
         { Option::OP_VM_CPU_BINDINFO, { } },
         { Option::OP_VM_MEM_BINDINFO, { } },
-        { Option::OP_VM_CPU_USAGE, 
+        { Option::OP_VM_CPU_USAGE, //DONE
             { 
                 { OptionParam::LOOP_INTERVAL, 3000 }
             } 
         },
-        { Option::OP_VM_CACHE_MISS,
+        { Option::OP_VM_CACHE_MISS, //DONE
             {
                 { OptionParam::LOOP_INTERVAL, 2000 },
                 { OptionParam::SAMPLE_INTERVAL, 50000 }
             }
         },
-        { Option::OP_VM_MEM_SAMPLE, { } },
+        //{ Option::OP_VM_MEM_SAMPLE, { } },
         { Option::OP_VM_USED_MEM_SIZE { } }
     });
 
@@ -69,7 +69,7 @@ int main()
         //your scheduler algorithm
         myscheduler(host, vms);
 
-        framework->exec_mig(host, vms); //only host parameter may be OK?
+        framework->exec_mig(); //only host parameter may be OK?
 
         sleep(1); 
     }
@@ -174,16 +174,16 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 vm.cache_miss(); //DONE
                 vm.cache_miss(vcpu_id/vmthread_id); //DONE
                 //OP_VM_MEM_SAMPLE ((( OP_VM_BASE //Yu
-                vm.mem_sample(); //sample the latest visited page addr
+                //vm.mem_sample(); //sample the latest visited page addr //have some difficulties to develop on 3.8.0 kernel using perf_event
                 //OP_VM_USED_MEM_SIZE ((( OP_HS_NODE_CPU, OP_VM_BASE //Zuo
                 vm.used_mem_size();
                 vm.used_mem_size(node_id);
 
         //OUTPUT: decide scheduling strategy
 
-                vm.set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu
+                vm.set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu //DONE
                 vm.set_mem_mig(node_ids); //Zuo
-                vm.set_mem_mig(node_ids, addr_start, page_size); //Zuo
+                //vm.set_mem_mig(node_ids, addr_start, page_size); //Zuo //depend on OP_VM_MEM_SAMPLE
                 vm.set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
     }
 

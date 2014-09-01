@@ -105,6 +105,7 @@ VM::VM(VmId vm_id)
     vm_base_ = VmBase::get_instance();
     vm_cpu_usage_ = VmCpuUsage::get_instance();
     vm_cache_miss_ = VmCacheMiss::get_instance();
+    cpu_mig_ = CpuMig::get_instance();
     vm_id_ = vm_id;
 }
 
@@ -204,6 +205,15 @@ CacheMissData VM::cache_miss() const
 CacheMissData VM::cache_miss(pid_t vmthread_id) const
 {
     return vm_cache_miss_->get_cache_miss(vmthread_id);
+}
+
+//VCPU MIG
+void VM::set_vcpu_mig(pid_t vmthread_id, std::set<HpthreadId> hpthread_ids) const
+{
+    set<int> ids; 
+    for (auto& id : hpthread_ids)
+        ids.insert(id.id);
+    cpu_mig_->set_cpu_mig(vmthread_id, ids);
 }
 
 VM& VM::operator=(const VM &v)

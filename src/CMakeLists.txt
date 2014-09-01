@@ -24,6 +24,7 @@ set (SRC_LIST
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cache_miss.cpp
     sysinfo/vm/dynamic/vm_cache_miss.cpp
+    exec/cpu_mig.cpp
     utils/func_option.cpp
     utils/runnable.cpp
     utils/log.cpp
@@ -31,6 +32,7 @@ set (SRC_LIST
     utils/perf_event.cpp
     framework/host.cpp
     framework/vm.cpp
+    framework/exec.cpp
     framework/compat.cpp
     framework/version.cpp
     vsf.cpp
@@ -54,8 +56,10 @@ add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_vm_vm_cache_miss)
 add_indi_test (test_vm_cache_miss)
+add_indi_test (test_exec_cpu_mig)
 add_indi_test (test_func_option)
 add_indi_test (test_vsf_init_twice)
+add_indi_test (test_vsf_exec_cpu_mig)
 add_indi_test (test_vsf_vm_base)
 add_indi_test (test_vsf_vm_cpu_usage)
 add_indi_test (test_vsf_vm_cache_miss)
