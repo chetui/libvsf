@@ -19,96 +19,142 @@ protected:
     VmBase* vm_base;
 };
 
-TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
+void print_callback(const CacheMissData& data)
 {
-    vm_base->start();
-    set<VmId> vm_ids = vm_base->get_vm_ids();
-    cache_miss->get_sys_cpu_usage();
-    sleep(2);
-    for(auto& vm_id : vm_ids) {
-        cout << vm_id << "'s cpu_usage:" << cache_miss->get_cpu_usage(vm_id) << endl;
-        sleep(1);
-        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
-        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
-        for (auto& v : stable_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v); 
-            sleep(1);
-            cout << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-            sleep(1);
-        }
-        for (auto& v : volatile_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v);
-            sleep(1);
-            cout << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-            sleep(1);
-        }
-    }
-    vm_base->stop();
+    std::cout << "print_callback:" << data << std::endl;
 }
-
-TEST_F(CacheMissTest, cache_miss_without_thread_without_vm_base)
-{
-    set<VmId> vm_ids = vm_base->get_vm_ids();
-    cache_miss->get_sys_cpu_usage();
-    sleep(2);
-    for(auto& vm_id : vm_ids) {
-        cout << vm_id << "'s cpu_usage:" << cache_miss->get_cpu_usage(vm_id) << endl;
-        sleep(1);
-        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
-        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
-        for (auto& v : stable_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v); 
-            sleep(1);
-            cout << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-            sleep(1);
-        }
-        for (auto& v : volatile_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v);
-            sleep(1);
-            cout << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-            sleep(1);
-        }
-    }
-}
-
 
 TEST_F(CacheMissTest, cache_miss_with_thread_with_vm_base)
 {
     vm_base->start();
+    cache_miss->set_loop_interval(2000);
+    cache_miss->set_sample_interval(80000);
+    cache_miss->set_callback(print_callback);
     cache_miss->start();
+
+    shared_timed_mutex& lock(cache_miss->get_data_mutex());
+    lock.lock();
+
     set<VmId> vm_ids = vm_base->get_vm_ids();
-    sleep(2);
-    for(auto& vm_id : vm_ids) {
-        cout << vm_id << "'s cpu_usage:" << cache_miss->get_cpu_usage(vm_id) << endl;
-        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
-        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
-        for (auto& v : stable_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v) << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-        }
-        for (auto& v : volatile_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v) << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-        }
+    set<pid_t> pids;
+    for (auto& vm_id : vm_ids) {
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthread_ids = vm_base->get_volatile_vmthread_ids(vm_id);
+        pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
+        pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
     }
-    cache_miss->stop();
-    vm_base->stop();
+
+    for (auto& pid : pids)
+        cache_miss->start_watching(pid);
+
+    lock.unlock();
+
+    for (auto& pid : pids) {
+            cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
+    }
+
+    cache_miss->stop_until_exit();
+    vm_base->stop_until_exit();
+}
+
+TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
+{
+    vm_base->start();
+    cache_miss->set_loop_interval(2000);
+    cache_miss->set_sample_interval(80000);
+    cache_miss->set_callback(print_callback);
+
+    shared_timed_mutex& lock(cache_miss->get_data_mutex());
+    lock.lock();
+
+    set<VmId> vm_ids = vm_base->get_vm_ids();
+    set<pid_t> pids;
+    for (auto& vm_id : vm_ids) {
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthread_ids = vm_base->get_volatile_vmthread_ids(vm_id);
+        pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
+        pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
+    }
+
+    for (auto& pid : pids)
+        cache_miss->start_watching(pid);
+
+    lock.unlock();
+
+    cache_miss->refresh();
+
+    for (auto& pid : pids) {
+            cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
+    }
+
+    lock.lock();
+    cache_miss->clear();
+    lock.unlock();
+    vm_base->stop_until_exit();
 }
 
 TEST_F(CacheMissTest, cache_miss_with_thread_without_vm_base)
 {
+    cache_miss->set_loop_interval(2000);
+    cache_miss->set_sample_interval(80000);
+    cache_miss->set_callback(print_callback);
     cache_miss->start();
+
+    shared_timed_mutex& lock(cache_miss->get_data_mutex());
+    lock.lock();
+
     set<VmId> vm_ids = vm_base->get_vm_ids();
-    sleep(2);
-    for(auto& vm_id : vm_ids) {
-        cout << vm_id << "'s cpu_usage:" << cache_miss->get_cpu_usage(vm_id) << endl;
-        set<pid_t> stable_vmthreads = vm_base->get_stable_vmthread_ids(vm_id);
-        set<pid_t> volatile_vmthreads = vm_base->get_volatile_vmthread_ids(vm_id);
-        for (auto& v : stable_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v) << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-        }
-        for (auto& v : volatile_vmthreads) {
-            cout << v << ":" << cache_miss->get_cpu_usage(v) << "[ON]" << cache_miss->get_running_on_hpthread(v) << endl;
-        }
+    set<pid_t> pids;
+    for (auto& vm_id : vm_ids) {
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthread_ids = vm_base->get_volatile_vmthread_ids(vm_id);
+        pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
+        pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
     }
-    cache_miss->stop();
+
+    for (auto& pid : pids)
+        cache_miss->start_watching(pid);
+
+    lock.unlock();
+
+    for (auto& pid : pids) {
+            cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
+    }
+
+    cache_miss->stop_until_exit();
+}
+
+TEST_F(CacheMissTest, cache_miss_without_thread_without_vm_base)
+{
+    cache_miss->set_loop_interval(2000);
+    cache_miss->set_sample_interval(80000);
+    cache_miss->set_callback(print_callback);
+
+    shared_timed_mutex& lock(cache_miss->get_data_mutex());
+    lock.lock();
+
+    set<VmId> vm_ids = vm_base->get_vm_ids();
+    set<pid_t> pids;
+    for (auto& vm_id : vm_ids) {
+        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthread_ids = vm_base->get_volatile_vmthread_ids(vm_id);
+        pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
+        pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
+    }
+
+    for (auto& pid : pids)
+        cache_miss->start_watching(pid);
+
+    lock.unlock();
+
+    cache_miss->refresh();
+
+    for (auto& pid : pids) {
+            cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
+    }
+
+    lock.lock();
+    cache_miss->clear();
+    lock.unlock();
 }
 

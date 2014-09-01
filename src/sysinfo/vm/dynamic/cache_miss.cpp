@@ -126,6 +126,7 @@ void CacheMiss::stop_sample()
         auto iter = cache_miss_data_.find(pid);
         if (iter != cache_miss_data_.end()) {
             iter->second.clear_fd();
+            cache_miss_data_.erase(iter);
         } else {
             LDEBUG << "cache miss erase from to_stop_watching_ failed on pid:" << pid << ". not existed";
         }
@@ -141,6 +142,8 @@ void CacheMiss::clear()
         data.second.clear_fd();
     }
     cache_miss_data_.clear();
+    to_start_watching_.clear();
+    to_stop_watching_.clear();
     *callback_func_ = nullptr;
     has_data_ = false;
 }

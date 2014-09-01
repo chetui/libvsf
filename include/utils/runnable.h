@@ -18,6 +18,7 @@ public:
      * MUST stop the thread when called.
      */
     void stop();
+    void stop_until_exit();
     void start(); 
     /**
      * Wait function run() to stop.

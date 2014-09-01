@@ -53,7 +53,18 @@ void Runnable::stop()
         return;
     }
     stop_ = true;
-    if (thread_ != nullptr && thread_->joinable()) {
+    if (joinable()) {
         thread_->detach();
+    } 
+}
+
+void Runnable::stop_until_exit()
+{
+    if (stop_) {
+        return;
+    }
+    stop_ = true;
+    if (joinable()) {
+        thread_->join();
     } 
 }

@@ -45,7 +45,12 @@ int main()
                 { OptionParam::LOOP_INTERVAL, 3000 }
             } 
         },
-        { Option::OP_VM_CACHE_MISS, { } },
+        { Option::OP_VM_CACHE_MISS,
+            {
+                { OptionParam::LOOP_INTERVAL, 2000 },
+                { OptionParam::SAMPLE_INTERVAL, 50000 }
+            }
+        },
         { Option::OP_VM_MEM_SAMPLE, { } },
         { Option::OP_VM_USED_MEM_SIZE { } }
     });
