@@ -27,6 +27,7 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     ./test_vsf_node_cpu
     ./test_vm_vm_base
     ./test_vm_vm_cpu_usage
+    ./test_vm_cpu_usage
     ./test_vm_vm_cache_miss
     ./test_vm_cache_miss
     ./test_exec_cpu_mig

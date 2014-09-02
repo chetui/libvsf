@@ -12,10 +12,10 @@ using namespace std;
 VmCacheMiss::VmCacheMiss():
     loop_interval_ms_(1000)
 {
-    vm_base = VmBase::get_instance();
-    cache_miss = CacheMiss::get_instance();
+    vm_base_ = VmBase::get_instance();
+    cache_miss_ = CacheMiss::get_instance();
 
-    cache_miss->set_callback(cal_vm_miss_rate);
+    cache_miss_->set_callback(cal_vm_miss_rate);
 }
 
 VmCacheMiss::~VmCacheMiss()
@@ -36,17 +36,17 @@ void VmCacheMiss::set_loop_interval(int interval_ms)
 
 void VmCacheMiss::set_sample_interval(int interval_us) 
 {
-    cache_miss->set_sample_interval(interval_us);
+    cache_miss_->set_sample_interval(interval_us);
 }
 
 CacheMissData VmCacheMiss::get_cache_miss(VmId vm_id)
 {
     if (!joinable())
         refresh();
-    while (!(cache_miss->get_has_data()))
+    while (!(cache_miss_->get_has_data()))
         this_thread::sleep_for(chrono::milliseconds(10));
 
-    shared_lock<shared_timed_mutex> lock(cache_miss->get_data_mutex());
+    shared_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
     auto iter = vm_cache_miss_data_.find(vm_id);
     if (iter != vm_cache_miss_data_.end())
         return iter->second;
@@ -59,7 +59,7 @@ CacheMissData VmCacheMiss::get_cache_miss(pid_t vmthread)
     if (!joinable())
         refresh();
 
-    return cache_miss->get_cache_miss_without_refresh(vmthread);
+    return cache_miss_->get_cache_miss_without_refresh(vmthread);
 }
 
 void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
@@ -89,15 +89,15 @@ void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
 
 void VmCacheMiss::refresh()
 {
-    shared_timed_mutex& lock(cache_miss->get_data_mutex());
+    shared_timed_mutex& lock(cache_miss_->get_data_mutex());
     lock.lock();
     vm_cache_miss_data_.clear();
 
-    set<VmId> vm_ids = vm_base->get_vm_ids();
+    set<VmId> vm_ids = vm_base_->get_vm_ids();
     set<pid_t> pids;
     for (auto& vm_id : vm_ids) {
-        set<pid_t> stable_vmthread_ids = vm_base->get_stable_vmthread_ids(vm_id);
-        set<pid_t> volatile_vmthread_ids = vm_base->get_volatile_vmthread_ids(vm_id);
+        set<pid_t> stable_vmthread_ids = vm_base_->get_stable_vmthread_ids(vm_id);
+        set<pid_t> volatile_vmthread_ids = vm_base_->get_volatile_vmthread_ids(vm_id);
         pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
         pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
         for (auto& pid : volatile_vmthread_ids)
@@ -116,24 +116,24 @@ void VmCacheMiss::refresh()
         back_inserter(to_stop));
     last_pids_ = pids;
     for (auto& pid : to_start)
-        cache_miss->start_watching(pid);
+        cache_miss_->start_watching(pid);
     for (auto& pid : to_stop)
-        cache_miss->stop_watching(pid);
+        cache_miss_->stop_watching(pid);
 
     lock.unlock();
 
-    cache_miss->refresh();
+    cache_miss_->refresh();
 }
 
 void VmCacheMiss::clear()
 {
-    unique_lock<shared_timed_mutex> lock(cache_miss->get_data_mutex());
+    unique_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
 
     vm_cache_miss_data_.clear();
     last_pids_.clear();
     volatile_vmthread_id_to_vm_id_.clear();
 
-    cache_miss->clear();
+    cache_miss_->clear();
 }
 
 void VmCacheMiss::run()

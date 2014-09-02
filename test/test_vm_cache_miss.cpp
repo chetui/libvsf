@@ -50,11 +50,11 @@ TEST_F(CacheMissTest, cache_miss_with_thread_with_vm_base)
     lock.unlock();
 
     for (auto& pid : pids) {
-            cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
+        cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
     }
 
-    cache_miss->stop_until_exit();
-    vm_base->stop_until_exit();
+    cache_miss->stop();
+    vm_base->stop();
 }
 
 TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
@@ -84,13 +84,13 @@ TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
     cache_miss->refresh();
 
     for (auto& pid : pids) {
-            cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
+        cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
     }
 
     lock.lock();
     cache_miss->clear();
     lock.unlock();
-    vm_base->stop_until_exit();
+    vm_base->stop();
 }
 
 TEST_F(CacheMissTest, cache_miss_with_thread_without_vm_base)
@@ -118,10 +118,10 @@ TEST_F(CacheMissTest, cache_miss_with_thread_without_vm_base)
     lock.unlock();
 
     for (auto& pid : pids) {
-            cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
+        cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
     }
 
-    cache_miss->stop_until_exit();
+    cache_miss->stop();
 }
 
 TEST_F(CacheMissTest, cache_miss_without_thread_without_vm_base)
@@ -150,7 +150,7 @@ TEST_F(CacheMissTest, cache_miss_without_thread_without_vm_base)
     cache_miss->refresh();
 
     for (auto& pid : pids) {
-            cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
+        cout << pid << ":" << cache_miss->get_cache_miss_without_refresh(pid) << endl;
     }
 
     lock.lock();

@@ -22,6 +22,7 @@ set (SRC_LIST
     sysinfo/host/static/node_dist.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
+    sysinfo/vm/dynamic/cpu_usage.cpp
     sysinfo/vm/dynamic/cache_miss.cpp
     sysinfo/vm/dynamic/vm_cache_miss.cpp
     exec/cpu_mig.cpp
@@ -54,6 +55,7 @@ add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
+add_indi_test (test_vm_cpu_usage)
 add_indi_test (test_vm_vm_cache_miss)
 add_indi_test (test_vm_cache_miss)
 add_indi_test (test_exec_cpu_mig)

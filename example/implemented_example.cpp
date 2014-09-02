@@ -15,6 +15,7 @@ int main()
     //if others functions are called without set corresponding flags, info would be collected immediately.
     framework->init({
         { Option::OP_HS_NODE_CPU, { } },
+        { Option::OP_HS_SYS_NODE_DIST, { } },
         { Option::OP_HS_TEST_NODE_DIST, 
             { 
                 { OptionParam::PATH, "." },
@@ -223,7 +224,7 @@ void myscheduler(Host *host, std::set<VM> &vms)
         for (auto& pid : volatile_pid_set)
             std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
         //OP_VM_CACHE_MISS
-        std::cout << "cpu_usage:" << vm.cache_miss() << std::endl;
+        std::cout << "cache_miss:" << vm.cache_miss() << std::endl;
         for (auto& pid : stable_pid_set)
             std::cout << "cache_miss[" << pid << "]:" << vm.cache_miss(pid) << std::endl;
         for (auto& pid : volatile_pid_set)

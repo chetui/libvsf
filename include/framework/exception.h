@@ -33,6 +33,8 @@ LOGIC_ERROR(FrameworkInitMoreThanTwice, "Framework can not be initialized more t
 LOGIC_ERROR(CompatCheckFailed, "Compatibility checking is failed. ")
 //cpu_mig.h
 LOGIC_ERROR(CpuAllocFailed, "CPU_ALLOC is failed. ")
+//cpu_usage.h
+LOGIC_ERROR(OpenProcFailed, "openproc is failed. ")
 
 
 #endif

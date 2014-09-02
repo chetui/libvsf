@@ -27,8 +27,8 @@ private:
     void run();
     static void cal_vm_miss_rate(const CacheMissData& data);
 
-    VmBase *vm_base;
-    CacheMiss *cache_miss;
+    VmBase *vm_base_;
+    CacheMiss *cache_miss_;
 
     std::map<VmId, CacheMissData> vm_cache_miss_data_;
     std::set<pid_t> last_pids_;
