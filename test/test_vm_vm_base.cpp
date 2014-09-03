@@ -16,6 +16,35 @@ protected:
     VmBase* vm_base;
 };
 
+void print_callback(
+    const VmId& vm_id,
+    const string& name,
+    const string& uuid,
+    const int vsocket_num,
+    const int vcore_num,
+    const int vhpthread_num,
+    const int total_mem_size,
+    const set<pid_t>& vcpu_ids,
+    const set<pid_t>& stable_vmthread_ids
+    )
+{
+    cout << "[vm_base]print_callback:" << vm_id << ":"
+        << name << ":"
+        << uuid << ":"
+        << vsocket_num << ":"
+        << vcore_num << ":"
+        << vhpthread_num << ":"
+        << total_mem_size << ":"
+        << "[";
+    for (auto& id : vcpu_ids)
+        cout << id << ":"; 
+    cout << "]:[";
+    for (auto& id : stable_vmthread_ids)
+        cout << id << ":"; 
+    cout << "]" << endl;
+}
+
+
 //TEST_F(VmBaseTest, set_vm_cmd_without_thread)
 //{
 //    vm_base->set_vm_cmd("sshd");
@@ -32,6 +61,7 @@ protected:
 
 TEST_F(VmBaseTest, vm_ids_with_thread)
 {
+    vm_base->set_callback(print_callback);
     vm_base->set_vm_cmd("qemu-system-x86_64");
     vm_base->start();
     set<VmId> ids = vm_base->get_vm_ids();
@@ -43,6 +73,7 @@ TEST_F(VmBaseTest, vm_ids_with_thread)
 
 TEST_F(VmBaseTest, vm_ids_without_thread_no_p)
 {
+    vm_base->set_callback(nullptr);
     vm_base->set_vm_cmd("qemu-system-x86_64");
     set<VmId> ids = vm_base->get_vm_ids();
     for(auto& id : ids)

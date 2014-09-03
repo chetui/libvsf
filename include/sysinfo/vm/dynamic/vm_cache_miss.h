@@ -15,6 +15,7 @@ public:
 
     void set_loop_interval(int interval_ms);
     void set_sample_interval(int interval_us);
+    void set_callback(cache_miss_callback_t callback_func);
 
     CacheMissData get_cache_miss(VmId vm_id);
     CacheMissData get_cache_miss(pid_t vmthread_id);
@@ -35,6 +36,7 @@ private:
     //only be used by the callback func of CacheMiss
     std::map<pid_t, VmId> volatile_vmthread_id_to_vm_id_;
     std::atomic<int> loop_interval_ms_;
+    std::atomic<cache_miss_callback_t*> callback_func_;
 };
 
 #endif

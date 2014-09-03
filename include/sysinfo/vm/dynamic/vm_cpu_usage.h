@@ -13,6 +13,7 @@ public:
     static VmCpuUsage *get_instance();
 
     void set_interval(int interval_ms);
+    void set_callback(cpu_usage_callback_t callback_func);
 
     int get_sys_cpu_usage();
     int get_cpu_usage(VmId vm_id);
@@ -26,9 +27,11 @@ private:
     void refresh();
     void refresh_twice();
     void clear();
+    static void cpu_usage_callback(int data);
 
     std::set<pid_t> last_pids_;
     std::atomic<int> interval_ms_;
+    std::atomic<cpu_usage_callback_t*> callback_func_;
 
     CpuUsage* cpu_usage_;
     VmBase* vm_base_;

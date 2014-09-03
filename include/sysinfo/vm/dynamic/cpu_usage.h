@@ -12,12 +12,9 @@
 #include <atomic>
 #include "../../../utils/runnable.h"
 
-struct ThreadCpuUsageData;
-
-typedef std::function<void(const ThreadCpuUsageData&)> cpu_usage_callback_t;
+typedef std::function<void(int)> cpu_usage_callback_t;
 
 class CpuUsage : public Runnable {
-    friend class ThreadCpuUsageData;
 public:
     static CpuUsage *get_instance();
 
@@ -46,10 +43,33 @@ public:
     void refresh_twice();
 
 private:
+    class ThreadCpuUsageData {
+    public:
+        ThreadCpuUsageData();
+        /**
+         * Update internal data.
+         */
+        void update(const proc_t* task);
+        /**
+         * Get CPU usage of this task.
+         * @return percentage of CPU usage.
+         */
+        void clear_data();
+
+        bool valid_ = false;
+        unsigned long long proctime_new_ = 0;
+        unsigned long long proctime_old_ = 0;
+        int cpu_usage_ = -1;
+        int processor_ = -1;;
+        pid_t tgid_ = -1;
+    };
+    friend std::ostream &operator<<(std::ostream &os, const ThreadCpuUsageData& data);
+
     CpuUsage();
     ~CpuUsage();
     void run();
     void refresh_system();
+    void refresh_watching();
     void refresh_thread();
     unsigned int get_total_cpu_time_delta() const;
 
@@ -73,29 +93,9 @@ private:
 
     static constexpr const char * SYS_PROC_STAT = "/proc/stat";
     static constexpr const int READ_PROC_FLAG = PROC_FILLSTAT|PROC_PID;
+
 };
 
-struct ThreadCpuUsageData {
-
-    ThreadCpuUsageData();
-    /**
-     * Update internal data.
-     */
-    void update(const proc_t* task);
-    /**
-     * Get CPU usage of this task.
-     * @return percentage of CPU usage.
-     */
-    void clear_data();
-
-    bool valid_ = false;
-    unsigned long long proctime_new_ = 0;
-    unsigned long long proctime_old_ = 0;
-    int cpu_usage_ = -1;
-    int processor_ = -1;;
-    pid_t tgid_ = -1;
-};
-
-std::ostream &operator<<(std::ostream &os, const ThreadCpuUsageData& data);
+std::ostream &operator<<(std::ostream &os, const CpuUsage::ThreadCpuUsageData& data);
 
 #endif

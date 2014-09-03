@@ -19,9 +19,9 @@ protected:
     VmBase* vm_base;
 };
 
-void print_callback(const ThreadCpuUsageData& data)
+void print_callback(int data)
 {
-    std::cout << "print_callback:" << data << std::endl;
+    std::cout << "[cpu_usage]print_callback:" << data << std::endl;
 }
 
 TEST_F(CpuUsageTest, cpu_usage_with_thread_with_vm_base)
@@ -60,7 +60,7 @@ TEST_F(CpuUsageTest, cpu_usage_without_thread_with_vm_base)
 {
     vm_base->start();
     cpu_usage->set_interval(2000);
-    cpu_usage->set_callback(print_callback);
+    cpu_usage->set_callback(nullptr);
 
     shared_timed_mutex& lock(cpu_usage->get_data_mutex());
     lock.lock();
@@ -98,7 +98,6 @@ TEST_F(CpuUsageTest, cpu_usage_without_thread_with_vm_base)
 TEST_F(CpuUsageTest, cpu_usage_with_thread_without_vm_base)
 {
     cpu_usage->set_interval(2000);
-    cpu_usage->set_callback(print_callback);
     cpu_usage->start();
 
     shared_timed_mutex& lock(cpu_usage->get_data_mutex());
@@ -132,7 +131,6 @@ TEST_F(CpuUsageTest, cpu_usage_with_thread_without_vm_base)
 TEST_F(CpuUsageTest, cpu_usage_without_thread_without_vm_base)
 {
     cpu_usage->set_interval(2000);
-    cpu_usage->set_callback(print_callback);
 
     shared_timed_mutex& lock(cpu_usage->get_data_mutex());
     lock.lock();

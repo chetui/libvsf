@@ -13,11 +13,15 @@
 
 struct VmId;
 
+typedef std::function<void(const VmId& vm_id, const std::string name, const std::string uuid, const int vsocket_num, const int vcore_num, const int vhpthread_num, const int total_mem_size, const std::set<pid_t>& vcpu_ids, const std::set<pid_t>& stable_vmthread_ids)> vm_base_callback_t;
+
 class VmBase : public Runnable {
 public:
     static VmBase *get_instance();
     void set_vm_cmd(std::string vm_cmd);
     void set_interval(int interval_ms);
+    void set_callback(vm_base_callback_t callback_func);
+
     std::set<VmId> get_vm_ids();
     std::set<VmId> get_vm_ids(std::string vm_cmd);
     std::string get_name(VmId vm_id);
@@ -64,6 +68,7 @@ private:
     std::string vm_cmd_ = "qemu-system-x86_64";
     std::atomic<bool> has_data_;
     std::atomic<int> interval_ms_;
+    std::atomic<vm_base_callback_t*> callback_func_;
 
     static constexpr const int BUF_SIZE = 102400;
     static constexpr const char * VCPU_DIR = "/sys/fs/cgroup/cpu/libvirt/qemu/";

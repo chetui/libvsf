@@ -12,6 +12,9 @@ using namespace std;
 VmCacheMiss::VmCacheMiss():
     loop_interval_ms_(1000)
 {
+    callback_func_ = new cache_miss_callback_t;
+    *callback_func_ = nullptr;
+
     vm_base_ = VmBase::get_instance();
     cache_miss_ = CacheMiss::get_instance();
 
@@ -21,6 +24,7 @@ VmCacheMiss::VmCacheMiss():
 VmCacheMiss::~VmCacheMiss()
 {
     stop();
+    delete callback_func_;
 }
 
 VmCacheMiss* VmCacheMiss::get_instance()
@@ -39,10 +43,17 @@ void VmCacheMiss::set_sample_interval(int interval_us)
     cache_miss_->set_sample_interval(interval_us);
 }
 
+void VmCacheMiss::set_callback(cache_miss_callback_t callback_func) 
+{
+    *callback_func_ = callback_func;
+}
+
 CacheMissData VmCacheMiss::get_cache_miss(VmId vm_id)
 {
     if (!joinable())
+    {
         refresh();
+    }
     while (!(cache_miss_->get_has_data()))
         this_thread::sleep_for(chrono::milliseconds(10));
 
@@ -64,9 +75,10 @@ CacheMissData VmCacheMiss::get_cache_miss(pid_t vmthread_id)
 
 void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
 {
+    VmCacheMiss* vm_cache_miss = VmCacheMiss::get_instance(); 
     VmId vm_id = VmBase::get_instance()->stable_vmthread_id_to_vm_id(data.tid);
     if (vm_id.start_timestamp == 0) { //not found
-        vm_id = VmCacheMiss::get_instance()->volatile_vmthread_id_to_vm_id_[data.tid];
+        vm_id = vm_cache_miss->volatile_vmthread_id_to_vm_id_[data.tid];
         if (vm_id.start_timestamp == 0) {//not found again
             LDEBUG << "not found vm_id of CacheMissData::tid " << data.tid;
             return;
@@ -78,6 +90,11 @@ void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
     cache_miss_data.instructions.count += data.instructions.count;
     cache_miss_data.cache_references.count += data.cache_references.count;
     cache_miss_data.update_miss_rate();
+
+    if (*(vm_cache_miss->callback_func_)) {
+        (*(vm_cache_miss->callback_func_))(data);
+    }
+
 //    LDEBUG << "callback:" 
 //        << vm_id << ":"
 //        << data.tid << ":"
@@ -129,11 +146,11 @@ void VmCacheMiss::clear()
 {
     unique_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
 
+    cache_miss_->clear();
+
     vm_cache_miss_data_.clear();
     last_tids_.clear();
     volatile_vmthread_id_to_vm_id_.clear();
-
-    cache_miss_->clear();
 }
 
 void VmCacheMiss::run()

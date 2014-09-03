@@ -62,7 +62,7 @@ TEST_F(CacheMissTest, cache_miss_without_thread_with_vm_base)
     vm_base->start();
     cache_miss->set_loop_interval(2000);
     cache_miss->set_sample_interval(80000);
-    cache_miss->set_callback(print_callback);
+    cache_miss->set_callback(nullptr);
 
     shared_timed_mutex& lock(cache_miss->get_data_mutex());
     lock.lock();
@@ -97,7 +97,6 @@ TEST_F(CacheMissTest, cache_miss_with_thread_without_vm_base)
 {
     cache_miss->set_loop_interval(2000);
     cache_miss->set_sample_interval(80000);
-    cache_miss->set_callback(print_callback);
     cache_miss->start();
 
     shared_timed_mutex& lock(cache_miss->get_data_mutex());
@@ -128,7 +127,6 @@ TEST_F(CacheMissTest, cache_miss_without_thread_without_vm_base)
 {
     cache_miss->set_loop_interval(2000);
     cache_miss->set_sample_interval(80000);
-    cache_miss->set_callback(print_callback);
 
     shared_timed_mutex& lock(cache_miss->get_data_mutex());
     lock.lock();

@@ -3,6 +3,7 @@
 #include <set>
 #include "gtest/gtest.h"
 
+#include "utils/log.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
 #include "sysinfo/vm/dynamic/vm_cache_miss.h"
 
@@ -19,9 +20,15 @@ protected:
     VmBase* vm_base;
 };
 
+void print_callback(const CacheMissData& data)
+{
+    cout << "[vm_cache_miss]print_callback:" << data << endl;
+}
+
 TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base)
 {
     vm_base->start();
+    vm_cache_miss->set_callback(print_callback);
     vm_cache_miss->start();
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
@@ -42,6 +49,7 @@ TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base)
 TEST_F(VmCacheMissTest, vm_cache_miss_without_thread_with_vm_base)
 {
     vm_base->start();
+    vm_cache_miss->set_callback(nullptr);
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
         cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;

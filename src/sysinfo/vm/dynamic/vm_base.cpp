@@ -15,12 +15,15 @@ using namespace std;
 VmBase::VmBase(): has_data_(false), interval_ms_(5000)
 {
     buf_ = new char[BUF_SIZE];
+    callback_func_ = new vm_base_callback_t;
+    *callback_func_ = nullptr;
 }
 
 VmBase::~VmBase()
 {
-    delete[] buf_;
     stop();
+    delete[] buf_;
+    delete callback_func_;
 }
 
 VmBase *VmBase::get_instance()
@@ -50,6 +53,11 @@ void VmBase::set_vm_cmd(std::string vm_cmd)
 void VmBase::set_interval(int interval_ms) 
 {
     interval_ms_ = interval_ms;
+}
+
+void VmBase::set_callback(vm_base_callback_t callback_func) 
+{
+    *callback_func_ = callback_func;
 }
 
 std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
@@ -161,6 +169,22 @@ void VmBase::refresh()
 
     refresh_most();
     refresh_vcpu_stable_vmthread();
+
+    for (auto& vm_id : vm_ids_) {
+        if (*callback_func_) {
+            (*callback_func_)(
+                vm_id,
+                name_[vm_id],
+                uuid_[vm_id],
+                vsocket_num_[vm_id],
+                vcore_num_[vm_id],
+                vhpthread_num_[vm_id],
+                total_mem_size_[vm_id],
+                vcpu_ids_[vm_id],
+                stable_vmthread_ids_[vm_id]
+                );
+        }
+    }
 
 //    LDEBUG << "DDD----" << endl;
 //    for (auto& vm_id : vm_ids_) {

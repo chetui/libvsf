@@ -145,7 +145,6 @@ void CacheMiss::clear()
     cache_miss_data_.clear();
     to_start_watching_.clear();
     to_stop_watching_.clear();
-    *callback_func_ = nullptr;
     has_data_ = false;
 }
 

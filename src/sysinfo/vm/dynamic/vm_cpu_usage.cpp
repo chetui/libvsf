@@ -9,13 +9,19 @@ using namespace std;
 
 VmCpuUsage::VmCpuUsage(): interval_ms_(1000)
 {
+    callback_func_ = new cpu_usage_callback_t;
+    *callback_func_ = nullptr;
+
     cpu_usage_ = CpuUsage::get_instance();
     vm_base_ = VmBase::get_instance();
+
+    cpu_usage_->set_callback(cpu_usage_callback);
 }
 
 VmCpuUsage::~VmCpuUsage()
 {
     stop();
+    delete callback_func_;
 }
 
 VmCpuUsage *VmCpuUsage::get_instance()
@@ -27,6 +33,11 @@ VmCpuUsage *VmCpuUsage::get_instance()
 void VmCpuUsage::set_interval(int interval_ms) 
 {
     interval_ms_ = interval_ms;
+}
+
+void VmCpuUsage::set_callback(cpu_usage_callback_t callback_func) 
+{
+    *callback_func_ = callback_func;
 }
 
 int VmCpuUsage::get_sys_cpu_usage()
@@ -51,6 +62,14 @@ HpthreadId VmCpuUsage::get_running_on_hpthread(pid_t vmthread_id)
 {
     refresh_twice();
     return HpthreadId(cpu_usage_->get_thread_running_on_cpu_without_refresh(vmthread_id));
+}
+
+void VmCpuUsage::cpu_usage_callback(int data)
+{
+    VmCpuUsage* vm_cpu_usage = VmCpuUsage::get_instance();
+    if (*(vm_cpu_usage->callback_func_)) {
+        (*(vm_cpu_usage->callback_func_))(data);
+    }
 }
 
 void VmCpuUsage::refresh_twice()
@@ -97,8 +116,8 @@ void VmCpuUsage::refresh()
 void VmCpuUsage::clear()
 {
     unique_lock<shared_timed_mutex> lock(cpu_usage_->get_data_mutex());
-    last_pids_.clear();
     cpu_usage_->clear();
+    last_pids_.clear();
 }
 
 void VmCpuUsage::run()

@@ -161,7 +161,6 @@ void CpuUsage::clear()
     idle_time_old = 0;
     idle_time_new = 0;
     idle_time_delta = 0;
-    *callback_func_ = nullptr;
     has_data_cnt_ = 0;
 }
 
@@ -170,6 +169,7 @@ void CpuUsage::refresh()
     unique_lock<shared_timed_mutex> lock(data_mutex_);
 
     refresh_system();
+    refresh_watching();
     refresh_thread();
 
 //    LDEBUG << "DDD----" << endl;
@@ -208,7 +208,7 @@ void CpuUsage::refresh_system()
     fclose(fp);
 }
 
-void CpuUsage::refresh_thread()
+void CpuUsage::refresh_watching()
 {
     for (auto pid : to_start_watching_) {
         auto ret = process_cpu_usage_data_.insert({pid, {} });
@@ -227,7 +227,10 @@ void CpuUsage::refresh_thread()
         }
     }
     to_stop_watching_.clear();
+}
 
+void CpuUsage::refresh_thread()
+{
     pid_t* pids = new pid_t[process_cpu_usage_data_.size() + 1];
     int idx = 0;
     for (auto& data : process_cpu_usage_data_) {
@@ -275,7 +278,7 @@ void CpuUsage::refresh_thread()
 
     for (const auto& data : thread_cpu_usage_data_) {
         if (*callback_func_) {
-            (*callback_func_)(data.second);
+            (*callback_func_)(data.second.cpu_usage_);
         }
     }
 
@@ -294,11 +297,11 @@ void CpuUsage::run()
     clear();
 }
 
-ThreadCpuUsageData::ThreadCpuUsageData()
+CpuUsage::ThreadCpuUsageData::ThreadCpuUsageData()
 {
 }
 
-void ThreadCpuUsageData::update(const proc_t* task)
+void CpuUsage::ThreadCpuUsageData::update(const proc_t* task)
 {
     processor_ = task->processor;
     tgid_ = task->tgid;
@@ -325,7 +328,7 @@ void ThreadCpuUsageData::update(const proc_t* task)
 
 }
 
-void ThreadCpuUsageData::clear_data()
+void CpuUsage::ThreadCpuUsageData::clear_data()
 {
     proctime_new_ = 0;
     proctime_old_ = 0;
@@ -334,7 +337,7 @@ void ThreadCpuUsageData::clear_data()
     tgid_ = -1;
 }
 
-std::ostream &operator<<(std::ostream &os, const ThreadCpuUsageData& data)
+std::ostream &operator<<(std::ostream &os, const CpuUsage::ThreadCpuUsageData& data)
 {
     os << "[" 
         << data.valid_ << ":" 

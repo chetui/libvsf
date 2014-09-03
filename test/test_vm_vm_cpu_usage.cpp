@@ -19,6 +19,11 @@ protected:
     VmBase* vm_base;
 };
 
+void print_callback(int data)
+{
+    cout << "[vm_cpu_usage]print_callback:" << data << endl;
+}
+
 TEST_F(VmCpuUsageTest, sys_cpu_usage_without_thread)
 {
     cout << "system_cpu_usage:" << vm_cpu_usage->get_sys_cpu_usage() << endl;
@@ -33,6 +38,7 @@ TEST_F(VmCpuUsageTest, sys_cpu_usage_with_thread)
 
 TEST_F(VmCpuUsageTest, vm_cpu_usage_without_thread_with_vm_base)
 {
+    vm_cpu_usage->set_callback(print_callback);
     vm_base->start();
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
@@ -53,6 +59,7 @@ TEST_F(VmCpuUsageTest, vm_cpu_usage_without_thread_with_vm_base)
 
 TEST_F(VmCpuUsageTest, vm_cpu_usage_without_thread_without_vm_base)
 {
+    vm_cpu_usage->set_callback(nullptr);
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
         cout << vm_id << "'s cpu_usage:" << vm_cpu_usage->get_cpu_usage(vm_id) << endl;
