@@ -23,13 +23,13 @@ public:
     std::shared_timed_mutex& get_data_mutex();
     std::atomic<bool>& get_has_data();
 
-    CacheMissData get_cache_miss(pid_t pid);
-    CacheMissData get_cache_miss_without_refresh(pid_t pid);
+    CacheMissData get_cache_miss(pid_t tid);
+    CacheMissData get_cache_miss_without_refresh(pid_t tid);
 
     //not mutex protected. need get_data_mutex() to protect
-    void start_watching(pid_t pid);
+    void start_watching(pid_t tid);
     //not mutex protected. need get_data_mutex() to protect
-    void stop_watching(pid_t pid);
+    void stop_watching(pid_t tid);
     //not mutex protected. need get_data_mutex() to protect
     void clear();
     void refresh();
@@ -57,12 +57,12 @@ class CacheMissData {
     friend class CacheMiss;
 public:
     CacheMissData();
-    CacheMissData(pid_t pid);
+    CacheMissData(pid_t tid);
     CacheMissData(const CacheMissData& c);
     CacheMissData& operator=(const CacheMissData& c);
     void update_miss_rate();
 
-    pid_t pid = -1;
+    pid_t tid = -1;
     /**
      * Miss per thousand cycles
      */
@@ -92,8 +92,8 @@ public:
         PerfData(unsigned long long c);
         PerfData(const PerfData& pd);
         PerfData& operator=(const PerfData& pd);
-        bool open_fd(pid_t pid);
-        bool open_fd(pid_t pid, int fd_dep);
+        bool open_fd(pid_t tid);
+        bool open_fd(pid_t tid, int fd_dep);
         bool first_read();
         bool second_read();
         void clear_data();

@@ -50,58 +50,69 @@ std::atomic<bool>& CacheMiss::get_has_data()
     return has_data_;
 }
 
-CacheMissData CacheMiss::get_cache_miss_without_refresh(pid_t pid)
+CacheMissData CacheMiss::get_cache_miss_without_refresh(pid_t tid)
 {
     while(!has_data_) 
         this_thread::sleep_for(chrono::milliseconds(10));
 
     shared_lock<shared_timed_mutex> lock(data_mutex_);
-    auto iter = cache_miss_data_.find(pid);
+    auto iter = cache_miss_data_.find(tid);
     if (iter != cache_miss_data_.end())
         return iter->second;
     else
-        return {pid};
+        return {tid};
 }
 
-CacheMissData CacheMiss::get_cache_miss(pid_t pid)
+CacheMissData CacheMiss::get_cache_miss(pid_t tid)
 {
     if(!joinable())
         refresh();
 
-    return get_cache_miss_without_refresh(pid);
+    return get_cache_miss_without_refresh(tid);
 }
 
-void CacheMiss::start_watching(pid_t pid) 
+void CacheMiss::start_watching(pid_t tid) 
 {
-    to_start_watching_.push_back(pid);
+    to_start_watching_.push_back(tid);
 }
 
-void CacheMiss::stop_watching(pid_t pid) 
+void CacheMiss::stop_watching(pid_t tid) 
 {
-    to_stop_watching_.push_back(pid);
+    to_stop_watching_.push_back(tid);
 }
 
 void CacheMiss::start_sample()
 {
     unique_lock<shared_timed_mutex> lock(data_mutex_);
 
-    for (auto pid : to_start_watching_) {
-        auto ret = cache_miss_data_.emplace(pid, pid);
+    for (auto tid : to_start_watching_) {
+        auto ret = cache_miss_data_.emplace(tid, tid);
         if (ret.second) { //insert successfully
-            if (!cache_miss_data_[pid].open_fd()) { //open_fd failed
+            if (!cache_miss_data_[tid].open_fd()) { //open_fd failed
                 cache_miss_data_.erase(ret.first);
-                LDEBUG << "cache miss to_start_watching_ failed on pid:" << pid << ". open_fd failed.";
+                LDEBUG << "cache miss to_start_watching_ failed on tid:" << tid << ". open_fd failed.";
             }
         } else {
-            LDEBUG << "cache miss insert to to_start_watching_ failed on pid:" << pid << ". already existed.";
+            LDEBUG << "cache miss insert to to_start_watching_ failed on tid:" << tid << ". already existed.";
         }
     }
     to_start_watching_.clear();
 
+    for (auto tid : to_stop_watching_) {
+        auto iter = cache_miss_data_.find(tid);
+        if (iter != cache_miss_data_.end()) {
+            iter->second.clear_fd();
+            cache_miss_data_.erase(iter);
+        } else {
+            LDEBUG << "cache miss erase from to_stop_watching_ failed on tid:" << tid << ". not existed";
+        }
+    }
+    to_stop_watching_.clear();
+
     for (auto& data : cache_miss_data_) {
         if (!data.second.first_read()) {
             to_stop_watching_.push_back(data.first);
-            LDEBUG << "pid:" << data.first << " first_read() failed";
+            LDEBUG << "tid:" << data.first << " first_read() failed";
         }
     }
 
@@ -114,7 +125,7 @@ void CacheMiss::stop_sample()
     for (auto& data : cache_miss_data_) {
         if (!data.second.second_read()) {
             to_stop_watching_.push_back(data.first);
-            LDEBUG << "pid:" << data.first << " second_read() failed";
+            LDEBUG << "tid:" << data.first << " second_read() failed";
         }
     }
     for (const auto& data : cache_miss_data_) {
@@ -122,16 +133,6 @@ void CacheMiss::stop_sample()
             (*callback_func_)(data.second);
         }
     }
-    for (auto pid : to_stop_watching_) {
-        auto iter = cache_miss_data_.find(pid);
-        if (iter != cache_miss_data_.end()) {
-            iter->second.clear_fd();
-            cache_miss_data_.erase(iter);
-        } else {
-            LDEBUG << "cache miss erase from to_stop_watching_ failed on pid:" << pid << ". not existed";
-        }
-    }
-    to_stop_watching_.clear();
 
     return;
 }
@@ -177,8 +178,8 @@ CacheMissData::CacheMissData():
 {
 }
 
-CacheMissData::CacheMissData(pid_t pid):
-    pid(pid),
+CacheMissData::CacheMissData(pid_t tid):
+    tid(tid),
     cache_misses(PERF_COUNT_HW_CACHE_MISSES),
     cpu_cycles(PERF_COUNT_HW_CPU_CYCLES),
     instructions(PERF_COUNT_HW_INSTRUCTIONS),
@@ -187,7 +188,7 @@ CacheMissData::CacheMissData(pid_t pid):
 }
 
 CacheMissData::CacheMissData(const CacheMissData& c):
-    pid(c.pid),
+    tid(c.tid),
     cache_misses(PERF_COUNT_HW_CACHE_MISSES),
     cpu_cycles(PERF_COUNT_HW_CPU_CYCLES),
     instructions(PERF_COUNT_HW_INSTRUCTIONS),
@@ -206,7 +207,7 @@ CacheMissData::CacheMissData(const CacheMissData& c):
 
 CacheMissData& CacheMissData::operator=(const CacheMissData& c)
 {
-    pid = c.pid;
+    tid = c.tid;
     mptc = c.mptc;
     mpti = c.mpti;
     mptr = c.mptr;
@@ -221,20 +222,20 @@ CacheMissData& CacheMissData::operator=(const CacheMissData& c)
 
 bool CacheMissData::open_fd()
 {
-    if (!cache_misses.open_fd(pid))
+    if (!cache_misses.open_fd(tid))
         return false;
-    if (!cpu_cycles.open_fd(pid, cache_misses.fd_)) {
+    if (!cpu_cycles.open_fd(tid, cache_misses.fd_)) {
         clear_data();
         cache_misses.clear_fd();
         return false;
     }
-    if (!instructions.open_fd(pid, cache_misses.fd_)) {
+    if (!instructions.open_fd(tid, cache_misses.fd_)) {
         clear_data();
         cache_misses.clear_fd();
         cpu_cycles.clear_fd();
         return false;
     }
-    if (!cache_references.open_fd(pid, cache_misses.fd_)) {
+    if (!cache_references.open_fd(tid, cache_misses.fd_)) {
         clear_data();
         cache_misses.clear_fd();
         cpu_cycles.clear_fd();
@@ -338,9 +339,9 @@ CacheMissData::PerfData& CacheMissData::PerfData::operator=(const PerfData& pd)
     return *this;
 }
 
-bool CacheMissData::PerfData::open_fd(pid_t pid)
+bool CacheMissData::PerfData::open_fd(pid_t tid)
 {
-    fd_ = perf_event::perf_event_open(&attr_, pid, -1, -1, 0);
+    fd_ = perf_event::perf_event_open(&attr_, tid, -1, -1, 0);
     if (fd_ < 0)
         return false;
     ioctl(fd_, PERF_EVENT_IOC_RESET, 0);
@@ -348,9 +349,9 @@ bool CacheMissData::PerfData::open_fd(pid_t pid)
     return true;
 }
 
-bool CacheMissData::PerfData::open_fd(pid_t pid, int fd_dep)
+bool CacheMissData::PerfData::open_fd(pid_t tid, int fd_dep)
 {
-    fd_ = perf_event::perf_event_open(&attr_, pid, -1, fd_dep, 0);
+    fd_ = perf_event::perf_event_open(&attr_, tid, -1, fd_dep, 0);
     if (fd_ < 0)
         return false;
     ioctl(fd_, PERF_EVENT_IOC_RESET, 0);

@@ -17,7 +17,7 @@ public:
     void set_sample_interval(int interval_us);
 
     CacheMissData get_cache_miss(VmId vm_id);
-    CacheMissData get_cache_miss(pid_t vmthread);
+    CacheMissData get_cache_miss(pid_t vmthread_id);
 
 private:
     VmCacheMiss();
@@ -31,7 +31,7 @@ private:
     CacheMiss *cache_miss_;
 
     std::map<VmId, CacheMissData> vm_cache_miss_data_;
-    std::set<pid_t> last_pids_;
+    std::set<pid_t> last_tids_;
     //only be used by the callback func of CacheMiss
     std::map<pid_t, VmId> volatile_vmthread_id_to_vm_id_;
     std::atomic<int> loop_interval_ms_;

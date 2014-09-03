@@ -54,21 +54,21 @@ CacheMissData VmCacheMiss::get_cache_miss(VmId vm_id)
         return {vm_id.pid};
 }
 
-CacheMissData VmCacheMiss::get_cache_miss(pid_t vmthread)
+CacheMissData VmCacheMiss::get_cache_miss(pid_t vmthread_id)
 {
     if (!joinable())
         refresh();
 
-    return cache_miss_->get_cache_miss_without_refresh(vmthread);
+    return cache_miss_->get_cache_miss_without_refresh(vmthread_id);
 }
 
 void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
 {
-    VmId vm_id = VmBase::get_instance()->stable_vmthread_id_to_vm_id(data.pid);
+    VmId vm_id = VmBase::get_instance()->stable_vmthread_id_to_vm_id(data.tid);
     if (vm_id.start_timestamp == 0) { //not found
-        vm_id = VmCacheMiss::get_instance()->volatile_vmthread_id_to_vm_id_[data.pid];
+        vm_id = VmCacheMiss::get_instance()->volatile_vmthread_id_to_vm_id_[data.tid];
         if (vm_id.start_timestamp == 0) {//not found again
-            LDEBUG << "not found vm_id of CacheMissData::pid " << data.pid;
+            LDEBUG << "not found vm_id of CacheMissData::tid " << data.tid;
             return;
         }
     }
@@ -80,7 +80,7 @@ void VmCacheMiss::cal_vm_miss_rate(const CacheMissData& data)
     cache_miss_data.update_miss_rate();
 //    LDEBUG << "callback:" 
 //        << vm_id << ":"
-//        << data.pid << ":"
+//        << data.tid << ":"
 //        << data.cache_misses.count << ":"
 //        << data.cpu_cycles.count << ":"
 //        << data.instructions.count << ":"
@@ -94,31 +94,31 @@ void VmCacheMiss::refresh()
     vm_cache_miss_data_.clear();
 
     set<VmId> vm_ids = vm_base_->get_vm_ids();
-    set<pid_t> pids;
+    set<pid_t> tids;
     for (auto& vm_id : vm_ids) {
         set<pid_t> stable_vmthread_ids = vm_base_->get_stable_vmthread_ids(vm_id);
         set<pid_t> volatile_vmthread_ids = vm_base_->get_volatile_vmthread_ids(vm_id);
-        pids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
-        pids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
-        for (auto& pid : volatile_vmthread_ids)
-            volatile_vmthread_id_to_vm_id_[pid] = vm_id;
+        tids.insert(stable_vmthread_ids.begin(), stable_vmthread_ids.end());
+        tids.insert(volatile_vmthread_ids.begin(), volatile_vmthread_ids.end());
+        for (auto& tid : volatile_vmthread_ids)
+            volatile_vmthread_id_to_vm_id_[tid] = vm_id;
     }
 
     vector<pid_t> to_start;
     vector<pid_t> to_stop;
     set_difference(
-        pids.begin(), pids.end(),
-        last_pids_.begin(), last_pids_.end(),
+        tids.begin(), tids.end(),
+        last_tids_.begin(), last_tids_.end(),
         back_inserter(to_start));
     set_difference(
-        last_pids_.begin(), last_pids_.end(),
-        pids.begin(), pids.end(),
+        last_tids_.begin(), last_tids_.end(),
+        tids.begin(), tids.end(),
         back_inserter(to_stop));
-    last_pids_ = pids;
-    for (auto& pid : to_start)
-        cache_miss_->start_watching(pid);
-    for (auto& pid : to_stop)
-        cache_miss_->stop_watching(pid);
+    last_tids_ = tids;
+    for (auto& tid : to_start)
+        cache_miss_->start_watching(tid);
+    for (auto& tid : to_stop)
+        cache_miss_->stop_watching(tid);
 
     lock.unlock();
 
@@ -130,7 +130,7 @@ void VmCacheMiss::clear()
     unique_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
 
     vm_cache_miss_data_.clear();
-    last_pids_.clear();
+    last_tids_.clear();
     volatile_vmthread_id_to_vm_id_.clear();
 
     cache_miss_->clear();
