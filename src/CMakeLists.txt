@@ -47,10 +47,11 @@ set (SRC_LIST
 #target_link_libraries (test_all gtest gtest_main) # link library: libxxx.a
 
 # build individual tests ------------------------
-    macro (add_indi_test test_name)
-        add_executable (${test_name} ${TEST_DIR}/${test_name}.cpp ${SRC_LIST})
-        target_link_libraries (${test_name} gtest gtest_main proc)
-    endmacro ()
+macro (add_indi_test test_name)
+    add_executable (${test_name} ${TEST_DIR}/${test_name}.cpp ${SRC_LIST})
+    target_link_libraries (${test_name} gtest gtest_main proc)
+endmacro ()
+
 add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_dist)
 add_indi_test (test_vm_vm_base)

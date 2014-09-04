@@ -27,7 +27,7 @@ private:
     void refresh();
     void refresh_twice();
     void clear();
-    static void cpu_usage_callback(int data);
+    static void cpu_usage_callback(pid_t pid, pid_t tid, int cpu_usage);
 
     std::set<pid_t> last_pids_;
     std::atomic<int> interval_ms_;

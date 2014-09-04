@@ -19,9 +19,9 @@ protected:
     VmBase* vm_base;
 };
 
-void print_callback(int data)
+void print_callback(pid_t pid, pid_t tid, int cpu_usage)
 {
-    std::cout << "[cpu_usage]print_callback:" << data << std::endl;
+    std::cout << "[vm_cpu_usage]print_callback:" << pid << ":" << tid << ":" << cpu_usage << std::endl;
 }
 
 TEST_F(CpuUsageTest, cpu_usage_with_thread_with_vm_base)

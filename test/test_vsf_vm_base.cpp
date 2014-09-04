@@ -13,7 +13,36 @@ protected:
     }
 
     Vsf* vsf;
+    set<void*> ff;
 };
+
+void print_callback(
+    const VmId& vm_id,
+    const string& name,
+    const string& uuid,
+    const int vsocket_num,
+    const int vcore_num,
+    const int vhpthread_num,
+    const int total_mem_size,
+    const set<pid_t>& vcpu_ids,
+    const set<pid_t>& stable_vmthread_ids
+    )
+{
+    cout << "[vm_base]print_callback:" << vm_id << ":"
+        << name << ":"
+        << uuid << ":"
+        << vsocket_num << ":"
+        << vcore_num << ":"
+        << vhpthread_num << ":"
+        << total_mem_size << ":"
+        << "[";
+    for (auto& id : vcpu_ids)
+        cout << id << ":"; 
+    cout << "]:[";
+    for (auto& id : stable_vmthread_ids)
+        cout << id << ":"; 
+    cout << "]" << endl;
+}
 
 TEST_F(VsfTest, vm_base)
 {
@@ -21,7 +50,8 @@ TEST_F(VsfTest, vm_base)
         { Option::OP_VM_BASE,
             {
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::LOOP_INTERVAL, 2000 }
+                { OptionParam::LOOP_INTERVAL, 2000 },
+                { OptionParam::CALLBACK, VmBaseCallback(print_callback) }
             }
         }
     });

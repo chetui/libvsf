@@ -35,7 +35,12 @@ enum class OptionParam : unsigned int {
     LOOP,
     VM_CMD,
     LOOP_INTERVAL,
-    SAMPLE_INTERVAL
+    SAMPLE_INTERVAL,
+    CALLBACK
 };
+
+#define VmBaseCallback(x) (void*)(new vm_base_callback_t(x))
+#define VmCpuUsageCallback(x) (void*)(new cpu_usage_callback_t(x))
+#define VmCacheMissCallback(x) (void*)(new cache_miss_callback_t(x))
 
 #endif

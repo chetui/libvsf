@@ -88,6 +88,10 @@ OptionParamVal::OptionParamVal(const double d): type(DBL), dval(d)
 { 
 }
 
+OptionParamVal::OptionParamVal(void *const p): type(PTR), pval(p) 
+{ 
+}
+
 OptionParamVal::~OptionParamVal()
 {
     if (type == STR)
@@ -161,6 +165,16 @@ OptionParamVal& OptionParamVal::operator=(const double d)
     return *this;
 }
 
+OptionParamVal& OptionParamVal::operator=(void *const p)
+{
+    if (type == STR)
+        sval.~string();
+    pval = p;
+    type = PTR;
+
+    return *this;
+}
+
 std::string OptionParamVal::get_string()
 {
     if (type == STR)
@@ -193,6 +207,14 @@ double OptionParamVal::get_double()
         return 0.0;
 }
 
+void* OptionParamVal::get_pointer()
+{
+    if (type == PTR)
+        return pval;
+    else
+        return nullptr;
+}
+
 void OptionParamVal::copy_union(const OptionParamVal &o)
 {
     switch (o.type) {
@@ -200,6 +222,7 @@ void OptionParamVal::copy_union(const OptionParamVal &o)
     case CHAR: cval = o.cval; break;
     case INT: ival = o.ival; break;
     case DBL: dval = o.dval; break;
+    case PTR: pval = o.pval; break;
     }
 
     return;

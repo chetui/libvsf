@@ -20,7 +20,7 @@ public:
     static VmBase *get_instance();
     void set_vm_cmd(std::string vm_cmd);
     void set_interval(int interval_ms);
-    void set_callback(vm_base_callback_t callback_func);
+    void set_callback(const vm_base_callback_t& callback_func);
 
     std::set<VmId> get_vm_ids();
     std::set<VmId> get_vm_ids(std::string vm_cmd);

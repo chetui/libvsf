@@ -16,6 +16,11 @@ protected:
     Vsf* vsf;
 };
 
+void print_callback(const CacheMissData& data)
+{
+    cout << "[vm_cache_miss]print_callback:" << data << endl;
+}
+
 TEST_F(VsfTest, vm_cache_miss)
 {
     vsf->init({ 
@@ -23,6 +28,7 @@ TEST_F(VsfTest, vm_cache_miss)
             {
                 { OptionParam::LOOP_INTERVAL, 1000 },
                 { OptionParam::SAMPLE_INTERVAL, 50000 },
+                { OptionParam::CALLBACK, VmCacheMissCallback(print_callback) }
             }
         }
     });

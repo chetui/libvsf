@@ -35,20 +35,23 @@ int main()
         { Option::OP_VM_BASE,  //DONE
             { 
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::LOOP_INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 },
+                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
             } 
         },
         { Option::OP_VM_CPU_BINDINFO, { } },
         { Option::OP_VM_MEM_BINDINFO, { } },
         { Option::OP_VM_CPU_USAGE, //DONE
             { 
-                { OptionParam::LOOP_INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 },
+                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
             } 
         },
         { Option::OP_VM_CACHE_MISS, //DONE
             {
                 { OptionParam::LOOP_INTERVAL, 2000 },
-                { OptionParam::SAMPLE_INTERVAL, 50000 }
+                { OptionParam::SAMPLE_INTERVAL, 50000 },
+                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
             }
         },
         //{ Option::OP_VM_MEM_SAMPLE, { } },

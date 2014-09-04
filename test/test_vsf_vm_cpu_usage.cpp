@@ -16,12 +16,18 @@ protected:
     Vsf* vsf;
 };
 
+void print_callback(pid_t pid, pid_t tid, int cpu_usage)
+{
+    std::cout << "[vm_cpu_usage]print_callback:" << pid << ":" << tid << ":" << cpu_usage << std::endl;
+}
+
 TEST_F(VsfTest, vm_cpu_usage)
 {
     vsf->init({ 
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::LOOP_INTERVAL, 1000 }
+                { OptionParam::LOOP_INTERVAL, 1000 },
+                { OptionParam::CALLBACK, VmCpuUsageCallback(print_callback) }
             }
         }
     });

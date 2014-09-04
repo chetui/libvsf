@@ -55,7 +55,7 @@ void VmBase::set_interval(int interval_ms)
     interval_ms_ = interval_ms;
 }
 
-void VmBase::set_callback(vm_base_callback_t callback_func) 
+void VmBase::set_callback(const vm_base_callback_t& callback_func) 
 {
     *callback_func_ = callback_func;
 }

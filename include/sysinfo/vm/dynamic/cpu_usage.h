@@ -12,7 +12,7 @@
 #include <atomic>
 #include "../../../utils/runnable.h"
 
-typedef std::function<void(int)> cpu_usage_callback_t;
+typedef std::function<void(pid_t pid, pid_t tid, int)> cpu_usage_callback_t;
 
 class CpuUsage : public Runnable {
 public:

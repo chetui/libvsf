@@ -64,11 +64,11 @@ HpthreadId VmCpuUsage::get_running_on_hpthread(pid_t vmthread_id)
     return HpthreadId(cpu_usage_->get_thread_running_on_cpu_without_refresh(vmthread_id));
 }
 
-void VmCpuUsage::cpu_usage_callback(int data)
+void VmCpuUsage::cpu_usage_callback(pid_t pid, pid_t tid, int cpu_usage)
 {
     VmCpuUsage* vm_cpu_usage = VmCpuUsage::get_instance();
     if (*(vm_cpu_usage->callback_func_)) {
-        (*(vm_cpu_usage->callback_func_))(data);
+        (*(vm_cpu_usage->callback_func_))(pid, tid, cpu_usage);
     }
 }
 

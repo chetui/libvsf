@@ -37,6 +37,7 @@ public:
     OptionParamVal(const char);
     OptionParamVal(const int);
     OptionParamVal(const double);
+    OptionParamVal(void *const);
     ~OptionParamVal();
     OptionParamVal &operator=(const OptionParamVal&);
     OptionParamVal &operator=(const std::string&);
@@ -44,18 +45,21 @@ public:
     OptionParamVal &operator=(const char);
     OptionParamVal &operator=(const int);
     OptionParamVal &operator=(const double);
+    OptionParamVal &operator=(void *const);
     std::string get_string();
     char get_char();
     int get_int();
     double get_double();
+    void* get_pointer();
 
 private:
-    enum {STR, CHAR, INT, DBL} type;
+    enum {STR, CHAR, INT, DBL, PTR} type;
     union {
         std::string sval;
         char cval;
         int ival;
         double dval;
+        void* pval;
     };
     void copy_union(const OptionParamVal&);
 };

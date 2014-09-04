@@ -8,6 +8,9 @@
 void myscheduler(Host *host, std::set<VM> &vms);
 Vsf* framework = Vsf::get_instance();
 void print_and_clean_mig(Host *host, std::set<VM> &vms);
+void vm_base_print_callback( const VmId& vm_id, const std::string& name, const std::string& uuid, const int vsocket_num, const int vcore_num, const int vhpthread_num, const int total_mem_size, const std::set<pid_t>& vcpu_ids, const std::set<pid_t>& stable_vmthread_ids);
+void vm_cpu_usage_print_callback(pid_t pid, pid_t tid, int cpu_usage);
+void vm_cache_miss_print_callback(const CacheMissData& data);
 
 int main()
 {
@@ -27,18 +30,21 @@ int main()
         { Option::OP_VM_BASE,
             {
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::LOOP_INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 },
+                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
             }
         },
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::LOOP_INTERVAL, 3000 }
+                { OptionParam::LOOP_INTERVAL, 3000 },
+                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
             }
         },
         { Option::OP_VM_CACHE_MISS,
             {
                 { OptionParam::LOOP_INTERVAL, 2000 },
-                { OptionParam::SAMPLE_INTERVAL, 50000 }
+                { OptionParam::SAMPLE_INTERVAL, 50000 },
+                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
             }
         }
     });
@@ -239,6 +245,44 @@ void myscheduler(Host *host, std::set<VM> &vms)
     return;
 }
 
+void vm_base_print_callback(
+    const VmId& vm_id,
+    const std::string& name,
+    const std::string& uuid,
+    const int vsocket_num,
+    const int vcore_num,
+    const int vhpthread_num,
+    const int total_mem_size,
+    const std::set<pid_t>& vcpu_ids,
+    const std::set<pid_t>& stable_vmthread_ids
+    )
+{
+    std::cout << "[vm_base]print_callback:" << vm_id << ":"
+        << name << ":"
+        << uuid << ":"
+        << vsocket_num << ":"
+        << vcore_num << ":"
+        << vhpthread_num << ":"
+        << total_mem_size << ":"
+        << "[";
+    for (auto& id : vcpu_ids)
+        std::cout << id << ":"; 
+    std::cout << "]:[";
+    for (auto& id : stable_vmthread_ids)
+        std::cout << id << ":"; 
+    std::cout << "]" << std::endl;
+}
+
+void vm_cpu_usage_print_callback(pid_t pid, pid_t tid, int cpu_usage)
+{
+    std::cout << "[vm_cpu_usage]print_callback:" << pid << ":" << tid << ":" << cpu_usage << std::endl;
+}
+
+void vm_cache_miss_print_callback(const CacheMissData& data)
+{
+    std::cout << "[vm_cache_miss]print_callback:" << data << std::endl;
+}
+
 void print_dist(const std::vector<std::vector<int> >& dist)
 {
     for (const auto& col : dist)
@@ -249,7 +293,6 @@ void print_dist(const std::vector<std::vector<int> >& dist)
     }
 
 }
-
 
 void print_and_clean_mig(Host *host, std::set<VM> &vms)
 {

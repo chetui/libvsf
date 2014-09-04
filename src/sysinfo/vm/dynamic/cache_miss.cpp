@@ -397,6 +397,7 @@ void CacheMissData::PerfData::clear_fd()
 std::ostream &operator<<(std::ostream &os, const CacheMissData&v)
 {
     os << "[" 
+        << v.tid << ":" 
         << v.mptc << ":" 
         << v.mpti << ":" 
         << v.mptr << ":" 

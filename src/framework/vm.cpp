@@ -1,5 +1,6 @@
 #include "framework/vm.h"
 #include <map>
+#include "utils/log.h"
 
 using namespace std;
 
@@ -43,6 +44,10 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
             case OptionParam::LOOP_INTERVAL:
                 vm_base_->set_interval(p.second.get_int());
                 break;
+            case OptionParam::CALLBACK:
+                vm_base_->set_callback(*((vm_base_callback_t*)p.second.get_pointer()));
+                delete (vm_base_callback_t*)p.second.get_pointer();
+                break;
             default:
                 //cerr message "invalid parameter for OP_VM_BASE"
                 break;
@@ -59,6 +64,10 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
             {
             case OptionParam::LOOP_INTERVAL:
                 vm_cpu_usage_->set_interval(p.second.get_int());
+                break;
+            case OptionParam::CALLBACK:
+                vm_cpu_usage_->set_callback(*((cpu_usage_callback_t*)p.second.get_pointer()));
+                delete (cpu_usage_callback_t*)p.second.get_pointer();
                 break;
             default:
                 //cerr message "invalid parameter"
@@ -79,6 +88,10 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             case OptionParam::SAMPLE_INTERVAL:
                 vm_cache_miss_->set_sample_interval(p.second.get_int());
+                break;
+            case OptionParam::CALLBACK:
+                vm_cache_miss_->set_callback(*((cache_miss_callback_t*)p.second.get_pointer()));
+                delete (cache_miss_callback_t*)p.second.get_pointer();
                 break;
             default:
                 //cerr message "invalid parameter"

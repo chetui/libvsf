@@ -278,7 +278,7 @@ void CpuUsage::refresh_thread()
 
     for (const auto& data : thread_cpu_usage_data_) {
         if (*callback_func_) {
-            (*callback_func_)(data.second.cpu_usage_);
+            (*callback_func_)(data.second.tgid_, data.first, data.second.cpu_usage_);
         }
     }
 
