@@ -36,15 +36,15 @@ int main()
         },
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::LOOP_INTERVAL, 3000 },
-                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
+                { OptionParam::LOOP_INTERVAL, 3000 }//,
+//                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
             }
         },
         { Option::OP_VM_CACHE_MISS,
             {
                 { OptionParam::LOOP_INTERVAL, 2000 },
-                { OptionParam::SAMPLE_INTERVAL, 50000 },
-                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
+                { OptionParam::SAMPLE_INTERVAL, 50000 }//,
+//                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
             }
         }
     });

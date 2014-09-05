@@ -8,6 +8,10 @@ FuncOption::FuncOption()
 {
 }
 
+FuncOption::~FuncOption()
+{
+}
+
 FuncOption* FuncOption::get_instance()
 {
     static FuncOption func_option;

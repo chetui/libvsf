@@ -20,6 +20,7 @@ public:
     std::set<VM> init_vms(Host *host, std::string vm_cmd);
 private:
     VmSet();
+    ~VmSet();
     std::mutex init_vms_mutex_;
 
     FuncOption *func_option_;

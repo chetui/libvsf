@@ -12,6 +12,53 @@ VmSet::VmSet()
     vm_cache_miss_ = VmCacheMiss::get_instance();
 }
 
+VmSet::~VmSet()
+{
+    if (func_option_->check_option(Option::OP_VM_BASE))
+    {
+        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
+        for (auto & p : param) 
+        {
+            switch(p.first)
+            {
+            case OptionParam::CALLBACK:
+                delete (vm_base_callback_t*)p.second.get_pointer();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
+        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
+        for (auto & p : param) 
+        {
+            switch(p.first)
+            {
+            case OptionParam::CALLBACK:
+                delete (cpu_usage_callback_t*)p.second.get_pointer();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
+        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CACHE_MISS);
+        for (auto & p : param) 
+        {
+            switch(p.first)
+            {
+            case OptionParam::CALLBACK:
+                delete (cache_miss_callback_t*)p.second.get_pointer();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
 VmSet* VmSet::get_instance()
 {
     static VmSet vm_set;
@@ -46,7 +93,6 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             case OptionParam::CALLBACK:
                 vm_base_->set_callback(*((vm_base_callback_t*)p.second.get_pointer()));
-                delete (vm_base_callback_t*)p.second.get_pointer();
                 break;
             default:
                 //cerr message "invalid parameter for OP_VM_BASE"
@@ -67,7 +113,6 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             case OptionParam::CALLBACK:
                 vm_cpu_usage_->set_callback(*((cpu_usage_callback_t*)p.second.get_pointer()));
-                delete (cpu_usage_callback_t*)p.second.get_pointer();
                 break;
             default:
                 //cerr message "invalid parameter"
@@ -91,7 +136,6 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             case OptionParam::CALLBACK:
                 vm_cache_miss_->set_callback(*((cache_miss_callback_t*)p.second.get_pointer()));
-                delete (cache_miss_callback_t*)p.second.get_pointer();
                 break;
             default:
                 //cerr message "invalid parameter"

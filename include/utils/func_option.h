@@ -23,12 +23,14 @@ public:
 
 private:
     FuncOption();
+    ~FuncOption();
     std::map<Option, std::map<OptionParam, OptionParamVal> > options_;
     std::shared_timed_mutex options_mutex_;
 };
 
 class OptionParamVal 
 {
+    friend class FuncOption;
 public:
     OptionParamVal();
     OptionParamVal(const OptionParamVal &o);
