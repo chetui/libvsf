@@ -77,9 +77,6 @@ private:
     std::map<pid_t, int> process_cpu_usage_data_;
     std::vector<pid_t> to_start_watching_;
     std::vector<pid_t> to_stop_watching_;
-
-    std::shared_timed_mutex data_mutex_;
-
     unsigned int total_cpu_time_new = 0;
     unsigned int total_cpu_time_old = 0;
     unsigned int total_cpu_time_delta = 0;
@@ -87,10 +84,12 @@ private:
     unsigned int idle_time_new = 0;
     unsigned int idle_time_delta = 0;
     std::atomic<int> has_data_cnt_;
+    std::shared_timed_mutex data_mutex_;
+
     std::atomic<int> interval_ms_;
-    static unsigned int cpu_num_;
     std::atomic<cpu_usage_callback_t*> callback_func_;
 
+    static unsigned int cpu_num_;
     static constexpr const char * SYS_PROC_STAT = "/proc/stat";
     static constexpr const int READ_PROC_FLAG = PROC_FILLSTAT|PROC_PID;
 

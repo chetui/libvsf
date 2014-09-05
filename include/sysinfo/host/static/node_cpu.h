@@ -57,6 +57,7 @@ public:
      * Reread the node_cpu info.
      */
     void refresh();
+    void clear();
 
 private:
     NodeCpu();
@@ -83,9 +84,8 @@ private:
     std::map<SocketId, std::set<HpthreadId> > socket_hpthread_;
     std::map<CoreId, std::set<HpthreadId> > core_hpthread_;
     std::set<HpthreadId> hpthread_;
-    std::atomic<bool> inited_;
+    std::atomic<bool> has_data_;
     std::shared_timed_mutex data_mutex_;
-
 
     static constexpr char const * NODE_DIR = "/sys/devices/system/node/";
     static constexpr char const * CPUINFO_FILE = "/proc/cpuinfo";

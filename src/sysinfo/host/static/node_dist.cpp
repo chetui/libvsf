@@ -8,6 +8,7 @@
 
 NodeDist::NodeDist()
 {
+    node_cpu_ = NodeCpu::get_instance();
 }
 
 NodeDist *NodeDist::get_instance()
@@ -19,22 +20,20 @@ NodeDist *NodeDist::get_instance()
 std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& param) 
 {
     std::shared_lock<std::shared_timed_mutex> read_lock(test_mutex_);
-//    LDEBUG << "AA" << std::endl;
-    if(test_inited_ && param == test_param_)
+    if(test_has_data_ && param == test_param_)
         return test_node_dist_;
     read_lock.unlock();
     std::unique_lock<std::shared_timed_mutex> write_lock(test_mutex_);
-    test_inited_ = true;
+    test_has_data_ = true;
     test_param_ = param;
     test_node_dist_.clear();
 
-//    LDEBUG << "BB" << std::endl;
 //    LDEBUG << "loop in get_test_node_dist" << param.loop << std::endl;
 //    LDEBUG << param.path << std::endl;
 //    LDEBUG << param.size_in_mb << std::endl;
 //    LDEBUG << param.type << std::endl;
 //    LDEBUG << param.loop << std::endl;
-    int node_size = NodeCpu::get_instance()->get_node_num();
+    int node_size = node_cpu_->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
         std::vector<int> row;
@@ -71,7 +70,6 @@ std::vector< std::vector<int> > NodeDist::get_test_node_dist(const MicroParam& p
         test_node_dist_.push_back(row);
     }
 
-//    LDEBUG << "CC" << std::endl;
     return test_node_dist_;
 }
 
@@ -83,11 +81,11 @@ int NodeDist::get_test_node_dist(int node_id_0, int node_id_1, const MicroParam&
 std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
 {
     std::shared_lock<std::shared_timed_mutex> read_lock(sys_mutex_);
-    if(sys_inited_)
+    if(sys_has_data_)
         return sys_node_dist_;
     read_lock.unlock();
     std::unique_lock<std::shared_timed_mutex> write_lock(sys_mutex_);
-    sys_inited_ = true;
+    sys_has_data_ = true;
     sys_node_dist_.clear();
 
     std::string command = "numactl --hardware";
@@ -136,6 +134,20 @@ std::vector< std::vector<int> > NodeDist::get_sys_node_dist()
 int NodeDist::get_sys_node_dist(int node_id_0, int node_id_1)
 {
     return get_sys_node_dist()[node_id_0][node_id_1];
+}
+
+void NodeDist::clear_sys()
+{
+    std::unique_lock<std::shared_timed_mutex> lock(sys_mutex_);
+    sys_node_dist_.clear();
+    sys_has_data_ = false;
+}
+
+void NodeDist::clear_test()
+{
+    std::unique_lock<std::shared_timed_mutex> lock(test_mutex_);
+    test_node_dist_.clear();
+    test_has_data_ = false;
 }
 
 void NodeDist::refresh_sys()

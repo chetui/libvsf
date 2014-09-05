@@ -13,7 +13,7 @@
 
 using namespace std;
 
-NodeCpu::NodeCpu(): inited_(false)
+NodeCpu::NodeCpu(): has_data_(false)
 {
 }
 
@@ -196,9 +196,23 @@ std::set<HpthreadId> NodeCpu::get_hpthread_ids(CoreId core_id)
     return get_value_by_key(core_hpthread_, core_id);
 }
 
+void NodeCpu::clear()
+{
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
+
+    node_socket_.clear();
+    node_core_.clear();
+    node_hpthread_.clear();
+    socket_core_.clear();
+    socket_hpthread_.clear();
+    core_hpthread_.clear();
+    hpthread_.clear();
+    has_data_ = false;
+}
+
 void NodeCpu::refresh()
 {
-    if(inited_)
+    if(has_data_)
         return;
 
     unique_lock<shared_timed_mutex> lock(data_mutex_);
@@ -207,7 +221,7 @@ void NodeCpu::refresh()
     refresh_socket_core_hpthread();
     refresh_others();
 
-    inited_ = true;
+    has_data_ = true;
 }
 
 void NodeCpu::refresh_node_hpthread()

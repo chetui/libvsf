@@ -12,8 +12,8 @@ VmCpuUsage::VmCpuUsage(): interval_ms_(1000)
     callback_func_ = new cpu_usage_callback_t;
     *callback_func_ = nullptr;
 
-    cpu_usage_ = CpuUsage::get_instance();
     vm_base_ = VmBase::get_instance();
+    cpu_usage_ = CpuUsage::get_instance();
 
     cpu_usage_->set_callback(cpu_usage_callback);
 }

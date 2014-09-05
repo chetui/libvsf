@@ -4,8 +4,8 @@
 #include <set>
 #include <atomic>
 #include "../../../utils/runnable.h"
-#include "sysinfo/vm/dynamic/cpu_usage.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
+#include "sysinfo/vm/dynamic/cpu_usage.h"
 #include "sysinfo/host/static/node_cpu.h"
 
 class VmCpuUsage : public Runnable {
@@ -30,11 +30,12 @@ private:
     static void cpu_usage_callback(pid_t pid, pid_t tid, int cpu_usage);
 
     std::set<pid_t> last_pids_;
+
     std::atomic<int> interval_ms_;
     std::atomic<cpu_usage_callback_t*> callback_func_;
 
-    CpuUsage* cpu_usage_;
     VmBase* vm_base_;
+    CpuUsage* cpu_usage_;
 };
 
 #endif

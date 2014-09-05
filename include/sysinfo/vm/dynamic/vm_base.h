@@ -61,12 +61,11 @@ private:
     std::map<VmId, int> total_mem_size_;
     std::map<VmId, std::set<pid_t> > vcpu_ids_;
     std::map<VmId, std::set<pid_t> > stable_vmthread_ids_;
-
-    std::shared_timed_mutex data_mutex_;
-
-    char *buf_;
-    std::string vm_cmd_ = "qemu-system-x86_64";
     std::atomic<bool> has_data_;
+    std::shared_timed_mutex data_mutex_;
+    char *buf_;
+
+    std::string vm_cmd_ = "qemu-system-x86_64";
     std::atomic<int> interval_ms_;
     std::atomic<vm_base_callback_t*> callback_func_;
 

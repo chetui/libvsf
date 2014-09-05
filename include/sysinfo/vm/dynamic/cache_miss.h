@@ -44,10 +44,9 @@ private:
     std::map<pid_t, CacheMissData> cache_miss_data_;
     std::vector<pid_t> to_start_watching_;
     std::vector<pid_t> to_stop_watching_;
-
+    std::atomic<bool> has_data_;
     std::shared_timed_mutex data_mutex_;
 
-    std::atomic<bool> has_data_;
     std::atomic<int> loop_interval_ms_;
     std::atomic<int> sample_interval_us_;
     std::atomic<cache_miss_callback_t*> callback_func_;

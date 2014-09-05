@@ -35,6 +35,7 @@ private:
     std::set<pid_t> last_tids_;
     //only be used by the callback func of CacheMiss
     std::map<pid_t, VmId> volatile_vmthread_id_to_vm_id_;
+
     std::atomic<int> loop_interval_ms_;
     std::atomic<cache_miss_callback_t*> callback_func_;
 };

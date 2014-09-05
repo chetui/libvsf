@@ -10,6 +10,8 @@
 #define WORKLOADTYPE_RANDOM 'r'
 #define WORKLOADTYPE_SERIAL 's'
 
+class NodeCpu;
+
 struct MicroParam {
     MicroParam() {};
     MicroParam(std::string path, int size_in_mb, char type, int loop):path(path), size_in_mb(size_in_mb), type(type), loop(loop) {};
@@ -36,16 +38,21 @@ public:
 
     void refresh_sys();
     void refresh_test(const MicroParam &param);
+    void clear_sys();
+    void clear_test();
 
 private:
     NodeDist();
     std::vector<std::vector<int> > sys_node_dist_;
     std::vector<std::vector<int> > test_node_dist_;
-    bool sys_inited_ = false;
-    bool test_inited_ = false;
+    bool sys_has_data_ = false;
+    bool test_has_data_ = false;
     std::shared_timed_mutex sys_mutex_;
     std::shared_timed_mutex test_mutex_;
+
     MicroParam test_param_;
+
+    NodeCpu* node_cpu_;
 
     static constexpr int BUF_SIZE = 1024;
 };
