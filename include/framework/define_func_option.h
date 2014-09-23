@@ -8,8 +8,8 @@ enum class Option : unsigned int {
     //<<host static info>>
     OP_HS_NODE_CPU,
     OP_HS_TOTAL_MEM_SIZE,
-    OP_HS_SYS_NODE_DIST,
-    OP_HS_TEST_NODE_DIST,
+    OP_HS_NODE_SYS_DIST,
+    OP_HS_NODE_TEST_DIST,
     //<<host dynamic info>>
     OP_HS_CPU_USAGE,
     OP_HS_USED_MEM_SIZE,

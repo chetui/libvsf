@@ -3,7 +3,8 @@
 
 #include "utils/func_option.h"
 #include "sysinfo/host/static/node_cpu.h"
-#include "sysinfo/host/static/node_dist.h"
+#include "sysinfo/host/static/node_sys_dist.h"
+#include "sysinfo/host/static/node_test_dist.h"
 
 class Host {
 public:
@@ -36,26 +37,27 @@ public:
     std::set<HpthreadId> hpthread_ids(NodeId node_id);
     std::set<HpthreadId> hpthread_ids(SocketId socket_id);
     std::set<HpthreadId> hpthread_ids(CoreId core_id);
-    //OP_HS_SYS_NODE_DIST
-    std::vector<std::vector<int> > sys_node_dist();
-    int sys_node_dist(int node_id_0, int node_id_1);
-    //OP_HS_TEST_NODE_DIST
+    //OP_HS_NODE_SYS_DIST
+    std::vector<std::vector<int> > node_sys_dist();
+    int node_sys_dist(int node_id_0, int node_id_1);
+    //OP_HS_NODE_TEST_DIST
         //may with Option Parameters. if without Option Parameters, then use default parameters.
-    std::vector<std::vector<int> > test_node_dist();
-    int test_node_dist(int node_id_0, int node_id_1);
+    std::vector<std::vector<int> > node_test_dist();
+    int node_test_dist(int node_id_0, int node_id_1);
         //must without Option Parameters.
-    std::vector<std::vector<int> > test_node_dist(const MicroParam &p);
-    int test_node_dist(int node_id_0, int node_id_1, const MicroParam &p);
+    std::vector<std::vector<int> > node_test_dist(const MicroParam &p);
+    int node_test_dist(int node_id_0, int node_id_1, const MicroParam &p);
 
 private:
     Host();
 
     FuncOption* func_option_;
     NodeCpu* node_cpu_;
-    NodeDist* node_dist_;
+    NodeSysDist* node_sys_dist_;
+    NodeTestDist* node_test_dist_;
 
-    //OP_HS_TEST_NODE_DIST
-    MicroParam get_param_test_node_dist();
+    //OP_HS_NODE_TEST_DIST
+    MicroParam get_param_node_test_dist();
 
 };
 

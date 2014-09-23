@@ -19,7 +19,8 @@ string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 # src files
 set (SRC_LIST 
     sysinfo/host/static/node_cpu.cpp
-    sysinfo/host/static/node_dist.cpp
+    sysinfo/host/static/node_sys_dist.cpp
+    sysinfo/host/static/node_test_dist.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cpu_usage.cpp
@@ -53,7 +54,8 @@ macro (add_indi_test test_name)
 endmacro ()
 
 add_indi_test (test_host_node_cpu)
-add_indi_test (test_host_node_dist)
+add_indi_test (test_host_node_sys_dist)
+add_indi_test (test_host_node_test_dist)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_vm_cpu_usage)
@@ -66,7 +68,7 @@ add_indi_test (test_vsf_exec_cpu_mig)
 add_indi_test (test_vsf_vm_base)
 add_indi_test (test_vsf_vm_cpu_usage)
 add_indi_test (test_vsf_vm_cache_miss)
-add_indi_test (test_vsf_node_cpu)
+add_indi_test (test_vsf_node_cpu_node_dist)
 add_indi_test (test_compat)
 
 # build examples -------------------------------

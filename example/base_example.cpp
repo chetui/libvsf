@@ -16,8 +16,8 @@ int main()
         //<<Optional Host Static Info>>
         { Option::OP_HS_NODE_CPU, { } }, //DONE
         { Option::OP_HS_TOTAL_MEM_SIZE, { } },
-        { Option::OP_HS_SYS_NODE_DIST, { } }, //DONE
-        { Option::OP_HS_TEST_NODE_DIST, //DONE
+        { Option::OP_HS_NODE_SYS_DIST, { } }, //DONE
+        { Option::OP_HS_NODE_TEST_DIST, //DONE
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
@@ -117,14 +117,14 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
                 host->total_mem_size();
                 host->total_mem_size(node_id);
-                //OP_HS_SYS_NODE_DIST ((( OP_HS_NODE_CPU //Yu
-                host->sys_node_dist(); //DONE
-                host->sys_node_dist(node_id_0, node_id_1); //DONE
-                //OP_HS_TEST_NODE_DIST ((( OP_HS_NODE_CPU //Yu
-                host->test_node_dist(); //DONE
-                host->test_node_dist(MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
-                host->test_node_dist(node_id_0, node_id_1); //DONE
-                host->test_node_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
+                //OP_HS_NODE_SYS_DIST ((( OP_HS_NODE_CPU //Yu
+                host->node_sys_dist(); //DONE
+                host->node_sys_dist(node_id_0, node_id_1); //DONE
+                //OP_HS_NODE_TEST_DIST ((( OP_HS_NODE_CPU //Yu
+                host->node_test_dist(); //DONE
+                host->node_test_dist(MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
+                host->node_test_dist(node_id_0, node_id_1); //DONE
+                host->node_test_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
 
             //<<host dynamic info>>
                 //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo

@@ -10,12 +10,13 @@ Host::Host()
     if(func_option_->check_option(Option::OP_HS_NODE_CPU))
         node_cpu_->refresh();
 
-    node_dist_ = NodeDist::get_instance();
-    if(func_option_->check_option(Option::OP_HS_SYS_NODE_DIST))
-        node_dist_->refresh_sys();
-    if(func_option_->check_option(Option::OP_HS_TEST_NODE_DIST))
+    node_sys_dist_ = NodeSysDist::get_instance();
+    node_test_dist_ = NodeTestDist::get_instance();
+    if(func_option_->check_option(Option::OP_HS_NODE_SYS_DIST))
+        node_sys_dist_->refresh();
+    if(func_option_->check_option(Option::OP_HS_NODE_TEST_DIST))
     {
-        node_dist_->refresh_test(get_param_test_node_dist());
+        node_test_dist_->refresh(get_param_node_test_dist());
     }
 }
 
@@ -131,20 +132,20 @@ std::set<HpthreadId> Host::hpthread_ids(CoreId core_id)
     return node_cpu_->get_hpthread_ids(core_id);
 }
 
-//OP_HS_SYS_NODE_DIST
-std::vector<std::vector<int> > Host::sys_node_dist()
+//OP_HS_NODE_SYS_DIST
+std::vector<std::vector<int> > Host::node_sys_dist()
 {
-    return node_dist_->get_sys_node_dist();
+    return node_sys_dist_->get_node_sys_dist();
 }
 
-int Host::sys_node_dist(int node_id_0, int node_id_1)
+int Host::node_sys_dist(int node_id_0, int node_id_1)
 {
-    return node_dist_->get_sys_node_dist(node_id_0, node_id_1);
+    return node_sys_dist_->get_node_sys_dist(node_id_0, node_id_1);
 }
 
-MicroParam Host::get_param_test_node_dist()
+MicroParam Host::get_param_node_test_dist()
 {
-    map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_HS_TEST_NODE_DIST);
+    map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_HS_NODE_TEST_DIST);
     MicroParam ret_p;
     for (auto & p : param) 
     {
@@ -163,29 +164,29 @@ MicroParam Host::get_param_test_node_dist()
             ret_p.loop = p.second.get_int();
             break;
         default:
-            //cerr message "invalid parameter for OP_HS_TEST_NODE_DIST"
+            //cerr message "invalid parameter for OP_HS_NODE_TEST_DIST"
             break;
         }
     }
     return ret_p;
 }
 
-std::vector<std::vector<int> > Host::test_node_dist()
+std::vector<std::vector<int> > Host::node_test_dist()
 {
-    return node_dist_->get_test_node_dist(get_param_test_node_dist());
+    return node_test_dist_->get_node_test_dist(get_param_node_test_dist());
 }
 
-int Host::test_node_dist(int node_id_0, int node_id_1)
+int Host::node_test_dist(int node_id_0, int node_id_1)
 {
-    return node_dist_->get_test_node_dist(node_id_0, node_id_1, get_param_test_node_dist());
+    return node_test_dist_->get_node_test_dist(node_id_0, node_id_1, get_param_node_test_dist());
 }
 
-std::vector<std::vector<int> > Host::test_node_dist(const MicroParam &p)
+std::vector<std::vector<int> > Host::node_test_dist(const MicroParam &p)
 {
-    return node_dist_->get_test_node_dist(p);
+    return node_test_dist_->get_node_test_dist(p);
 }
 
-int Host::test_node_dist(int node_id_0, int node_id_1, const MicroParam &p)
+int Host::node_test_dist(int node_id_0, int node_id_1, const MicroParam &p)
 {
-    return node_dist_->get_test_node_dist(node_id_0, node_id_1, p);
+    return node_test_dist_->get_node_test_dist(node_id_0, node_id_1, p);
 }

@@ -24,7 +24,7 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     ./test_vsf_vm_base
     ./test_vsf_vm_cpu_usage
     ./test_vsf_vm_cache_miss
-    ./test_vsf_node_cpu
+    ./test_vsf_node_cpu_node_dist
     ./test_vm_vm_base
     ./test_vm_vm_cpu_usage
     ./test_vm_cpu_usage
@@ -34,7 +34,8 @@ if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     ./test_func_option
     ./test_compat
     ./test_host_node_cpu
-    ./test_host_node_dist
+    ./test_host_node_sys_dist
+    ./test_host_node_test_dist
     ./implemented_example
     #./test_all
 fi

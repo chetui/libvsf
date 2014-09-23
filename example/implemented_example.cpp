@@ -18,8 +18,8 @@ int main()
     //if others functions are called without set corresponding flags, info would be collected immediately.
     framework->init({
         { Option::OP_HS_NODE_CPU, { } },
-        { Option::OP_HS_SYS_NODE_DIST, { } },
-        { Option::OP_HS_TEST_NODE_DIST, 
+        { Option::OP_HS_NODE_SYS_DIST, { } },
+        { Option::OP_HS_NODE_TEST_DIST, 
             { 
                 { OptionParam::PATH, "." },
                 { OptionParam::SIZE_IN_MB, 20 },
@@ -186,15 +186,15 @@ void myscheduler(Host *host, std::set<VM> &vms)
         std::cout << std::endl;
     }
 
-    //OP_HS_SYS_NODE_DIST
-    print_dist(host->sys_node_dist());
-    std::cout << "sys_node_dist 0-1: " << host->sys_node_dist(0, 1) << std::endl;
+    //OP_HS_NODE_SYS_DIST
+    print_dist(host->node_sys_dist());
+    std::cout << "node_sys_dist 0-1: " << host->node_sys_dist(0, 1) << std::endl;
 
-    //OP_HS_TEST_NODE_DIST
-    print_dist(host->test_node_dist());
-    print_dist(host->test_node_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
-    std::cout << "test_node_dist 0-1: " << host->test_node_dist(0, 1) << std::endl;
-    std::cout << "test_node_dist 0-1 with p: " << host->test_node_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
+    //OP_HS_NODE_TEST_DIST
+    print_dist(host->node_test_dist());
+    print_dist(host->node_test_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
+    std::cout << "node_test_dist 0-1: " << host->node_test_dist(0, 1) << std::endl;
+    std::cout << "node_test_dist 0-1 with p: " << host->node_test_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
 
     std::set<HpthreadId> affinity_set = {1, 3, 5};
     for (auto& vm : vms)
