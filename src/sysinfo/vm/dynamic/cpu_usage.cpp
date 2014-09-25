@@ -12,17 +12,17 @@ using namespace std;
 
 unsigned int CpuUsage::cpu_num_;
 
-CpuUsage::CpuUsage(): has_data_cnt_(0), interval_ms_(1000)
+constexpr const int CpuUsage::DEFAULT_INTERVAL_MS;
+
+CpuUsage::CpuUsage(): has_data_cnt_(0), interval_ms_(DEFAULT_INTERVAL_MS), callback_func_(new cpu_usage_callback_t)
 {
     cpu_num_ = static_cast<unsigned int>(sysconf(_SC_NPROCESSORS_CONF));
-    callback_func_ = new cpu_usage_callback_t;
     *callback_func_ = nullptr;
 }
 
 CpuUsage::~CpuUsage()
 {
     stop();
-    delete callback_func_;
 }
 
 CpuUsage *CpuUsage::get_instance()
@@ -38,7 +38,15 @@ void CpuUsage::set_interval(int interval_ms)
 
 void CpuUsage::set_callback(cpu_usage_callback_t callback_func) 
 {
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
     *callback_func_ = callback_func;
+}
+
+void CpuUsage::clear_param()
+{
+    interval_ms_ = DEFAULT_INTERVAL_MS;
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
+    *callback_func_ = nullptr;;
 }
 
 int CpuUsage::get_sys_cpu_usage_without_refresh()
@@ -171,6 +179,8 @@ void CpuUsage::refresh()
     refresh_system();
     refresh_watching();
     refresh_thread();
+
+//    LDEBUG << "DDDD: interval_ms_: " << interval_ms_ << endl;
 
 //    LDEBUG << "DDD----" << endl;
 //    for (auto& vm_id : vm_ids_) {

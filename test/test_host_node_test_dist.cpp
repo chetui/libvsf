@@ -27,13 +27,13 @@ void print_dist(const std::vector<std::vector<int> >& dist)
 TEST_F(NodeTestDistTest, matrix)
 {
     //default
-    MicroParam dp;
-    std::vector<std::vector<int> > res = nd->get_node_test_dist(dp);
+    std::vector<std::vector<int> > res = nd->get_node_test_dist();
     print_dist(res);
 
     //custom
     MicroParam cp(".", 23, WORKLOADTYPE_RANDOM, 212);
-    res = nd->get_node_test_dist(cp);
+    nd->set_param(cp);
+    res = nd->get_node_test_dist();
     print_dist(res);
     ASSERT_EQ(true, res[0][1] > 10);
 }
@@ -41,6 +41,8 @@ TEST_F(NodeTestDistTest, matrix)
 TEST_F(NodeTestDistTest, one)
 {
     MicroParam p(".", 23, WORKLOADTYPE_RANDOM, 212);
-    std::cout << nd->get_node_test_dist(0, 1, p) << std::endl;
-    ASSERT_EQ(true, nd->get_node_test_dist(0, 1, p) > 10);
+    nd->set_param(p);
+    auto res = nd->get_node_test_dist(0, 1);
+    std::cout << res << std::endl;
+    ASSERT_EQ(true, res > 10);
 }

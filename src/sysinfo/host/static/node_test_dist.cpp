@@ -17,22 +17,35 @@ NodeTestDist *NodeTestDist::get_instance()
     return &node_test_dist;
 }
 
-std::vector< std::vector<int> > NodeTestDist::get_node_test_dist(const MicroParam& param) 
+void NodeTestDist::set_param(const MicroParam& param) 
+{
+    std::unique_lock<std::shared_timed_mutex> write_lock(data_mutex_);
+    last_param_ = param_;
+    param_ = param;
+}
+
+void NodeTestDist::clear_param() 
+{
+    std::unique_lock<std::shared_timed_mutex> write_lock(data_mutex_);
+    param_ = MicroParam();
+}
+
+std::vector< std::vector<int> > NodeTestDist::get_node_test_dist() 
 {
     std::shared_lock<std::shared_timed_mutex> read_lock(data_mutex_);
-    if(has_data_ && param == param_)
+    if(has_data_ && last_param_ == param_) {
         return node_test_dist_;
+    }
     read_lock.unlock();
     std::unique_lock<std::shared_timed_mutex> write_lock(data_mutex_);
     has_data_ = true;
-    param_ = param;
+    last_param_ = param_;
     node_test_dist_.clear();
 
-//    LDEBUG << "loop in get_node_test_dist" << param.loop << std::endl;
-//    LDEBUG << param.path << std::endl;
-//    LDEBUG << param.size_in_mb << std::endl;
-//    LDEBUG << param.type << std::endl;
-//    LDEBUG << param.loop << std::endl;
+//    LDEBUG << "DDDD: " << param_.path;
+//    LDEBUG << "DDDD: " << param_.size_in_mb;
+//    LDEBUG << "DDDD: " << param_.type;
+//    LDEBUG << "DDDD: " << param_.loop;
     int node_size = node_cpu_->get_node_num();
     for(int cpu=0; cpu<node_size; cpu++)
     {
@@ -44,7 +57,7 @@ std::vector< std::vector<int> > NodeTestDist::get_node_test_dist(const MicroPara
             char command[BUF_SIZE];
             sprintf(command,
                     "numactl --cpunodebind=%d --membind=%d %s/microbench -wb %dm -wt %c -l %d",
-                    cpu, mem, param.path.c_str(), param.size_in_mb, param.type, param.loop);
+                    cpu, mem, param_.path.c_str(), param_.size_in_mb, param_.type, param_.loop);
             
             // execuate command
             FILE *fp = popen(command, "r");
@@ -73,9 +86,9 @@ std::vector< std::vector<int> > NodeTestDist::get_node_test_dist(const MicroPara
     return node_test_dist_;
 }
 
-int NodeTestDist::get_node_test_dist(int node_id_0, int node_id_1, const MicroParam& param)
+int NodeTestDist::get_node_test_dist(int node_id_0, int node_id_1)
 {
-    return get_node_test_dist(param)[node_id_0][node_id_1];
+    return get_node_test_dist()[node_id_0][node_id_1];
 }
 
 void NodeTestDist::clear()
@@ -85,13 +98,17 @@ void NodeTestDist::clear()
     has_data_ = false;
 }
 
-void NodeTestDist::refresh(const MicroParam &param)
+void NodeTestDist::refresh()
 {
-    get_node_test_dist(param);
+    get_node_test_dist();
 }
 
 bool operator==(const MicroParam &lp, const MicroParam &rp)
 {
+//    LDEBUG << "==" << lp.path << rp.path;
+//    LDEBUG << "==" << lp.size_in_mb << rp.size_in_mb;
+//    LDEBUG << "==" << lp.type << rp.type;
+//    LDEBUG << "==" << lp.loop << rp.loop;
     return lp.path == rp.path &&
         lp.size_in_mb == rp.size_in_mb &&
         lp.type == rp.type &&

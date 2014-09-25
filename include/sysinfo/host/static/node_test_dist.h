@@ -29,11 +29,13 @@ bool operator==(const MicroParam &lp, const MicroParam &rp);
 class NodeTestDist {
 public:
     static NodeTestDist* get_instance();
+    void set_param(const MicroParam& param);
+    void clear_param();
 
-    std::vector< std::vector<int> > get_node_test_dist(const MicroParam& param);
-    int get_node_test_dist(int node_id_0, int node_id_1, const MicroParam& param);
+    std::vector< std::vector<int> > get_node_test_dist();
+    int get_node_test_dist(int node_id_0, int node_id_1);
 
-    void refresh(const MicroParam &param);
+    void refresh();
     void clear();
 
 private:
@@ -43,6 +45,7 @@ private:
     std::shared_timed_mutex data_mutex_;
 
     MicroParam param_;
+    MicroParam last_param_;
 
     NodeCpu* node_cpu_;
 

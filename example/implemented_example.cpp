@@ -192,9 +192,22 @@ void myscheduler(Host *host, std::set<VM> &vms)
 
     //OP_HS_NODE_TEST_DIST
     print_dist(host->node_test_dist());
-    print_dist(host->node_test_dist(MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)));
     std::cout << "node_test_dist 0-1: " << host->node_test_dist(0, 1) << std::endl;
-    std::cout << "node_test_dist 0-1 with p: " << host->node_test_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 213)) << std::endl;
+    framework->set_param({
+        { Option::OP_HS_NODE_TEST_DIST, 
+            { 
+                { OptionParam::PATH, "." },
+                { OptionParam::SIZE_IN_MB, 23 },
+                { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
+                { OptionParam::LOOP, 213 }
+            }
+         }
+    });
+    print_dist(host->node_test_dist());
+    std::cout << "node_test_dist 0-1: " << host->node_test_dist(0, 1) << std::endl;
+    framework->clear_param({
+        Option::OP_HS_NODE_TEST_DIST
+    });
 
     std::set<HpthreadId> affinity_set = {1, 3, 5};
     for (auto& vm : vms)
@@ -241,6 +254,33 @@ void myscheduler(Host *host, std::set<VM> &vms)
         for (auto& pid : volatile_pid_set)
             vm.set_vcpu_mig(pid, affinity_set);
     }
+
+    framework->clear_param({
+        Option::OP_VM_CPU_USAGE,
+        Option::OP_VM_CACHE_MISS
+    });
+    framework->set_param({
+//        { Option::OP_VM_BASE,
+//            {
+//                { OptionParam::VM_CMD, "qemu-system-x86_64" },
+//                { OptionParam::LOOP_INTERVAL, 3000 },
+//                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
+//            }
+//        },
+        { Option::OP_VM_CPU_USAGE,
+            {
+                { OptionParam::LOOP_INTERVAL, 2800 },
+                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
+            }
+        },
+        { Option::OP_VM_CACHE_MISS,
+            {
+                { OptionParam::LOOP_INTERVAL, 1800 },
+                { OptionParam::SAMPLE_INTERVAL, 45000 },
+                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
+            }
+        }
+    });
 
     return;
 }

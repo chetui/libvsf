@@ -7,16 +7,17 @@
 
 using namespace std;
 
-CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(1000), sample_interval_us_(50000)
+constexpr const int CacheMiss::DEFAULT_LOOP_INTERVAL_MS;
+constexpr const int CacheMiss::DEFAULT_SAMPLE_INTERVAL_MS;
+
+CacheMiss::CacheMiss(): has_data_(false), loop_interval_ms_(DEFAULT_LOOP_INTERVAL_MS), sample_interval_us_(DEFAULT_SAMPLE_INTERVAL_MS), callback_func_(new cache_miss_callback_t)
 {
-    callback_func_ = new cache_miss_callback_t;
     *callback_func_ = nullptr;
 }
 
 CacheMiss::~CacheMiss()
 {
     stop();
-    delete callback_func_;
 }
 
 CacheMiss *CacheMiss::get_instance()
@@ -37,7 +38,16 @@ void CacheMiss::set_sample_interval(int interval_us)
 
 void CacheMiss::set_callback(cache_miss_callback_t callback_func) 
 {
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
     *callback_func_ = callback_func;
+}
+
+void CacheMiss::clear_param()
+{
+    loop_interval_ms_ = DEFAULT_LOOP_INTERVAL_MS;
+    sample_interval_us_ = DEFAULT_SAMPLE_INTERVAL_MS;
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
+    *callback_func_ = nullptr;;
 }
 
 std::shared_timed_mutex& CacheMiss::get_data_mutex()
@@ -155,6 +165,9 @@ void CacheMiss::refresh()
     stop_sample();
 
     has_data_ = true;
+
+//    LDEBUG << "DDDD: sample_interval_us_: " << sample_interval_us_ << endl;
+//    LDEBUG << "DDDD: loop_interval_ms_: " << loop_interval_ms_ << endl;
     return;
 }
 

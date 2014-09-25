@@ -84,6 +84,45 @@ void myscheduler(HOST *host, std::set<VM> &vms)
 {
     for (auto& vm : vms)
     {
+        //set_param can reset parameters that configured by Vsf::init.
+        framework->set_param({ 
+            { Option::OP_HS_NODE_TEST_DIST,
+                { 
+                    { OptionParam::PATH, "." },
+                    { OptionParam::SIZE_IN_MB, 21 },
+                    { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
+                    { OptionParam::LOOP, 214 }
+                }
+            },
+            { Option::OP_VM_BASE, 
+                { 
+                    { OptionParam::VM_CMD, "qemu-system-x86_64" },
+                    { OptionParam::LOOP_INTERVAL, 3500 },
+                    { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
+                } 
+            },
+            { Option::OP_VM_CPU_USAGE,
+                { 
+                    { OptionParam::LOOP_INTERVAL, 3200 },
+                    { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
+                } 
+            },
+            { Option::OP_VM_CACHE_MISS,
+                {
+                    { OptionParam::LOOP_INTERVAL, 15000 },
+                    { OptionParam::SAMPLE_INTERVAL, 40000 },
+                    { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
+                }
+            },
+        });
+        //clear_param can configure the parameters to be default value.
+        //Notice: it would not remove the configuration of paramters or stop corresponding threads.
+        framework->clear_param({
+            Option::OP_HS_NODE_TEST_DIST, 
+            Option::OP_VM_BASE, 
+            Option::OP_VM_CPU_USAGE,
+            Option::OP_VM_CACHE_MISS,
+        });
         //INPUT: available info
 
             //<<host static info>>
@@ -122,9 +161,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->node_sys_dist(node_id_0, node_id_1); //DONE
                 //OP_HS_NODE_TEST_DIST ((( OP_HS_NODE_CPU //Yu
                 host->node_test_dist(); //DONE
-                host->node_test_dist(MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
                 host->node_test_dist(node_id_0, node_id_1); //DONE
-                host->node_test_dist(node_id_0, node_id_1, MicroParam(".", 20, WORKLOADTYPE_RANDOM, 200)); //DONE
 
             //<<host dynamic info>>
                 //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo

@@ -24,7 +24,12 @@ void print_callback(const CacheMissData& data)
     std::cout << "print_callback:" << data << std::endl;
 }
 
-TEST_F(CacheMissTest, cache_miss_with_thread_with_vm_base)
+void print_callback2(const CacheMissData& data)
+{
+    std::cout << "print_callback_222:" << data << std::endl;
+}
+
+TEST_F(CacheMissTest, cache_miss_with_thread_with_vm_base_with_clear_param)
 {
     vm_base->start();
     cache_miss->set_loop_interval(2000);
@@ -49,6 +54,12 @@ TEST_F(CacheMissTest, cache_miss_with_thread_with_vm_base)
 
     lock.unlock();
 
+    sleep(4);
+    cache_miss->clear_param();
+    cache_miss->set_loop_interval(1700);
+    cache_miss->set_sample_interval(75000);
+    cache_miss->set_callback(print_callback2);
+    sleep(4);
     for (auto& pid : pids) {
         cout << pid << ":" << cache_miss->get_cache_miss(pid) << endl;
     }

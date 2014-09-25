@@ -7,9 +7,10 @@
 
 using namespace std;
 
-VmCpuUsage::VmCpuUsage(): interval_ms_(1000)
+constexpr const int VmCpuUsage::DEFAULT_INTERVAL_MS;
+
+VmCpuUsage::VmCpuUsage(): interval_ms_(DEFAULT_INTERVAL_MS), callback_func_(new cpu_usage_callback_t)
 {
-    callback_func_ = new cpu_usage_callback_t;
     *callback_func_ = nullptr;
 
     vm_base_ = VmBase::get_instance();
@@ -21,7 +22,6 @@ VmCpuUsage::VmCpuUsage(): interval_ms_(1000)
 VmCpuUsage::~VmCpuUsage()
 {
     stop();
-    delete callback_func_;
 }
 
 VmCpuUsage *VmCpuUsage::get_instance()
@@ -38,6 +38,15 @@ void VmCpuUsage::set_interval(int interval_ms)
 void VmCpuUsage::set_callback(cpu_usage_callback_t callback_func) 
 {
     *callback_func_ = callback_func;
+}
+
+void VmCpuUsage::clear_param()
+{
+    cpu_usage_->clear_param();
+    cpu_usage_->set_callback(cpu_usage_callback);
+    interval_ms_ = DEFAULT_INTERVAL_MS;
+    unique_lock<shared_timed_mutex> lock(cpu_usage_->get_data_mutex());
+    *callback_func_ = nullptr;;
 }
 
 int VmCpuUsage::get_sys_cpu_usage()
@@ -110,6 +119,8 @@ void VmCpuUsage::refresh()
     lock.unlock();
 
     cpu_usage_->refresh();
+
+//    LDEBUG << "DDDD: interval_ms_: " << interval_ms_ << endl;
     return;
 }
 

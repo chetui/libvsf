@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <atomic>
+#include <memory>
 #include "utils/runnable.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
 #include "sysinfo/vm/dynamic/cache_miss.h"
@@ -16,9 +17,13 @@ public:
     void set_loop_interval(int interval_ms);
     void set_sample_interval(int interval_us);
     void set_callback(cache_miss_callback_t callback_func);
+    void clear_param();
 
     CacheMissData get_cache_miss(VmId vm_id);
     CacheMissData get_cache_miss(pid_t vmthread_id);
+
+    static constexpr const int DEFAULT_LOOP_INTERVAL_MS = 1000;
+    static constexpr const int DEFAULT_SAMPLE_INTERVAL_MS = CacheMiss::DEFAULT_SAMPLE_INTERVAL_MS;
 
 private:
     VmCacheMiss();
@@ -37,7 +42,7 @@ private:
     std::map<pid_t, VmId> volatile_vmthread_id_to_vm_id_;
 
     std::atomic<int> loop_interval_ms_;
-    std::atomic<cache_miss_callback_t*> callback_func_;
+    std::unique_ptr<cache_miss_callback_t> callback_func_;
 };
 
 #endif

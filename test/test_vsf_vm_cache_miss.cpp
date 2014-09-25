@@ -21,6 +21,11 @@ void print_callback(const CacheMissData& data)
     cout << "[vm_cache_miss]print_callback:" << data << endl;
 }
 
+void print_callback2(const CacheMissData& data)
+{
+    cout << "[vm_cache_miss]print_callback_222:" << data << endl;
+}
+
 TEST_F(VsfTest, vm_cache_miss)
 {
     vsf->init({ 
@@ -35,6 +40,21 @@ TEST_F(VsfTest, vm_cache_miss)
     Host *host = vsf->init_host();
 
     set<VM> vms = vsf->init_vms(host);
+
+    sleep(4);
+    vsf->clear_param({
+        Option::OP_VM_CACHE_MISS 
+    });
+    vsf->set_param({
+        { Option::OP_VM_CACHE_MISS,
+            {
+                { OptionParam::LOOP_INTERVAL, 1800 },
+                { OptionParam::SAMPLE_INTERVAL, 64000 },
+                { OptionParam::CALLBACK, VmCacheMissCallback(print_callback2) }
+            }
+        }
+    });
+    sleep(4);
 
     for (auto& vm : vms)
     {

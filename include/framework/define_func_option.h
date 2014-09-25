@@ -13,6 +13,9 @@ enum class Option : unsigned int {
     //<<host dynamic info>>
     OP_HS_CPU_USAGE,
     OP_HS_USED_MEM_SIZE,
+
+    SEPARATOR_FOR_HS_AND_VM, 
+
     //<<vm static info>>
     OP_VM_VNODE,
     OP_VM_MEM_POLICY,

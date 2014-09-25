@@ -9,10 +9,12 @@
 
 using namespace std;
 
+constexpr const int VmCacheMiss::DEFAULT_LOOP_INTERVAL_MS;
+constexpr const int VmCacheMiss::DEFAULT_SAMPLE_INTERVAL_MS;
+
 VmCacheMiss::VmCacheMiss():
-    loop_interval_ms_(1000)
+    loop_interval_ms_(DEFAULT_LOOP_INTERVAL_MS), callback_func_(new cache_miss_callback_t)
 {
-    callback_func_ = new cache_miss_callback_t;
     *callback_func_ = nullptr;
 
     vm_base_ = VmBase::get_instance();
@@ -24,7 +26,6 @@ VmCacheMiss::VmCacheMiss():
 VmCacheMiss::~VmCacheMiss()
 {
     stop();
-    delete callback_func_;
 }
 
 VmCacheMiss* VmCacheMiss::get_instance()
@@ -45,7 +46,17 @@ void VmCacheMiss::set_sample_interval(int interval_us)
 
 void VmCacheMiss::set_callback(cache_miss_callback_t callback_func) 
 {
+    unique_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
     *callback_func_ = callback_func;
+}
+
+void VmCacheMiss::clear_param()
+{
+    cache_miss_->clear_param();
+    cache_miss_->set_callback(cal_vm_miss_rate);
+    loop_interval_ms_ = DEFAULT_LOOP_INTERVAL_MS;
+    unique_lock<shared_timed_mutex> lock(cache_miss_->get_data_mutex());
+    *callback_func_ = nullptr;;
 }
 
 CacheMissData VmCacheMiss::get_cache_miss(VmId vm_id)
@@ -140,6 +151,8 @@ void VmCacheMiss::refresh()
     lock.unlock();
 
     cache_miss_->refresh();
+
+//    LDEBUG << "DDDD: loop_interval_ms_: " << loop_interval_ms_ << endl;
 }
 
 void VmCacheMiss::clear()

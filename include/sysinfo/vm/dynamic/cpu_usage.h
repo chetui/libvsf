@@ -10,6 +10,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
+#include <memory>
 #include "../../../utils/runnable.h"
 
 typedef std::function<void(pid_t pid, pid_t tid, int)> cpu_usage_callback_t;
@@ -39,8 +40,11 @@ public:
     void stop_watching(pid_t pid);
     //not mutex protected. need get_data_mutex() to protect
     void clear();
+    void clear_param();
     void refresh();
     void refresh_twice();
+
+    static constexpr const int DEFAULT_INTERVAL_MS = 1000;
 
 private:
     class ThreadCpuUsageData {
@@ -87,12 +91,11 @@ private:
     std::shared_timed_mutex data_mutex_;
 
     std::atomic<int> interval_ms_;
-    std::atomic<cpu_usage_callback_t*> callback_func_;
+    std::unique_ptr<cpu_usage_callback_t> callback_func_;
 
     static unsigned int cpu_num_;
     static constexpr const char * SYS_PROC_STAT = "/proc/stat";
     static constexpr const int READ_PROC_FLAG = PROC_FILLSTAT|PROC_PID;
-
 };
 
 std::ostream &operator<<(std::ostream &os, const CpuUsage::ThreadCpuUsageData& data);

@@ -1,12 +1,15 @@
 #ifndef _HOST_H_
 #define _HOST_H_
 
+#include <map>
+#include <vector>
 #include "utils/func_option.h"
 #include "sysinfo/host/static/node_cpu.h"
 #include "sysinfo/host/static/node_sys_dist.h"
 #include "sysinfo/host/static/node_test_dist.h"
 
 class Host {
+    friend class Vsf;
 public:
     static Host *get_instance();
 
@@ -41,15 +44,13 @@ public:
     std::vector<std::vector<int> > node_sys_dist();
     int node_sys_dist(int node_id_0, int node_id_1);
     //OP_HS_NODE_TEST_DIST
-        //may with Option Parameters. if without Option Parameters, then use default parameters.
     std::vector<std::vector<int> > node_test_dist();
     int node_test_dist(int node_id_0, int node_id_1);
-        //must without Option Parameters.
-    std::vector<std::vector<int> > node_test_dist(const MicroParam &p);
-    int node_test_dist(int node_id_0, int node_id_1, const MicroParam &p);
 
 private:
     Host();
+    void set_param(std::map<Option, std::map<OptionParam, OptionParamVal> > ops);
+    void clear_param(std::vector<Option> ops);
 
     FuncOption* func_option_;
     NodeCpu* node_cpu_;
@@ -57,7 +58,8 @@ private:
     NodeTestDist* node_test_dist_;
 
     //OP_HS_NODE_TEST_DIST
-    MicroParam get_param_node_test_dist();
+    MicroParam option_param_to_micro_param(std::map<OptionParam, OptionParamVal>& param);
+    std::map<OptionParam, OptionParamVal>  micro_param_to_option_param(MicroParam param);
 
 };
 

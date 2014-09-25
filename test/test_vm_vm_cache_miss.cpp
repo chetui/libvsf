@@ -25,11 +25,24 @@ void print_callback(const CacheMissData& data)
     cout << "[vm_cache_miss]print_callback:" << data << endl;
 }
 
-TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base)
+void print_callback2(const CacheMissData& data)
+{
+    cout << "[vm_cache_miss]print_callback_222:" << data << endl;
+}
+
+TEST_F(VmCacheMissTest, vm_cache_miss_with_thread_with_vm_base_with_clear_param)
 {
     vm_base->start();
+    vm_cache_miss->set_loop_interval(1700);
+    vm_cache_miss->set_sample_interval(75000);
     vm_cache_miss->set_callback(print_callback);
     vm_cache_miss->start();
+    sleep(4);
+    vm_cache_miss->clear_param();
+    vm_cache_miss->set_loop_interval(1800);
+    vm_cache_miss->set_sample_interval(74000);
+    vm_cache_miss->set_callback(print_callback2);
+    sleep(4);
     set<VmId> vm_ids = vm_base->get_vm_ids();
     for(auto& vm_id : vm_ids) {
         cout << vm_id << "'s cache_miss:" << vm_cache_miss->get_cache_miss(vm_id) << endl;

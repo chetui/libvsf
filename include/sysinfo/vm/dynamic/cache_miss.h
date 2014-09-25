@@ -6,6 +6,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
+#include <memory>
 #include "utils/runnable.h"
 #include "utils/perf_event.h"
 
@@ -20,6 +21,7 @@ public:
     void set_loop_interval(int interval_ms);
     void set_sample_interval(int interval_ms);
     void set_callback(cache_miss_callback_t);
+    void clear_param();
     std::shared_timed_mutex& get_data_mutex();
     std::atomic<bool>& get_has_data();
 
@@ -33,6 +35,9 @@ public:
     //not mutex protected. need get_data_mutex() to protect
     void clear();
     void refresh();
+
+    static constexpr const int DEFAULT_LOOP_INTERVAL_MS = 1000;
+    static constexpr const int DEFAULT_SAMPLE_INTERVAL_MS = 50000;
 
 private:
     CacheMiss();
@@ -49,7 +54,7 @@ private:
 
     std::atomic<int> loop_interval_ms_;
     std::atomic<int> sample_interval_us_;
-    std::atomic<cache_miss_callback_t*> callback_func_;
+    std::unique_ptr<cache_miss_callback_t> callback_func_;
 };
 
 class CacheMissData {

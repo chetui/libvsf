@@ -14,6 +14,7 @@ class Host;
 class VM;
 
 class VmSet {
+    friend class Vsf;
 public:
     static VmSet* get_instance();
     std::set<VM> init_vms(Host *host);
@@ -21,6 +22,11 @@ public:
 private:
     VmSet();
     ~VmSet();
+    void set_param(std::map<Option, std::map<OptionParam, OptionParamVal> > ops);
+    void clear_param(std::vector<Option> ops);
+    void set_param_by_option(const Option& op, std::map<OptionParam, OptionParamVal>& op_param);
+    void delete_callback(Option op);
+
     std::mutex init_vms_mutex_;
 
     FuncOption *func_option_;

@@ -3,6 +3,7 @@
 
 #include <set>
 #include <atomic>
+#include <memory>
 #include "../../../utils/runnable.h"
 #include "sysinfo/vm/dynamic/vm_base.h"
 #include "sysinfo/vm/dynamic/cpu_usage.h"
@@ -14,11 +15,14 @@ public:
 
     void set_interval(int interval_ms);
     void set_callback(cpu_usage_callback_t callback_func);
+    void clear_param();
 
     int get_sys_cpu_usage();
     int get_cpu_usage(VmId vm_id);
     int get_cpu_usage(pid_t vmthread_id);
     HpthreadId get_running_on_hpthread(pid_t vmthread_id);
+
+    static constexpr const int DEFAULT_INTERVAL_MS = 1000;
 
 private:
     VmCpuUsage();
@@ -32,10 +36,11 @@ private:
     std::set<pid_t> last_pids_;
 
     std::atomic<int> interval_ms_;
-    std::atomic<cpu_usage_callback_t*> callback_func_;
+    std::unique_ptr<cpu_usage_callback_t> callback_func_;
 
     VmBase* vm_base_;
     CpuUsage* cpu_usage_;
+
 };
 
 #endif

@@ -18,12 +18,14 @@ FuncOption* FuncOption::get_instance()
     return &func_option;
 }
 
-void FuncOption::enable_option(std::map<Option, std::map<OptionParam, OptionParamVal> > &ops)
+void FuncOption::enable_option(const std::map<Option, std::map<OptionParam, OptionParamVal> > &ops)
 {
     unique_lock<shared_timed_mutex> lock(options_mutex_);
 
     //enable ops
-    options_.insert(ops.begin(), ops.end());
+    for (auto& op : ops) {
+        options_[op.first] = op.second;
+    }
     
 //    //enable all the dependent options of ops
 //    for (auto& op : ops)

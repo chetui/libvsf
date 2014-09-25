@@ -14,49 +14,9 @@ VmSet::VmSet()
 
 VmSet::~VmSet()
 {
-    if (func_option_->check_option(Option::OP_VM_BASE))
-    {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
-        for (auto & p : param) 
-        {
-            switch(p.first)
-            {
-            case OptionParam::CALLBACK:
-                delete (vm_base_callback_t*)p.second.get_pointer();
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
-        for (auto & p : param) 
-        {
-            switch(p.first)
-            {
-            case OptionParam::CALLBACK:
-                delete (cpu_usage_callback_t*)p.second.get_pointer();
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CACHE_MISS);
-        for (auto & p : param) 
-        {
-            switch(p.first)
-            {
-            case OptionParam::CALLBACK:
-                delete (cache_miss_callback_t*)p.second.get_pointer();
-                break;
-            default:
-                break;
-            }
-        }
-    }
+    delete_callback(Option::OP_VM_BASE);
+    delete_callback(Option::OP_VM_CPU_USAGE);
+    delete_callback(Option::OP_VM_CACHE_MISS);
 }
 
 VmSet* VmSet::get_instance()
@@ -65,23 +25,129 @@ VmSet* VmSet::get_instance()
     return &vm_set;
 }
 
-std::set<VM> VmSet::init_vms(Host *host)
+void VmSet::set_param(std::map<Option, std::map<OptionParam, OptionParamVal> > ops)
 {
-    return init_vms(host, "");
+    for (auto& op : ops) {
+        switch (op.first) {
+//        case Option::OP_VM_BASE:
+        case Option::OP_VM_CPU_USAGE:
+        case Option::OP_VM_CACHE_MISS:
+            if(func_option_->check_option(op.first))
+                delete_callback(op.first);
+            set_param_by_option(op.first, op.second);
+            break;
+        default:
+            break;
+        }
+    }
+    func_option_->enable_option(ops);
 }
 
-std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
+void VmSet::clear_param(std::vector<Option> ops)
 {
-    lock_guard<mutex> lock(init_vms_mutex_);
-    //TODO check whether host is inited
-    host = host;
+    for (auto& op : ops) {
+        switch (op) {
+//        case Option::OP_VM_BASE:
+//            if(func_option_->check_option(op))
+//                delete_callback(op);
+//            vm_base_->clear_param();
+        case Option::OP_VM_CPU_USAGE:
+            if(func_option_->check_option(op)) {
+                delete_callback(op);
+                func_option_->enable_option({
+                    { Option::OP_VM_CPU_USAGE,
+                        {
+                            { OptionParam::LOOP_INTERVAL, VmCpuUsage::DEFAULT_INTERVAL_MS },
+                            { OptionParam::CALLBACK, NULL }
+                        }
+                    }
+                });
+            }
+            vm_cpu_usage_->clear_param();
+        case Option::OP_VM_CACHE_MISS:
+            if(func_option_->check_option(op)) {
+                delete_callback(op);
+                func_option_->enable_option({
+                    { Option::OP_VM_CACHE_MISS,
+                        {
+                            { OptionParam::LOOP_INTERVAL, VmCacheMiss::DEFAULT_LOOP_INTERVAL_MS },
+                            { OptionParam::SAMPLE_INTERVAL, VmCacheMiss::DEFAULT_SAMPLE_INTERVAL_MS },
+                            { OptionParam::CALLBACK, NULL }
+                        }
+                    }
+                });
+            }
+            vm_cache_miss_->clear_param();
+            break;
+        default:
+            break;
+        }
+    }
+}
 
-    set<VM> vms;
+void VmSet::delete_callback(Option op)
+{
+    switch (op) {
+    case Option::OP_VM_BASE:
+        if (func_option_->check_option(Option::OP_VM_BASE))
+        {
+            map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
+            for (auto & p : param) 
+            {
+                switch(p.first)
+                {
+                case OptionParam::CALLBACK:
+                    delete (vm_base_callback_t*)p.second.get_pointer();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        break;
+    case Option::OP_VM_CPU_USAGE:
+        if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
+            map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
+            for (auto & p : param) 
+            {
+                switch(p.first)
+                {
+                case OptionParam::CALLBACK:
+                    delete (cpu_usage_callback_t*)p.second.get_pointer();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        break;
+    case Option::OP_VM_CACHE_MISS:
+        if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
+            map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CACHE_MISS);
+            for (auto & p : param) 
+            {
+                switch(p.first)
+                {
+                case OptionParam::CALLBACK:
+                    delete (cache_miss_callback_t*)p.second.get_pointer();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
-    if (func_option_->check_option(Option::OP_VM_BASE))
+void VmSet::set_param_by_option(const Option& op, map<OptionParam, OptionParamVal>& op_param)
+{
+    switch (op)
     {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_BASE);
-        for (auto & p : param) 
+    case Option::OP_VM_BASE:
+        for (auto & p : op_param) 
         {
             switch(p.first)
             {
@@ -99,12 +165,9 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             }
         }
-        if (!vm_base_->joinable())
-            vm_base_->start();
-    }
-    if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CPU_USAGE);
-        for (auto & p : param) 
+        break;
+    case Option::OP_VM_CPU_USAGE:
+        for (auto & p : op_param) 
         {
             switch(p.first)
             {
@@ -119,12 +182,9 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             }
         }
-        if (!vm_cpu_usage_->joinable())
-            vm_cpu_usage_->start();
-    }
-    if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
-        map<OptionParam, OptionParamVal> &param = func_option_->get_param(Option::OP_VM_CACHE_MISS);
-        for (auto & p : param) 
+        break;
+    case Option::OP_VM_CACHE_MISS:
+        for (auto & p : op_param) 
         {
             switch(p.first)
             {
@@ -142,6 +202,38 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
                 break;
             }
         }
+        break;
+    default:
+        break;
+    }
+}
+
+std::set<VM> VmSet::init_vms(Host *host)
+{
+    return init_vms(host, "");
+}
+
+std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
+{
+    lock_guard<mutex> lock(init_vms_mutex_);
+    //TODO check whether host is inited
+    host = host;
+
+    set<VM> vms;
+
+    if (func_option_->check_option(Option::OP_VM_BASE))
+    {
+        set_param_by_option(Option::OP_VM_BASE, func_option_->get_param(Option::OP_VM_BASE));
+        if (!vm_base_->joinable())
+            vm_base_->start();
+    }
+    if (func_option_->check_option(Option::OP_VM_CPU_USAGE)) {
+        set_param_by_option(Option::OP_VM_CPU_USAGE, func_option_->get_param(Option::OP_VM_CPU_USAGE));
+        if (!vm_cpu_usage_->joinable())
+            vm_cpu_usage_->start();
+    }
+    if (func_option_->check_option(Option::OP_VM_CACHE_MISS)) {
+        set_param_by_option(Option::OP_VM_CACHE_MISS, func_option_->get_param(Option::OP_VM_CACHE_MISS));
         if (!vm_cache_miss_->joinable())
             vm_cache_miss_->start();
     }

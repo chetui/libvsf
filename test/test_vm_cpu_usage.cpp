@@ -24,7 +24,12 @@ void print_callback(pid_t pid, pid_t tid, int cpu_usage)
     std::cout << "[vm_cpu_usage]print_callback:" << pid << ":" << tid << ":" << cpu_usage << std::endl;
 }
 
-TEST_F(CpuUsageTest, cpu_usage_with_thread_with_vm_base)
+void print_callback2(pid_t pid, pid_t tid, int cpu_usage)
+{
+    std::cout << "[vm_cpu_usage]print_callback_222:" << pid << ":" << tid << ":" << cpu_usage << std::endl;
+}
+
+TEST_F(CpuUsageTest, cpu_usage_with_thread_with_vm_base_with_clear_param)
 {
     vm_base->start();
     cpu_usage->set_interval(2000);
@@ -41,6 +46,11 @@ TEST_F(CpuUsageTest, cpu_usage_with_thread_with_vm_base)
 
     lock.unlock();
 
+    sleep(4);
+    cpu_usage->clear_param();
+    cpu_usage->set_interval(1500);
+    cpu_usage->set_callback(print_callback2);
+    sleep(4);
     cout << "sys " << cpu_usage->get_sys_cpu_usage() << endl;
     for (auto& vm_id : vm_ids) {
         cout << "process " << vm_id.pid << ":" << cpu_usage->get_process_cpu_usage(vm_id.pid) << endl;

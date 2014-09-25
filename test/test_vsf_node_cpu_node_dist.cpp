@@ -114,13 +114,22 @@ TEST_F(VsfTest, node_num_and_node_dist)
     ASSERT_EQ(res, true);
 
 
-
-
-
-
-    std::cout << host->node_test_dist(0, 1) << std::endl;
+    std::cout << "test_dist: " << host->node_test_dist(0, 1) << std::endl;
     ASSERT_EQ(true, host->node_test_dist(0, 1) > 10);
-    std::cout << host->node_test_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 230)) << std::endl;
+    vsf->clear_param({
+        Option::OP_HS_NODE_TEST_DIST 
+    });
+    vsf->set_param({
+        { Option::OP_HS_NODE_TEST_DIST, 
+            { 
+                { OptionParam::PATH, "." },
+                { OptionParam::SIZE_IN_MB, 23 },
+                { OptionParam::WORKLOAD_TYPE, WORKLOADTYPE_RANDOM },
+                { OptionParam::LOOP, 230 }
+            }
+         }
+    });
+    std::cout << host->node_test_dist(0, 1) << std::endl;
 //    ASSERT_EQ(true, host->node_test_dist(0, 1, MicroParam(".", 23, WORKLOADTYPE_RANDOM, 230)) > 10);
 
     ASSERT_EQ(host->node_sys_dist(0, 1), 20);
