@@ -1,15 +1,21 @@
 Sysinfo Development Guide
 ======
-[This doc is out of date currently]
 
-The purpose of this guide is to help the developers who want to add new sysinfo class into libvsf.
+The purpose of this guide is to help the developers who want to add new sysinfo module into libvsf.
 
 ## General Requirement
 
-#### the name of API
+#### the naming rule
 
+For API:  
 The final API is just the name of the sysinfo data, like *int node_num()*.  
 The name of sysinfo class public function is get\_\*(), like *int get_node_num()*.
+  
+For class name and file name:  
+Class name, file name, Options name should be consistent.  
+E.g,  
+for host related module: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_HS_SOME_MODULE;   
+for vm related module: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_VM_SOME_MODULE.
 
 #### input parameter type of sysinfo class public function
 
@@ -26,13 +32,19 @@ Config parameter is optional.
 If the result of your sysinfo is based on user-defined config, then you need to add config parameter into your design.
 
 The logic of config parameter:
-* Users can execute function by different config parameters; 
-* When users execute function by the same config parameters, function would return the cached result produced by the first execution, namely always return the same result.
+* Users can set config parameter by set\_*().
+* Users can reset all the config paramters into default value by clear\_param().
+* Notice clear() is only for data clean, it should not change the config paramters.
+* For static info, when users execute function by the same config parameters, function would return the cached result produced by the first execution, namely always return the same result.
 
 The implementation of config parameter:
 * Add a new OptionParam to sysinfo/define_func_option.h;
-* Add code in *init_host()* (actually in Host::Host()) or *init_vms()*;
-* Add config parameter version of sysinfo class public function && API;
+* Add code in *init_host()* (actually in Host::Host()) or *init_vms()* (actually in VmSet::set_param_by_option());
+* Add code in set_param() && clear_param() in Host or VmSet;
+* Add config parameter version of sysinfo class public function & API;
+* Add code to clear\_param();
+* Notice any read/write of config parameter in sysinfo class should be thread-safe;
+* For callback paramter, you should add a new micro in define_func_option.h, and corresponding clean code in VmSet::delete_callback() & VmSet::~VmSet();
 
 #### multi-thread safety
 
@@ -40,8 +52,21 @@ The sysinfo class must be multi-thread safety.
 It means you need to consider all the data in the sysinfo class, to check whether they are multi-thread safety.  
 
 In my practice, you need to consider each member variable one by one. 
-* Add corresponding *mutex* to STL container; Add *lock_guard<mutex>* in each functions who read or write STL container;
+* Add corresponding *shared_timed_mutex* to STL container; 
+* Add *unique_lock<shared_timed_mutex>* in each functions who write STL container;
+* Add *shared_lock<shared_timed_mutex>* in each functions who read STL container;
+* If you have multiple STL containers, in most cases you need only one *shared_timed_mutex* to protect them all.
 * Add *atomic<...>* to **fundamental types**;
 * Some variables would always be read or written along with STL container protected by *mutex*. Hence they do not need *atomic<...>* or *mutex*;
-* Do not recurse *lock_guard<mutex>* bound by the same *mutex* variable, to avoid dead lock;
-* Use the same order of all the *mutex* variables when define multiple *lock_guard<mutex>*, to avoid dead lock;
+* Do not recurse any *lock* bound by the same *mutex* variable except *recursive_mutex*, to avoid dead lock;
+* Use the same order of all the *mutex* variables when define multiple *lock*, to avoid dead lock;
+
+#### callback function
+
+For any sysinfo module that can be run as a thread asynchronously, you must define callback function to allow users do something synchronously when data is refreshed.
+
+#### data clean
+
+In nay sysinfo module, there should be a clear() function to clean the data.  
+For dynamic module, the clear() should be called by the end of refresh();  
+For static module, the clear() should be public to allow user to clear the data.  
