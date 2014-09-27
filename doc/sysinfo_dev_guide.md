@@ -14,8 +14,8 @@ The name of sysinfo class public function is get\_\*(), like *int get_node_num()
 For class name and file name:  
 Class name, file name, Options name should be consistent.  
 E.g,  
-for host related module: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_HS_SOME_MODULE;   
-for vm related module: class VmSomeModule, vm\_some\_module.cpp, vm\_some\_module.h, Option::OP_VM_SOME_MODULE.
+for host related modules: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_HS_SOME_MODULE;   
+for vm related modules: class VmSomeModule, vm\_some\_module.cpp, vm\_some\_module.h, Option::OP_VM_SOME_MODULE.
 
 #### input parameter type of sysinfo class public function
 
@@ -33,18 +33,18 @@ If the result of your sysinfo is based on user-defined config, then you need to 
 
 The logic of config parameter:
 * Users can set config parameter by set\_*().
-* Users can reset all the config paramters into default value by clear\_param().
-* Notice clear() is only for data clean, it should not change the config paramters.
+* Users can reset all the config paramters into default values by *clear\_param()*.
+* Notice *clear()* is only for data clean, it should not change the config paramters.
 * For static info, when users execute function by the same config parameters, function would return the cached result produced by the first execution, namely always return the same result.
 
 The implementation of config parameter:
 * Add a new OptionParam to sysinfo/define_func_option.h;
-* Add code in *init_host()* (actually in Host::Host()) or *init_vms()* (actually in VmSet::set_param_by_option());
-* Add code in set_param() && clear_param() in Host or VmSet;
+* Add code in *init_host()* (actually in *Host::Host()*) or *init_vms()* (actually in *VmSet::set_param_by_option()*);
+* Add code in *set\_param()* & *clear\_param()* in Host or VmSet;
 * Add config parameter version of sysinfo class public function & API;
-* Add code to clear\_param();
+* Add code to *clear\_param()* of module;
 * Notice any read/write of config parameter in sysinfo class should be thread-safe;
-* For callback paramter, you should add a new micro in define_func_option.h, and corresponding clean code in VmSet::delete_callback() & VmSet::~VmSet();
+* For callback paramter, you should add a new micro in *define\_func\_option.h*, and corresponding clean code in *VmSet::delete\_callback()* & *VmSet::~VmSet()*;
 
 #### multi-thread safety
 
@@ -67,6 +67,6 @@ For any sysinfo module that can be run as a thread asynchronously, you must defi
 
 #### data clean
 
-In nay sysinfo module, there should be a clear() function to clean the data.  
-For dynamic module, the clear() should be called by the end of refresh();  
-For static module, the clear() should be public to allow user to clear the data.  
+In any sysinfo module, there should be a *clear()* function to clean the data.  
+For dynamic module, the *clear()* should be called by the end of *refresh()*;  
+For static module, the *clear()* should be public to allow user to clear the data.  
