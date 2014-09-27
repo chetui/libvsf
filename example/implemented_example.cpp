@@ -30,8 +30,8 @@ int main()
         { Option::OP_VM_BASE,
             {
                 { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::LOOP_INTERVAL, 3000 },
-                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
+                { OptionParam::LOOP_INTERVAL, 3000 }//,
+//                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
             }
         },
         { Option::OP_VM_CPU_USAGE,
@@ -57,8 +57,7 @@ int main()
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
-        //std::set<VM> vms = framework->init_vms(host);
-        std::set<VM> vms = framework->init_vms(host, "qemu-system-x86_64");
+        std::set<VM> vms = framework->init_vms(host);
 
         //your scheduler algorithm
         myscheduler(host, vms);
@@ -260,24 +259,24 @@ void myscheduler(Host *host, std::set<VM> &vms)
         Option::OP_VM_CACHE_MISS
     });
     framework->set_param({
-//        { Option::OP_VM_BASE,
-//            {
-//                { OptionParam::VM_CMD, "qemu-system-x86_64" },
-//                { OptionParam::LOOP_INTERVAL, 3000 },
+        { Option::OP_VM_BASE,
+            {
+                { OptionParam::VM_CMD, "qemu-system-x86_64" },
+                { OptionParam::LOOP_INTERVAL, 3500 }//,
 //                { OptionParam::CALLBACK, VmBaseCallback(vm_base_print_callback) }
-//            }
-//        },
+            }
+        },
         { Option::OP_VM_CPU_USAGE,
             {
-                { OptionParam::LOOP_INTERVAL, 2800 },
-                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
+                { OptionParam::LOOP_INTERVAL, 2800 }//,
+//                { OptionParam::CALLBACK, VmCpuUsageCallback(vm_cpu_usage_print_callback) }
             }
         },
         { Option::OP_VM_CACHE_MISS,
             {
                 { OptionParam::LOOP_INTERVAL, 1800 },
-                { OptionParam::SAMPLE_INTERVAL, 45000 },
-                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
+                { OptionParam::SAMPLE_INTERVAL, 45000 }//,
+//                { OptionParam::CALLBACK, VmCacheMissCallback(vm_cache_miss_print_callback) }
             }
         }
     });

@@ -44,6 +44,33 @@ void print_callback(
     cout << "]" << endl;
 }
 
+void print_callback2(
+    const VmId& vm_id,
+    const string& name,
+    const string& uuid,
+    const int vsocket_num,
+    const int vcore_num,
+    const int vhpthread_num,
+    const int total_mem_size,
+    const set<pid_t>& vcpu_ids,
+    const set<pid_t>& stable_vmthread_ids
+    )
+{
+    cout << "[vm_base]print_callback_222:" << vm_id << ":"
+        << name << ":"
+        << uuid << ":"
+        << vsocket_num << ":"
+        << vcore_num << ":"
+        << vhpthread_num << ":"
+        << total_mem_size << ":"
+        << "[";
+    for (auto& id : vcpu_ids)
+        cout << id << ":"; 
+    cout << "]:[";
+    for (auto& id : stable_vmthread_ids)
+        cout << id << ":"; 
+    cout << "]" << endl;
+}
 
 //TEST_F(VmBaseTest, set_vm_cmd_without_thread)
 //{
@@ -59,11 +86,18 @@ void print_callback(
 //    ASSERT_EQ(size_before, size_after);
 //}
 
-TEST_F(VmBaseTest, vm_ids_with_thread)
+TEST_F(VmBaseTest, vm_ids_with_thread_with_clear_param)
 {
     vm_base->set_callback(print_callback);
-    vm_base->set_vm_cmd("qemu-system-x86_64");
+    vm_base->set_interval(2000);
+    vm_base->set_vm_cmd("qemu-system-x86_64_AAAA");
     vm_base->start();
+    sleep(5);
+    vm_base->clear_param();
+    vm_base->set_callback(print_callback2);
+    vm_base->set_interval(2500);
+    vm_base->set_vm_cmd("qemu-system-x86_64");
+    sleep(5);
     set<VmId> ids = vm_base->get_vm_ids();
     for(auto& id : ids)
         cout << id.start_timestamp << ":" << id.pid << " ";
@@ -81,13 +115,13 @@ TEST_F(VmBaseTest, vm_ids_without_thread_no_p)
     cout << endl;
 }
 
-TEST_F(VmBaseTest, vm_ids_without_thread_p)
-{
-    set<VmId> ids = vm_base->get_vm_ids("qemu-system-x86_64");
-    for(auto& id : ids)
-        cout << id.start_timestamp << ":" << id.pid << " ";
-    cout << endl;
-}
+//TEST_F(VmBaseTest, vm_ids_without_thread_p)
+//{
+//    set<VmId> ids = vm_base->get_vm_ids("qemu-system-x86_64");
+//    for(auto& id : ids)
+//        cout << id.start_timestamp << ":" << id.pid << " ";
+//    cout << endl;
+//}
 
 TEST_F(VmBaseTest, volatile_vmthread_with_thread)
 {

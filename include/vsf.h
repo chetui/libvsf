@@ -21,7 +21,6 @@ public:
     void clear_param(std::initializer_list<Option> ops);
     Host *init_host();
     std::set<VM> init_vms(Host *host);
-    std::set<VM> init_vms(Host *host, std::string vm_cmd);
     void exec_mig();
 
 private:

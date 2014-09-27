@@ -12,18 +12,20 @@
 
 using namespace std;
 
-VmBase::VmBase(): has_data_(false), interval_ms_(5000)
+constexpr const int VmBase::DEFAULT_INTERVAL_MS;
+constexpr const char * VmBase::DEFAULT_VM_CMD;
+
+VmBase::VmBase(): has_data_(false), interval_ms_(DEFAULT_INTERVAL_MS), callback_func_(new vm_base_callback_t)
 {
     buf_ = new char[BUF_SIZE];
-    callback_func_ = new vm_base_callback_t;
     *callback_func_ = nullptr;
+    vm_cmd_ = DEFAULT_VM_CMD;
 }
 
 VmBase::~VmBase()
 {
     stop();
     delete[] buf_;
-    delete callback_func_;
 }
 
 VmBase *VmBase::get_instance()
@@ -57,13 +59,16 @@ void VmBase::set_interval(int interval_ms)
 
 void VmBase::set_callback(const vm_base_callback_t& callback_func) 
 {
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
     *callback_func_ = callback_func;
 }
 
-std::set<VmId> VmBase::get_vm_ids(string vm_cmd)
+void VmBase::clear_param()
 {
-    set_vm_cmd(vm_cmd);
-    return get_vm_ids();
+    interval_ms_ = DEFAULT_INTERVAL_MS;
+    unique_lock<shared_timed_mutex> lock(data_mutex_);
+    vm_cmd_ = DEFAULT_VM_CMD;
+    *callback_func_ = nullptr;
 }
 
 std::set<VmId> VmBase::get_vm_ids()
@@ -185,6 +190,9 @@ void VmBase::refresh()
                 );
         }
     }
+
+//    LDEBUG << "vm_cmd:" << vm_cmd_;
+//    LDEBUG << "interval:" << interval_ms_;
 
 //    LDEBUG << "DDD----" << endl;
 //    for (auto& vm_id : vm_ids_) {

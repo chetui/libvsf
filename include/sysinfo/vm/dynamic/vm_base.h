@@ -9,6 +9,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
+#include <memory>
 #include "../../../utils/runnable.h"
 
 struct VmId;
@@ -21,9 +22,9 @@ public:
     void set_vm_cmd(std::string vm_cmd);
     void set_interval(int interval_ms);
     void set_callback(const vm_base_callback_t& callback_func);
+    void clear_param();
 
     std::set<VmId> get_vm_ids();
-    std::set<VmId> get_vm_ids(std::string vm_cmd);
     std::string get_name(VmId vm_id);
     std::string get_uuid(VmId vm_id);
     int get_vsocket_num(VmId vm_id);
@@ -38,6 +39,9 @@ public:
     int get_volatile_vmthread_num(VmId vm_id);
 
     VmId stable_vmthread_id_to_vm_id(pid_t pid);
+
+    static constexpr const int DEFAULT_INTERVAL_MS = 5000;
+    static constexpr const char * DEFAULT_VM_CMD = "qemu-system-x86_64";
 
 private:
     VmBase();
@@ -65,9 +69,10 @@ private:
     std::shared_timed_mutex data_mutex_;
     char *buf_;
 
-    std::string vm_cmd_ = "qemu-system-x86_64";
+    std::string vm_cmd_;
     std::atomic<int> interval_ms_;
-    std::atomic<vm_base_callback_t*> callback_func_;
+    std::unique_ptr<vm_base_callback_t> callback_func_;
+//    std::atomic<vm_base_callback_t*> callback_func_;
 
     static constexpr const int BUF_SIZE = 102400;
     static constexpr const char * VCPU_DIR = "/sys/fs/cgroup/cpu/libvirt/qemu/";

@@ -29,7 +29,7 @@ void VmSet::set_param(std::map<Option, std::map<OptionParam, OptionParamVal> > o
 {
     for (auto& op : ops) {
         switch (op.first) {
-//        case Option::OP_VM_BASE:
+        case Option::OP_VM_BASE:
         case Option::OP_VM_CPU_USAGE:
         case Option::OP_VM_CACHE_MISS:
             if(func_option_->check_option(op.first))
@@ -47,10 +47,20 @@ void VmSet::clear_param(std::vector<Option> ops)
 {
     for (auto& op : ops) {
         switch (op) {
-//        case Option::OP_VM_BASE:
-//            if(func_option_->check_option(op))
-//                delete_callback(op);
-//            vm_base_->clear_param();
+        case Option::OP_VM_BASE:
+            if(func_option_->check_option(op)) {
+                delete_callback(op);
+                func_option_->enable_option({
+                    { Option::OP_VM_BASE,
+                        {
+                            { OptionParam::VM_CMD, VmBase::DEFAULT_VM_CMD },
+                            { OptionParam::LOOP_INTERVAL, VmBase::DEFAULT_INTERVAL_MS },
+                            { OptionParam::CALLBACK, NULL }
+                        }
+                    }
+                });
+            }
+            vm_base_->clear_param();
         case Option::OP_VM_CPU_USAGE:
             if(func_option_->check_option(op)) {
                 delete_callback(op);
@@ -210,11 +220,6 @@ void VmSet::set_param_by_option(const Option& op, map<OptionParam, OptionParamVa
 
 std::set<VM> VmSet::init_vms(Host *host)
 {
-    return init_vms(host, "");
-}
-
-std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
-{
     lock_guard<mutex> lock(init_vms_mutex_);
     //TODO check whether host is inited
     host = host;
@@ -238,11 +243,8 @@ std::set<VM> VmSet::init_vms(Host *host, string vm_cmd)
             vm_cache_miss_->start();
     }
 
-    set<VmId> vm_ids;
-    if (vm_cmd == "")
-        vm_ids = vm_base_->get_vm_ids();
-    else
-        vm_ids = vm_base_->get_vm_ids(vm_cmd);
+    set<VmId> vm_ids = vm_base_->get_vm_ids();
+
     for (auto& vm_id : vm_ids)
         vms.insert(VM(vm_id));
 
