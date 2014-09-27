@@ -15,7 +15,7 @@ For class name and file name:
 Class name, file name, Options name should be consistent.  
 E.g,  
 for host related module: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_HS_SOME_MODULE;   
-for vm related module: class SomeModule, some\_module.cpp, some\_module.h, Option::OP_VM_SOME_MODULE.
+for vm related module: class VmSomeModule, vm\_some\_module.cpp, vm\_some\_module.h, Option::OP_VM_SOME_MODULE.
 
 #### input parameter type of sysinfo class public function
 
