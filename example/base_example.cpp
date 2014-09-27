@@ -15,7 +15,7 @@ int main()
     framework->init({
         //<<Optional Host Static Info>>
         { Option::OP_HS_NODE_CPU, { } }, //DONE
-        { Option::OP_HS_TOTAL_MEM_SIZE, { } },
+        { Option::OP_HS_TOTAL_MEM_SIZE, { } }, 
         { Option::OP_HS_NODE_SYS_DIST, { } }, //DONE
         { Option::OP_HS_NODE_TEST_DIST, //DONE
             { 
@@ -152,7 +152,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->hpthread_ids(node_id); //DONE
                 host->hpthread_ids(socket_id); //DONE
                 host->hpthread_ids(core_id); //DONE
-                //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
+                //OP_HS_TOTAL_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo //-
                 host->total_mem_size();
                 host->total_mem_size(node_id);
                 //OP_HS_NODE_SYS_DIST ((( OP_HS_NODE_CPU //Yu
@@ -163,13 +163,13 @@ void myscheduler(HOST *host, std::set<VM> &vms)
                 host->node_test_dist(node_id_0, node_id_1); //DONE
 
             //<<host dynamic info>>
-                //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo
+                //OP_HS_CPU_USAGE ((( OP_HS_NODE_CPU //Zuo //-
                 host->cpu_usage();
                 host->cpu_usage(node_id);
                 host->cpu_usage(socket_id);
                 host->cpu_usage(core_id);
                 host->cpu_usage(hpthread_id);
-                //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo
+                //OP_HS_USED_MEM_SIZE ((( OP_HS_NODE_CPU //Zuo //-
                 host->used_mem_size(); 
                 host->used_mem_size(node_id);
 
@@ -221,7 +221,7 @@ void myscheduler(HOST *host, std::set<VM> &vms)
         //OUTPUT: decide scheduling strategy
 
                 vm.set_vcpu_mig(vcpu_id/vmthread_id, hpthread_ids); //Yu //DONE
-                vm.set_mem_mig(node_ids); //Zuo
+                vm.set_mem_mig(node_ids); //Zuo //-
                 //vm.set_mem_mig(node_ids, addr_start, page_size); //Zuo //depend on OP_VM_MEM_SAMPLE
                 vm.set_mem_mig(vnode_id, node_id); //vNUMA //Zuo
     }
