@@ -21,6 +21,7 @@ set (SRC_LIST
     sysinfo/host/static/node_cpu.cpp
     sysinfo/host/static/node_sys_dist.cpp
     sysinfo/host/static/node_test_dist.cpp
+    sysinfo/host/static/node_size.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cpu_usage.cpp
@@ -70,6 +71,7 @@ add_indi_test (test_vsf_vm_cpu_usage)
 add_indi_test (test_vsf_vm_cache_miss)
 add_indi_test (test_vsf_node_cpu_node_dist)
 add_indi_test (test_compat)
+add_indi_test (test_node_size)
 
 # build examples -------------------------------
 add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})

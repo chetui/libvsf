@@ -73,13 +73,3 @@ int get_node_size_info(node_data_p nodes, size_t nodes_size) {
     return num_nodes;
 }
 
-int main()
-{
-    node_data nodes[4];
-    int n=get_node_size_info(nodes,4);
-    for(int i=0;i<n;i++)
-    {
-        cout<<"node["<<i<<"]:"<<nodes[i].MBs_total<<endl;
-    }
-    return 0;
-}
