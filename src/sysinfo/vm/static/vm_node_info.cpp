@@ -1,10 +1,7 @@
 
 #include<iostream>
 #include<sstream>
-#include<string>
-#include<vector>
-#include<atomic>
-#include<mutex>
+
 #include<cstring>
 using namespace std;
 
@@ -129,30 +126,13 @@ vm_vnode_return_structure get_vm_vnode_static_info_from_cmdline(string cmdline)
 	return ret;
 }
 
-class vm_node_info
-{
-	int vnode_num;
-	vector<vm_vnode_static_info> vnode_info;
-	atomic<bool> init;
-	mutex mtx;
-        uint32_t pid;
-	vm_node_info(uint32_t pid):vnode_num(-1),init(false),pid(pid){};
-public:
-	static vm_node_info * get_instance(uint32_t pid);
-	
-	int update();
-	int get_vnode_num();
-    vector<int> get_vnode_ids();
-    vector<int> get_vcpu_ids(int vnode_id,int vcpu_num);
-};
-
-	vm_node_info* vm_node_info::get_instance(uint32_t pid)
+	vmNodeInfo* vmNodeInfo::get_instance(uint32_t pid)
 	{
-		static vm_node_info instance(pid);
+		static vmNodeInfo instance(pid);
 		return &instance;
 	}
 	
-	int vm_node_info::update()
+	int vmNodeInfo::update()
 	{
 		string cmdline=read_cmd_line(pid);
 		*((vm_vnode_return_structure *) this)=get_vm_vnode_static_info_from_cmdline(cmdline);
@@ -160,14 +140,14 @@ public:
 		return 0;
 	}
 	
-	int vm_node_info::get_vnode_num()
+	int vmNodeInfo::get_vnode_num()
 	{
 		if(!init)
 			update();
 		return vnode_num;
 	}
 	
-	vector<int> vm_node_info::get_vnode_ids()
+	vector<int> vmNodeInfo::get_vnode_ids()
 	{
 		if(!init)
 			update();
@@ -177,7 +157,7 @@ public:
 		return ret;
 	}
 	
-	vector<int> vm_node_info::get_vcpu_ids(int vnode_id,int vcpu_num=0)
+	vector<int> vmNodeInfo::get_vcpu_ids(int vnode_id,int vcpu_num=0)
 	{
 		if(!init)
 			update();

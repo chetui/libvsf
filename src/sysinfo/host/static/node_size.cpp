@@ -6,7 +6,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "node_size.h"
+#include "include/host/static/node_size.h"
 using namespace std;
 
 int node_and_digits(const struct dirent *dptr) {
