@@ -12,7 +12,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -ggdb3 -DDEBUG")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set (CMAKE_CXX_FLAGS_LIST 
-        -Wall -Wextra -Wunused-variable -std=c++14 -pthread -pipe -D_GLIBCXX_USE_NANOSLEEP 
+        -Wall -Wextra -Wunused-variable -std=c++14 -pthread -pipe -lnuma -D_GLIBCXX_USE_NANOSLEEP 
     )
 string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_LIST}")
 
@@ -21,7 +21,7 @@ set (SRC_LIST
     sysinfo/host/static/node_cpu.cpp
     sysinfo/host/static/node_sys_dist.cpp
     sysinfo/host/static/node_test_dist.cpp
-    sysinfo/host/static/node_size.cpp
+    sysinfo/host/static/total_mem_size.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cpu_usage.cpp
@@ -57,6 +57,7 @@ endmacro ()
 add_indi_test (test_host_node_cpu)
 add_indi_test (test_host_node_sys_dist)
 add_indi_test (test_host_node_test_dist)
+add_indi_test (test_host_total_mem_size)
 add_indi_test (test_vm_vm_base)
 add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_vm_cpu_usage)
@@ -71,7 +72,6 @@ add_indi_test (test_vsf_vm_cpu_usage)
 add_indi_test (test_vsf_vm_cache_miss)
 add_indi_test (test_vsf_node_cpu_node_dist)
 add_indi_test (test_compat)
-add_indi_test (test_node_size)
 
 # build examples -------------------------------
 add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})

@@ -16,3 +16,4 @@ typedef struct node_data
     uint64_t MBs_free;
 } node_data_t, *node_data_p;
 
+int get_node_size_info(node_data_p nodes, size_t nodes_size);

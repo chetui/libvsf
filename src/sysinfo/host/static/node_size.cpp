@@ -6,7 +6,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "include/host/static/node_size.h"
+#include "sysinfo/host/static/node_size.h"
 using namespace std;
 
 int node_and_digits(const struct dirent *dptr) {
@@ -29,7 +29,7 @@ int get_node_size_info(node_data_p nodes, size_t nodes_size) {
     struct dirent **namelist;
     int num_files = scandir ("/sys/devices/system/node", &namelist, node_and_digits, NULL);
     int num_nodes = num_files;
-    if (num_nodes > nodes_size)
+    if (num_nodes > (int)nodes_size)
     {
         cerr<<"Space of nodes array is insufficient!"<<endl;
     }
@@ -45,7 +45,7 @@ int get_node_size_info(node_data_p nodes, size_t nodes_size) {
             if (p != NULL) {
                 p += 9;
             } else {
-                cerr<<"Could not get node MemTotal\n";
+                cerr<<"Could not get nonclude/sysinfo/host/static/node_size.hinclude/sysinfo/host/static/node_size.hde MemTotal\n";
                 return -1;
             }
             while (!isdigit(*p)) { p++; }
