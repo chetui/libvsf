@@ -8,17 +8,17 @@
 #include <numa.h>
 #include <mutex>
 #include <shared_mutex>
-#include "sysinfo/host/dynamic/phy_mem_free_space.h"
+#include "sysinfo/host/dynamic/hs_used_mem_size.h"
 
 using namespace std;
 
-phy_mem_free_space* phy_mem_free_space::get_instance()
+hsUsedMemSize* hsUsedMemSize::get_instance()
 {
-    static phy_mem_free_space instance;
+    static hsUsedMemSize instance;
     return &instance;
 }
 
-int phy_mem_free_space::get_numa_free_space_info()
+int hsUsedMemSize::get_numa_free_space_info()
 {
     unique_lock<shared_timed_mutex> lock(thread_mutex);
     int max_node=numa_max_node();
@@ -47,7 +47,7 @@ int phy_mem_free_space::get_numa_free_space_info()
     return 0;
 }
 
-void phy_mem_free_space::run()
+void hsUsedMemSize::run()
 {
     get_numa_free_space_info();
     thread_run=true;
@@ -58,12 +58,12 @@ void phy_mem_free_space::run()
     }
 }
 
-void phy_mem_free_space::reflesh()
+void hsUsedMemSize::reflesh()
 {
     get_numa_free_space_info();
 }
 
-long long phy_mem_free_space::get_used_mem_size()
+long long hsUsedMemSize::get_used_mem_size()
 {
     if(!thread_run)
         reflesh();
@@ -71,7 +71,7 @@ long long phy_mem_free_space::get_used_mem_size()
     return total_mem-total_free;
 }
 
-long long phy_mem_free_space::get_used_mem_size(int node_id)
+long long hsUsedMemSize::get_used_mem_size(int node_id)
 {
     shared_lock<shared_timed_mutex> lock(thread_mutex);
     unordered_map<int,mem_info>::iterator it=mem_infos.find(node_id);
@@ -80,13 +80,3 @@ long long phy_mem_free_space::get_used_mem_size(int node_id)
     return it->second.mem_total-it->second.mem_free;
 }
 
-
-
-int main()
-{
-    phy_mem_free_space *p=phy_mem_free_space::get_instance();
-    cout<<"memory:"<<p->get_used_mem_size()<<endl;
-    for(int i=0;i<p->node_num;i++)
-        cout<<"node"<<i<<" memory:"<<p->get_used_mem_size(i)<<endl;
-    return 0;
-}
