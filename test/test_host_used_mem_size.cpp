@@ -1,7 +1,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include "sysinfo/host/dymatic/hs_cpu_uasge.h"
+#include "sysinfo/host/dymatic/hs_used_mem_size.h"
 
 using namespace std;
 
