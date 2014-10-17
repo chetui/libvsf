@@ -1,5 +1,5 @@
 #ifndef __HS_CPU_USAGE_H__
-#define __HS_CPU_USAGE_H__ "Fuckyu my baby!"
+#define __HS_CPU_USAGE_H__ "Fuckyu_my_baby!"
 
 #include <unordered_map>
 #include <mutex>
@@ -22,13 +22,13 @@ class hsCpuUsage:public Runnable
     hsCpuUsage(int int_time_us=300000,int relax_time_us=1000000):cpu_num(0),\
     total_cpu_usage(-1),int_time_us(int_time_us),relax_time_us(relax_time_us){}
     int collect_cpu_usage();
-    void run();
-    void refresh();
 public:
     static hsCpuUsage *get_instance();
     double get_cpu_usage();
     double get_cpu_usage(int cpuid);
     int set_cpu_usage_collect_interval_us(int time_us);
     int set_sleep_interval_us(int time_us);
+    void run(); 
+    void refresh();
 };
 #endif

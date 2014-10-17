@@ -5,9 +5,9 @@
 
 using namespace std;
 
-class hsCpuUsage : pubqlica4lic ::testing::Test {
+class hsCpuUsageTest: public ::testing::Test {
 protected:
-    hsCpuUsage() {
+    hsCpuUsageTest() {
         hs_cpu_uasge = hsCpuUsage::get_instance();
     }
 
@@ -17,7 +17,7 @@ protected:
 
 
 
-TEST_F(hsCpuUsage, host_cpu_usage_function)
+TEST_F(hsCpuUsageTest, host_cpu_usage_function)
 {
     hs_cpu_uasge->run();
 	cout<<"total CPU usage:"<<hs_cpu_uasge->get_cpu_usage()<<endl;
