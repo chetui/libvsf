@@ -8,7 +8,7 @@
 #include <numa.h>
 #include <mutex>
 #include <shared_mutex>
-#include "sysinfo/host/dynamic/hs_used_mem_size.h"
+#include "sysinfo/host/dymatic/hs_used_mem_size.h"
 
 using namespace std;
 
@@ -51,7 +51,7 @@ void hsUsedMemSize::run()
 {
     get_numa_free_space_info();
     thread_run=true;
-    while(1)
+    while(!stop_)
     {
         get_numa_free_space_info();
         usleep(sleep_interval_us);

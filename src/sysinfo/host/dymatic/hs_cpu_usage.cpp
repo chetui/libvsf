@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
-#include "sysinfo/host/dynamic/hs_cpu_usage.h"
+#include "sysinfo/host/dymatic/hs_cpu_usage.h"
 
 using namespace std;
 
@@ -163,7 +163,7 @@ int hsCpuUsage::collect_cpu_usage()
 
 void hsCpuUsage::run()
 {
-    while(true)
+    while(!stop_)
     {
         collect_cpu_usage();
         usleep(relax_time_us);

@@ -9,7 +9,7 @@ void vmUsedMemSize::update()
 }
 void vmUsedMemSize::run()
 {
-	while(1)
+	while(!stop_)
 	{
 		update();
 		usleep(usleep_interval);

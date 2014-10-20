@@ -1,5 +1,5 @@
 #ifndef __HS_CPU_USAGE_H__
-#define __HS_CPU_USAGE_H__ "Fuckyu_my_baby!"
+#define __HS_CPU_USAGE_H__ 
 
 #include <unordered_map>
 #include <mutex>

@@ -22,6 +22,8 @@ set (SRC_LIST
     sysinfo/host/static/node_sys_dist.cpp
     sysinfo/host/static/node_test_dist.cpp
     sysinfo/host/static/total_mem_size.cpp
+    sysinfo/host/dymatic/hs_cpu_usage.cpp
+    sysinfo/host/dymatic/hs_used_mem_size.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cpu_usage.cpp
