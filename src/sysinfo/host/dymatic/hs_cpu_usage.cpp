@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
-#include "sysinfo/host/dynamic/phy_cpu_usage.h"
+#include "sysinfo/host/dymatic/hs_cpu_usage.h"
 
 using namespace std;
 
@@ -101,25 +101,25 @@ int get_phy_cpu(phy_cpu_info_ret_struct *cpu_time_info)
 }
 
 
-int phy_cpu_usage::set_cpu_usage_collect_interval_us(int time_us)
+int hsCpuUsage::set_cpu_usage_collect_interval_us(int time_us)
 {
     int_time_us=time_us;
     return 0;
 }
 
-int phy_cpu_usage::set_sleep_interval_us(int time_us)
+int hsCpuUsage::set_sleep_interval_us(int time_us)
 {
     relax_time_us=time_us;
     return 0;
 }
 
-phy_cpu_usage * phy_cpu_usage::get_instance()
+hsCpuUsage * hsCpuUsage::get_instance()
 {
-    static phy_cpu_usage instance;
+    static hsCpuUsage instance;
     return &instance;
 }
 
-int phy_cpu_usage::collect_cpu_usage()
+int hsCpuUsage::collect_cpu_usage()
 {
     phy_cpu_info_ret_struct ret1,ret2;
     int retval;
@@ -161,21 +161,21 @@ int phy_cpu_usage::collect_cpu_usage()
     return 0;
 }
 
-void phy_cpu_usage::run()
+void hsCpuUsage::run()
 {
-    while(true)
+    while(!stop_)
     {
         collect_cpu_usage();
         usleep(relax_time_us);
     }
 }
 
-void phy_cpu_usage::refresh()
+void hsCpuUsage::refresh()
 {
     collect_cpu_usage();
 }
 
-double phy_cpu_usage::get_cpu_usage(int cpuid)
+double hsCpuUsage::get_cpu_usage(int cpuid)
 {
     if(!init)
         refresh();
@@ -191,7 +191,7 @@ double phy_cpu_usage::get_cpu_usage(int cpuid)
     }
 }
 
-double phy_cpu_usage::get_cpu_usage()
+double hsCpuUsage::get_cpu_usage()
 {
     if(!init)
         refresh();

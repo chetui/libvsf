@@ -4,7 +4,7 @@
 #include<atomic>
 #include<mutex>
 #define MAX_NODE 1024
-class vm_used_mem_size
+class vmUsedMemSize
 {
 	int max_node;
 	int pid;
@@ -13,7 +13,7 @@ class vm_used_mem_size
 	atomic<bool> init; 
 	mutex mlock;
 public:
-	vm_used_mem_size(int pid,int usleep_interval=1000000):pid(pid),init(false),usleep_interval(usleep_interval){}
+	vmUsedMemSize(int pid,int usleep_interval=1000000):pid(pid),init(false),usleep_interval(usleep_interval){}
 	void run();
 	void update();
 	vector<uint64_t> get_used_mem_size();
