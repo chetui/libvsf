@@ -24,6 +24,7 @@ set (SRC_LIST
     sysinfo/host/static/total_mem_size.cpp
     sysinfo/host/dymatic/hs_cpu_usage.cpp
     sysinfo/host/dymatic/hs_used_mem_size.cpp
+    sysinfo/vm/static/vm_node_info.cpp
     sysinfo/vm/dynamic/vm_base.cpp
     sysinfo/vm/dynamic/vm_cpu_usage.cpp
     sysinfo/vm/dynamic/cpu_usage.cpp
@@ -67,6 +68,7 @@ add_indi_test (test_vm_vm_cpu_usage)
 add_indi_test (test_vm_cpu_usage)
 add_indi_test (test_vm_vm_cache_miss)
 add_indi_test (test_vm_cache_miss)
+add_indi_test (test_vm_node_info)
 add_indi_test (test_exec_cpu_mig)
 add_indi_test (test_func_option)
 add_indi_test (test_vsf_init_twice)

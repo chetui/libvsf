@@ -3,23 +3,8 @@
 #include<sstream>
 
 #include<cstring>
+#include"sysinfo/vm/static/vm_node_info.h"
 using namespace std;
-
-struct vm_vnode_static_info
-{
-	int vnode_id;
-	vector<int> cpus;
-	int mem_size_mb;
-	int static_bind;
-};
-
-struct vm_vnode_return_structure
-{
-	int vnode_size;
-	vector<vm_vnode_static_info> vnode_info;
-};
-
-const int BUF_SIZE=10240;
 
 string read_cmd_line(uint32_t pid)
 {
@@ -62,9 +47,9 @@ inline string extract_attr(string attr_str, string name)
 	int end=start;
 	if (start == -1)
 		return "";
-	for (; end < attr_str.size() && attr_str[end] != '='; end++)
+	for (; end < (int)attr_str.size() && attr_str[end] != '='; end++)
 		;
-	if (end != attr_str.size())
+	if (end != (int)attr_str.size())
 		for (; end>start&&attr_str[end] != ','; end--)
 			;
 		return string(attr_str.begin() + start, attr_str.begin() + end);
@@ -157,7 +142,7 @@ vm_vnode_return_structure get_vm_vnode_static_info_from_cmdline(string cmdline)
 		return ret;
 	}
 	
-	vector<int> vmNodeInfo::get_vcpu_ids(int vnode_id,int vcpu_num=0)
+	vector<int> vmNodeInfo::get_vcpu_ids(int vnode_id,int vcpu_num)
 	{
 		if(!init)
 			update();
