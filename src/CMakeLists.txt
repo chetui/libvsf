@@ -80,6 +80,8 @@ add_indi_test (test_compat)
 # build examples -------------------------------
 add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC_LIST})
 target_link_libraries (implemented_example proc)
+add_executable (vm_scheduling_monitor ${EXAMPLE_DIR}/vm_scheduling_monitor.cpp ${SRC_LIST})
+target_link_libraries (vm_scheduling_monitor proc)
 
 # build other dep exec ------------------------
 add_executable (microbench utils/microbench.c)
