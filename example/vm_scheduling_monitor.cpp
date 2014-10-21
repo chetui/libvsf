@@ -1,54 +1,40 @@
 #include <unistd.h>
 #include <iostream>
+#include <cstdio>
 #include <set>
 #include <string>
 #include <vector>
 #include "vsf.h"
 
-void myscheduler(Host *host, std::set<VM> &vms);
 Vsf* framework = Vsf::get_instance();
 
-int main()
+void print_dist(const std::vector<std::vector<int> >& dist)
 {
-    //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
-    //if others functions are called without set corresponding flags, info would be collected immediately.
-    framework->init({
-        { Option::OP_HS_NODE_CPU, { } },
-        { Option::OP_HS_NODE_SYS_DIST, { } },
-        { Option::OP_VM_BASE,
-            {
-                { OptionParam::VM_CMD, "qemu-system-x86_64" },
-                { OptionParam::LOOP_INTERVAL, 3000 }//,
-            }
-        },
-        { Option::OP_VM_CPU_USAGE,
-            {
-                { OptionParam::LOOP_INTERVAL, 3000 }//,
-            }
-        },
-    });
-
-    //refresh <<Optional Host Static Info>>
-    Host *host = framework->init_host();
-    
-    while(true) {
-
-        //refresh <<Optional VM Static Info>>
-        //and start threads of <<Optional VM Dynamic Info>>
-        std::set<VM> vms = framework->init_vms(host);
-
-        //your scheduler algorithm
-        myscheduler(host, vms);
-
-        framework->exec_mig();
-
-        sleep(3); 
+    for (const auto& col : dist)
+    {
+        for (const auto& row : col)
+            std::cout << row << " ";
+        std::cout << std::endl;
     }
-
-    return 0;
 }
 
-void print_dist(const std::vector<std::vector<int> >& dist);
+void get_vcpu_affinity(std::string vm_name)
+{
+    FILE *in;
+    char buf[10240];
+
+    std::string cmd = "./get_vcpu_affinity.py " + vm_name;
+    if (!(in = popen(cmd.c_str(), "r"))) {
+        exit(1);
+    }
+
+    while (fgets(buf, sizeof(buf), in) != NULL) {
+        std::cout << buf;
+    }
+    pclose(in);
+
+    return;
+}
 
 void myscheduler(Host *host, std::set<VM> &vms)
 {
@@ -194,19 +180,50 @@ void myscheduler(Host *host, std::set<VM> &vms)
             std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
         for (auto& pid : volatile_pid_set)
             std::cout << "cpu_usage[" << pid << "]:" << vm.cpu_usage(pid) << "[ON]" << vm.running_on_hpthread(pid) << std::endl;
+
+        get_vcpu_affinity(vm.name());
     }
 
     return;
 }
 
-void print_dist(const std::vector<std::vector<int> >& dist)
+int main()
 {
-    for (const auto& col : dist)
-    {
-        for (const auto& row : col)
-            std::cout << row << " ";
-        std::cout << std::endl;
+    //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
+    //if others functions are called without set corresponding flags, info would be collected immediately.
+    framework->init({
+        { Option::OP_HS_NODE_CPU, { } },
+        { Option::OP_HS_NODE_SYS_DIST, { } },
+        { Option::OP_VM_BASE,
+            {
+                { OptionParam::VM_CMD, "qemu-system-x86_64" },
+                { OptionParam::LOOP_INTERVAL, 3000 }//,
+            }
+        },
+        { Option::OP_VM_CPU_USAGE,
+            {
+                { OptionParam::LOOP_INTERVAL, 3000 }//,
+            }
+        },
+    });
+
+    //refresh <<Optional Host Static Info>>
+    Host *host = framework->init_host();
+    
+    while(true) {
+
+        //refresh <<Optional VM Static Info>>
+        //and start threads of <<Optional VM Dynamic Info>>
+        std::set<VM> vms = framework->init_vms(host);
+
+        //your scheduler algorithm
+        myscheduler(host, vms);
+
+        framework->exec_mig();
+
+        sleep(3); 
     }
 
+    return 0;
 }
 

@@ -14,6 +14,7 @@ echo "==================<<<Build2: Make>>>====================="
 echo ""
 make -j 17
 echo ""
+cp ../example/get_vcpu_affinity.py ./bin
 
 if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     echo "==================<<<UnitTest: GTest>>>=================="
