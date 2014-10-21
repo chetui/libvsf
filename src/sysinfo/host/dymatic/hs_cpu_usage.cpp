@@ -60,7 +60,7 @@ int get_phy_cpu(phy_cpu_info_ret_struct *cpu_time_info)
     if(strcmp(token,"cpu")!=0)
         return -1;
     
-    while(token=strtok(NULL," "))
+    while(token=strtok(NULL," "),token)
     {
         index++;
         time+=atoll(token);
@@ -83,7 +83,7 @@ int get_phy_cpu(phy_cpu_info_ret_struct *cpu_time_info)
         
         index=0;
         
-        while(token=strtok(NULL," "))
+        while(token=strtok(NULL," "),token)
         {
             index++;
             time+=atoll(token);
