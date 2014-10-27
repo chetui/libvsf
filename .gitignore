@@ -2,3 +2,4 @@
 2make
 *.swp
 .tmux.conf
+xydoc
