@@ -65,8 +65,8 @@ void hsUsedMemSize::reflesh()
 
 long long hsUsedMemSize::get_used_mem_size()
 {
-	if(!stop&&!thread_run)
-		usleep(sleep_interval_us);
+	if(!stop_&&!thread_run)
+		usleep(100);
 
     if(!thread_run)
         reflesh();
@@ -76,8 +76,8 @@ long long hsUsedMemSize::get_used_mem_size()
 
 long long hsUsedMemSize::get_used_mem_size(int node_id)
 {
-	if(!stop&&!thread_run)
-		usleep(sleep_interval_us);
+	if(!stop_&&!thread_run)
+		usleep(100);
 
     if(!thread_run)
         reflesh();
