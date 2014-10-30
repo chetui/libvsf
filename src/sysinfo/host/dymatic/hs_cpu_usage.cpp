@@ -177,6 +177,9 @@ void hsCpuUsage::refresh()
 
 double hsCpuUsage::get_cpu_usage(int cpuid)
 {
+	if(!stop&&!init)
+		usleep(relax_time_us);
+
     if(!init)
         refresh();
     
@@ -193,6 +196,9 @@ double hsCpuUsage::get_cpu_usage(int cpuid)
 
 double hsCpuUsage::get_cpu_usage()
 {
+	if(!stop&&!init)
+		usleep(relax_time_us);
+
     if(!init)
         refresh();
     

@@ -65,6 +65,9 @@ void hsUsedMemSize::reflesh()
 
 long long hsUsedMemSize::get_used_mem_size()
 {
+	if(!stop&&!thread_run)
+		usleep(sleep_interval_us);
+
     if(!thread_run)
         reflesh();
     shared_lock<shared_timed_mutex> lock(thread_mutex);
@@ -73,6 +76,12 @@ long long hsUsedMemSize::get_used_mem_size()
 
 long long hsUsedMemSize::get_used_mem_size(int node_id)
 {
+	if(!stop&&!thread_run)
+		usleep(sleep_interval_us);
+
+    if(!thread_run)
+        reflesh();
+		
     shared_lock<shared_timed_mutex> lock(thread_mutex);
     unordered_map<int,mem_info>::iterator it=mem_infos.find(node_id);
     if(it==mem_infos.end())
