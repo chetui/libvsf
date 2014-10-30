@@ -9,6 +9,7 @@ p = subprocess.Popen("virsh vcpuinfo %s | grep -E 'CPU Affinity:' | cut -d ':' -
     )
 output = "".join(p.stdout.readlines()).split("\n")
 line_num = 0
+content = ""
 for line in output:
     affinity_flag = line.strip()
     if affinity_flag == "":
@@ -19,8 +20,7 @@ for line in output:
         if f == 'y':
             affinity_num = "%s,%d" % (affinity_num, cnt)
         cnt = cnt + 1
-    print str(line_num) + " " + affinity_num[1:]
+
+    content = "%s,[%s]" % ( content, affinity_num[1:])
     line_num = line_num + 1
-
-
-
+sys.stdout.write("[" + content[1:] + "]")
