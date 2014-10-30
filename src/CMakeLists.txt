@@ -84,8 +84,8 @@ add_executable (implemented_example ${EXAMPLE_DIR}/implemented_example.cpp ${SRC
 target_link_libraries (implemented_example proc)
 add_executable (vm_scheduling_monitor ${EXAMPLE_DIR}/vm_scheduling_monitor.cpp ${SRC_LIST})
 target_link_libraries (vm_scheduling_monitor proc)
-add_executable (template_for_generate ${EXAMPLE_DIR}/template_for_generate.cpp ${SRC_LIST})
-target_link_libraries (template_for_generate proc)
+add_executable (web_user_generate ${EXAMPLE_DIR}/web_user_generate.cpp ${SRC_LIST})
+target_link_libraries (web_user_generate proc)
 add_executable (naive_scheduler ${EXAMPLE_DIR}/naive_scheduler.cpp ${SRC_LIST}) 
 target_link_libraries (naive_scheduler proc)
 
