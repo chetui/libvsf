@@ -44,7 +44,7 @@ void print_mig_res(std::set<VM> &vms)
         std::string cmd = "virsh vcpuinfo " + vm.name() + "| grep 'Affinity'";
         FILE* data = popen(cmd.c_str(), "r");
         while (fgets(buf, sizeof(buf), data)) {
-            std::cout << "vm_id: " << vm.vm_id() << buf;
+            std::cout << "vm_id: " << vm.vm_id() << " " << buf;
         }
         pclose(data);
     }

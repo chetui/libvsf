@@ -14,7 +14,6 @@ echo "==================<<<Build2: Make>>>====================="
 echo ""
 make -j 17
 echo ""
-# copy scripts
 cp ../example/get_vcpu_affinity.py ./bin
 cp ../example/init_scheduling_result.py ./bin
 cp ../example/get_scheduling_result.py ./bin

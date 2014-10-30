@@ -1,41 +1,63 @@
-#include <unistd.h>
-#include <iostream>
-#include <set>
-#include <string>
-#include <vector>
 #include "vsf.h"
 
-void myscheduler(Host *host, std::set<VM> &vms);
-Vsf* framework = Vsf::get_instance();
-void print_and_clean_mig(Host *host, std::set<VM> &vms);
-void vm_base_print_callback( const VmId& vm_id, const std::string& name, const std::string& uuid, const int vsocket_num, const int vcore_num, const int vhpthread_num, const int total_mem_size, const std::set<pid_t>& vcpu_ids, const std::set<pid_t>& stable_vmthread_ids);
-void vm_cpu_usage_print_callback(pid_t pid, pid_t tid, int cpu_usage);
-void vm_cache_miss_print_callback(const CacheMissData& data);
+#include <iostream>
+#include <map>
+Vsf* vsf = Vsf::get_instance();
 void myscheduler(Host *host, std::set<VM> &vms)
 {
-    // fill your scheduling algorithm here
-    // you can bound some vcpus to hyperthread or set its affinity
+std::cout << "--------Naive Scheduler--------" << std::endl;
+std::multimap<int, const VM*> sorted_vms;
+for (auto& vm : vms) {
+sorted_vms.emplace(vm.cpu_usage(), &vm);
 }
-   
+std::set<NodeId> node_ids = host->node_ids();
+auto node_id = node_ids.begin();
+for (auto& sorted_vm : sorted_vms) {
+std::cout << "vm_id: " << sorted_vm.second->vm_id();
+std::cout << " cpu_usage: " << sorted_vm.second->cpu_usage();
+if (node_id == node_ids.end()) {
+node_id = node_ids.begin();
+}
+std::cout << " node_id: " << *node_id << std::endl;
+//bind the vm to a node
+for (auto& vm_thread_id : sorted_vm.second->stable_vmthread_ids()) {
+sorted_vm.second->set_vcpu_mig(vm_thread_id, host->hpthread_ids(*node_id));
+}
+++node_id;
+}
+return;
+} 
 int main()
 {
     //set some flags ahead of time to refresh optional functions info when init_host(), init_vms(), update_info();
     //if others functions are called without set corresponding flags, info would be collected immediately.
-    framework->init({
+    vsf->init({
+
+{ Option::OP_HS_NODE_CPU, { } },
+{ Option::OP_HS_CPU_USAGE, { } },
+{ Option::OP_VM_BASE, {
+	{ OptionParam::VM_CMD, "qemu-system-x86_64"},
+	{ OptionParam::LOOP_INTERVAL,3000}
+}}
+,
+{ Option::OP_VM_CPU_USAGE, {
+	{ OptionParam::LOOP_INTERVAL,3000}
+}}
 
 });
-Host *host = framework->init_host();
+    //refresh <<Optional Host Static Info>>
+    Host *host = vsf->init_host();
     
-    while(1) {
+    while(true) {
 
         //refresh <<Optional VM Static Info>>
         //and start threads of <<Optional VM Dynamic Info>>
-        std::set<VM> vms = framework->init_vms(host);
+        std::set<VM> vms = vsf->init_vms(host);
 
         //your scheduler algorithm
         myscheduler(host, vms);
 
-        framework->exec_mig(); //only host parameter may be OK?
+        vsf->exec_mig(); //only host parameter may be OK?
 
         sleep(1); 
     }
