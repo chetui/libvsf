@@ -67,7 +67,7 @@ private:
     std::map<VmId, std::set<pid_t> > stable_vmthread_ids_;
     std::atomic<bool> has_data_;
     std::shared_timed_mutex data_mutex_;
-    char *buf_;
+    std::unique_ptr<char[]> buf_;
 
     std::string vm_cmd_;
     std::atomic<int> interval_ms_;

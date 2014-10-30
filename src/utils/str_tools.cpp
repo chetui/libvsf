@@ -1,9 +1,6 @@
+#include <iostream>
 #include "utils/str_tools.h"
 #include "framework/exception.h"
-
-namespace str_tools {
-std::string dir_prefix_;
-}
 
 std::string str_tools::strip(const std::string& ret)
 {
@@ -52,7 +49,32 @@ void str_tools::split(std::string& s, char delim, std::vector<std::string>& ret)
 int str_tools::prefix_and_digits(const struct dirent *dptr)
 {
     auto *p = (char *)(dptr->d_name);
-    for (auto& c : dir_prefix_) {
+    do {
+        if (!std::isdigit(*p++))
+            return 0;
+    } while (*p != '\0');
+    return 1;
+}
+
+int str_tools::prefix_and_digits_node(const struct dirent *dptr)
+{
+    auto *p = (char *)(dptr->d_name);
+    std::string dir_prefix = "node";
+    for (auto& c : dir_prefix) {
+        if (*p++ != c) return 0;
+    }
+    do {
+        if (!std::isdigit(*p++))
+            return 0;
+    } while (*p != '\0');
+    return 1;
+}
+
+int str_tools::prefix_and_digits_vcpu(const struct dirent *dptr)
+{
+    auto *p = (char *)(dptr->d_name);
+    std::string dir_prefix = "vcpu";
+    for (auto& c : dir_prefix) {
         if (*p++ != c) return 0;
     }
     do {
@@ -64,9 +86,17 @@ int str_tools::prefix_and_digits(const struct dirent *dptr)
 
 void str_tools::get_dirs(std::string dir, std::string dir_prefix, std::vector<std::string>* node_dirs)
 {
-    dir_prefix_ = dir_prefix;
     struct dirent **namelist;
-    int num_nodes = scandir(dir.c_str(), &namelist, prefix_and_digits, nullptr);
+    int num_nodes;
+    if (dir_prefix == "") {
+        num_nodes = scandir(dir.c_str(), &namelist, prefix_and_digits, nullptr);
+    } else if (dir_prefix == "node") {
+        num_nodes = scandir(dir.c_str(), &namelist, prefix_and_digits_node, nullptr);
+    } else if (dir_prefix == "vcpu") {
+        num_nodes = scandir(dir.c_str(), &namelist, prefix_and_digits_vcpu, nullptr);
+    } else {
+        THROW(ScandirFailed, "Undefine dir prefix: " + dir_prefix);
+    }
     if (num_nodes < 0) {
         THROW(ScandirFailed, "To scan directory: " + dir);
     } else {

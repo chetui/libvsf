@@ -175,7 +175,7 @@ int main()
     myscheduler(host, vms);
 
     framework->exec_mig();
-        
+
     return 0;
 }
 

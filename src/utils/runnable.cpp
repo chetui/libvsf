@@ -19,7 +19,6 @@ Runnable::~Runnable()
             LOG(LogLevel::warn) << "Thread stop exception " << e.what() << endl;
         }
     }*/     
-    delete thread_;
 }
 
 void Runnable::join()
@@ -40,11 +39,10 @@ void Runnable::start()
         return;
     }
     if (thread_ != nullptr) {
-        delete thread_;
         thread_ = nullptr;
     }
     stop_ = false;
-    thread_ = new thread(&Runnable::run, this);
+    thread_ = std::move(std::unique_ptr<std::thread>(new thread(&Runnable::run, this)));
 }
 
 void Runnable::stop()
