@@ -4,6 +4,7 @@
 #include <syslog.h>
 #include <string>
 #include <sstream>
+#include <memory>
 
 #define LOG(x) LogStream(x)
 #define LDEBUG LogStream(LogLevel::debug, PutsFunc::puts_debug_without_syslog)
@@ -50,8 +51,8 @@ private:
     void puts_exception(LogLevel priority, const std::string& msg);
     void puts_debug_without_syslog(LogLevel priority, const std::string& msg);
 
-    char* str_buf_;
-    void** trace_buf_;
+    std::unique_ptr<char[]> str_buf_;
+    std::unique_ptr<void*[]> trace_buf_;
     static constexpr int option_ = LOG_PERROR;
     static constexpr int facility_ = LOG_DAEMON;
     static constexpr const int STR_BUF_SIZE = 10240;

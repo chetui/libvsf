@@ -6,18 +6,16 @@
 #include <iostream>
 #include "framework/version.h"
 
-Log::Log()
+Log::Log(): 
+    str_buf_(new char[STR_BUF_SIZE]),
+    trace_buf_(new void*[TRACE_BUF_SIZE])
 {
     openlog(indent().c_str(), option_, facility_);
-    str_buf_ = new char[STR_BUF_SIZE];
-    trace_buf_ = new void*[TRACE_BUF_SIZE];
 } 
 
 Log::~Log()
 {
     closelog();
-    delete[] str_buf_;
-    delete[] trace_buf_;
 }
 
 const std::string& Log::indent()
@@ -43,11 +41,11 @@ void Log::puts_exception(LogLevel priority, const std::string& msg)
 
     std::ostringstream out_str;
     out_str << "\n" << msg << "\n";
-    out_str << RED << "[Errno Info]\n " << NC << strerror_r(errno, str_buf_, sizeof(char) * STR_BUF_SIZE) << "\n";
+    out_str << RED << "[Errno Info]\n " << NC << strerror_r(errno, str_buf_.get(), sizeof(char) * STR_BUF_SIZE) << "\n";
 
     size_t size;
-    size = backtrace(trace_buf_, TRACE_BUF_SIZE);
-    char **traces = backtrace_symbols(trace_buf_, size);
+    size = backtrace(trace_buf_.get(), TRACE_BUF_SIZE);
+    char **traces = backtrace_symbols(trace_buf_.get(), size);
     out_str << RED << "[Funtion Call Trace]\n " << NC << "return " << size << " addresses:" << "\n";
     for (size_t i = 0; i < size; ++i)
         out_str << traces[i] << "\n";

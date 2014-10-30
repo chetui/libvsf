@@ -15,9 +15,12 @@ using namespace std;
 constexpr const int VmBase::DEFAULT_INTERVAL_MS;
 constexpr const char * VmBase::DEFAULT_VM_CMD;
 
-VmBase::VmBase(): has_data_(false), interval_ms_(DEFAULT_INTERVAL_MS), callback_func_(new vm_base_callback_t)
+VmBase::VmBase(): 
+    has_data_(false), 
+    buf_(new char[BUF_SIZE]), 
+    interval_ms_(DEFAULT_INTERVAL_MS),
+    callback_func_(new vm_base_callback_t) 
 {
-    buf_ = new char[BUF_SIZE];
     *callback_func_ = nullptr;
     vm_cmd_ = DEFAULT_VM_CMD;
 }
@@ -25,7 +28,6 @@ VmBase::VmBase(): has_data_(false), interval_ms_(DEFAULT_INTERVAL_MS), callback_
 VmBase::~VmBase()
 {
     stop();
-    delete[] buf_;
 }
 
 VmBase *VmBase::get_instance()
@@ -227,10 +229,10 @@ void VmBase::refresh_most()
     string start_timestamp;
     vector<string> args;
     string tmp_str;
-    while(fgets(buf_, BUF_SIZE, data))
+    while(fgets(buf_.get(), BUF_SIZE, data))
     {
         args.clear();
-        istringstream is(buf_);
+        istringstream is(buf_.get());
         is >> start_timestamp;
 
         long long days = 0;

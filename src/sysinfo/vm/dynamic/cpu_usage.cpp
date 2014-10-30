@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <memory>
 #include "utils/log.h"
 #include "framework/exception.h"
 
@@ -241,7 +242,7 @@ void CpuUsage::refresh_watching()
 
 void CpuUsage::refresh_thread()
 {
-    pid_t* pids = new pid_t[process_cpu_usage_data_.size() + 1];
+    std::unique_ptr<pid_t[]> pids(new pid_t[process_cpu_usage_data_.size() + 1]);
     int idx = 0;
     for (auto& data : process_cpu_usage_data_) {
         pids[idx] = data.first;
@@ -249,7 +250,7 @@ void CpuUsage::refresh_thread()
     }
     pids[idx] = 0;
 
-    PROCTAB* proctab = openproc(READ_PROC_FLAG, pids); 
+    PROCTAB* proctab = openproc(READ_PROC_FLAG, pids.get()); 
     if (proctab == nullptr)
     {
         string pids_str;
@@ -293,7 +294,6 @@ void CpuUsage::refresh_thread()
     }
 
     closeproc(proctab);
-    delete[] pids;
 }
 
 void CpuUsage::run()

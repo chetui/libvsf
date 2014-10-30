@@ -1,6 +1,7 @@
 #ifndef _RUNNABLE_H_
 #define _RUNNABLE_H_
 
+#include <memory>
 #include <atomic>
 #include <thread>
 
@@ -41,7 +42,7 @@ private:
      * using a pointer to prevent the inconsistency 
      * when a runnable is distructing
      */
-    std::thread* thread_;
+    std::unique_ptr<std::thread> thread_;
 };
 
 #endif  // _UTILS_RUNNABLE_H_
