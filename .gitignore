@@ -1,6 +1,8 @@
 /build
 2make
 *.swp
+*.pyc
+*.py~
 .tmux.conf
 .ycm_extra_conf.*
 xydoc
