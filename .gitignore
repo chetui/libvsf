@@ -2,4 +2,5 @@
 2make
 *.swp
 .tmux.conf
+.ycm_extra_conf.*
 xydoc
