@@ -45,12 +45,6 @@ if __name__ == '__main__':
                 operations.append({"operation": "move",
                                    "vcpu": name + ":" + str(vcpu['vcpuid']),
                                    "hpthread": "hpthread" + str(on)})
-                # operations.append({"operation": "delete_link",
-                #                    "source": "hpthread" + str(old_on),
-                #                    "target": name + ":" + str(vcpu['vcpuid'])})
-                # operations.append({"operation": "add_link",
-                #                    "source": name + ":" + str(vcpu['vcpuid']),
-                #                    "target": "hpthread" + str(on)})
     
     print json.dumps(operations)
 

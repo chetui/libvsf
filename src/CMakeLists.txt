@@ -88,6 +88,8 @@ add_executable (web_user_generate ${EXAMPLE_DIR}/web_user_generate.cpp ${SRC_LIS
 target_link_libraries (web_user_generate proc)
 add_executable (naive_scheduler ${EXAMPLE_DIR}/naive_scheduler.cpp ${SRC_LIST}) 
 target_link_libraries (naive_scheduler proc)
+add_executable (web_monitor ${EXAMPLE_DIR}/web_monitor.cpp ${SRC_LIST}) 
+target_link_libraries (web_monitor proc)
 
 # build other dep exec ------------------------
 add_executable (microbench utils/microbench.c)
