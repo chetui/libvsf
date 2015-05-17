@@ -1,6 +1,10 @@
 set (CMAKE_CPP_COMPILER g++)
+# set output dir
+set (OUTPUT_DIR /build/)
 # set output path as build/bin
-set (EXECUTABLE_OUTPUT_PATH ../bin)
+set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${OUTPUT_DIR}/bin)
+# set output path as build/bin
+set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${OUTPUT_DIR}/libvsf)
 # test dir
 set (TEST_DIR ../test)
 # example dir
@@ -95,4 +99,5 @@ target_link_libraries (web_monitor proc)
 add_executable (microbench utils/microbench.c)
 target_link_libraries (microbench pthread)
 
-ADD_LIBRARY(vsf STATIC ${SRC_LIST})
+# build static library: libvsf.a --------------
+add_library(vsf STATIC ${SRC_LIST})

@@ -3,8 +3,10 @@
 set -o nounset    
 set -o errexit
 
-rm -rf ./build/*
-cd ./build
+OUTPUT_DIR=./build/
+
+rm -rf ${OUTPUT_DIR}/*
+cd ${OUTPUT_DIR}
 echo ""
 echo "==================<<<Build1: CMake>>>===================="
 echo ""
@@ -17,6 +19,9 @@ echo ""
 cp ../example/get_vcpu_affinity.py ./bin
 cp ../example/init_scheduling_result.py ./bin
 cp ../example/get_scheduling_result.py ./bin
+cp -r ../include ./libvsf
+mkdir ./libvsf/bin
+cp ./bin/microbench ./libvsf/bin
 
 if  [ "$#" == "1" ] && [ "$1" == "test" ]; then
     echo "==================<<<UnitTest: GTest>>>=================="
