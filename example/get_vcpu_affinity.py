@@ -2,11 +2,15 @@
 
 import os, sys, subprocess
 
-p = subprocess.Popen("virsh vcpuinfo %s | grep -E 'CPU Affinity:' | cut -d ':' -f 2" % (sys.argv[1]),
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE,
-        shell = True
-    )
+try:
+    p = subprocess.Popen("virsh vcpuinfo %s | grep -E 'CPU Affinity:' | cut -d ':' -f 2" % (sys.argv[1]),
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            shell = True
+        )
+except:
+    sys.stdout.write("[]")
+
 output = "".join(p.stdout.readlines()).split("\n")
 line_num = 0
 content = ""

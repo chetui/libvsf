@@ -95,3 +95,4 @@ target_link_libraries (web_monitor proc)
 add_executable (microbench utils/microbench.c)
 target_link_libraries (microbench pthread)
 
+ADD_LIBRARY(vsf STATIC ${SRC_LIST})
