@@ -19,7 +19,7 @@ Then copy the directory ./build/libvsf to your source directory.
 Assume you have a program named my_program using libvsf.
 
 ```
-$ g++ my_program.cpp -o my_program -I./libvsf/include -L./libvsf -lpthread -lproc -lvsf -std=c++14`
+$ g++ my_program.cpp -o my_program -I./libvsf/include -L./libvsf -lpthread -lproc -lvsf -std=c++14
 ```
 
 #### Examples
