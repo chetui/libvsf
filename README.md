@@ -11,18 +11,22 @@ a library for Virtual Machine Scheduling Framework.
 
 #### How to build & install
 
-`./make`
+```
+$ ./make
+```
 
-Then copy the directory ./build/libvsf to your source directory.
+Then copy the directory ./build/libvsf to your source directory.  
 Assume you have a program named my_program using libvsf.
 
-`g++ my_program.cpp -o my_program -I./libvsf/include -L./libvsf -lpthread -lproc -lvsf -std=c++14`
+```
+$ g++ my_program.cpp -o my_program -I./libvsf/include -L./libvsf -lpthread -lproc -lvsf -std=c++14`
+```
 
 #### Examples
 
-[Implemented Example](https://github.com/chetui/libvsf/blob/master/example/implemented_example.cpp)
+* [Implemented Example](https://github.com/chetui/libvsf/blob/master/example/implemented_example.cpp)
 
-There is another example [Base Example](https://github.com/chetui/libvsf/blob/master/example/base_example.cpp), which contains all the new features we are working on but not available yet.
+* There is another example [Base Example](https://github.com/chetui/libvsf/blob/master/example/base_example.cpp), which contains all the new features we are working on but not available yet.
 
 #### Dev Guide 
 
